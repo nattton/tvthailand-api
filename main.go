@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	"github.com/code-mobi/tvthailand-api/api2"
 	_ "github.com/go-sql-driver/mysql"
 	"html/template"
@@ -11,6 +12,9 @@ import (
 )
 
 func main() {
+	port := flag.String("port", "9000", "PORT")
+	flag.Parse()
+
 	db, err := sql.Open("mysql", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatal(err)
@@ -20,8 +24,7 @@ func main() {
 	http.Handle("/static/", http.FileServer(http.Dir("./")))
 	http.Handle("/api2/", &api2.Api2Handler{Db: db})
 	http.HandleFunc("/", HomeHandler)
-
-	if err := http.ListenAndServe(":9000", nil); err != nil {
+	if err := http.ListenAndServe(":"+*port, nil); err != nil {
 		panic(err)
 	}
 }
