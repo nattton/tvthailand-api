@@ -23,9 +23,9 @@ type Show struct {
 type ShowInfo struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`
+	Description string `json:"description"`
 	Thumbnail   string `json:"thumbnail"`
 	Poster      string `json:"poster"`
-	Description string `json:"description"`
 	Detail      string `json:"detail"`
 	LastEpname  string `json:"last_epname"`
 	ViewCount   int    `json:"view_count"`
@@ -55,14 +55,16 @@ func (h *Api2Handler) GetShowByCategoryID(id string, start int, limit int) []*Sh
 
 	defer rows.Close()
 	for rows.Next() {
-		var id string
-		var title string
-		var description string
-		var thumbnail string
-		var rating string
-		var is_otv string
-		var otv_id string
-		var otv_api_name string
+		var (
+			id           string
+			title        string
+			description  string
+			thumbnail    string
+			rating       string
+			is_otv       string
+			otv_id       string
+			otv_api_name string
+		)
 		if err := rows.Scan(&id, &title, &description, &thumbnail, &rating, &is_otv, &otv_id, &otv_api_name); err != nil {
 			log.Fatal(err)
 		}
@@ -84,14 +86,16 @@ func (h *Api2Handler) GetShowByChannelID(id string, start int, limit int) []*Sho
 
 	defer rows.Close()
 	for rows.Next() {
-		var id string
-		var title string
-		var description string
-		var thumbnail string
-		var rating string
-		var is_otv string
-		var otv_id string
-		var otv_api_name string
+		var (
+			id           string
+			title        string
+			description  string
+			thumbnail    string
+			rating       string
+			is_otv       string
+			otv_id       string
+			otv_api_name string
+		)
 		if err := rows.Scan(&id, &title, &description, &thumbnail, &rating, &is_otv, &otv_id, &otv_api_name); err != nil {
 			log.Fatal(err)
 		}
@@ -102,4 +106,30 @@ func (h *Api2Handler) GetShowByChannelID(id string, start int, limit int) []*Sho
 		log.Fatal(err)
 	}
 	return shows
+}
+
+func (h *Api2Handler) GetShowInfo(showId string) ShowInfo {
+	var (
+		id          string
+		title       string
+		description string
+		thumbnail   string
+		poster      string
+		detail      string
+		lastEpname  string
+		viewCount   int
+		rating      string
+		voteCount   int
+		isOtv       string
+		otvId       string
+		otvApiName  string
+	)
+	err := h.Db.QueryRow("SELECT program_id id, program_title title, program_thumbnail thumbnail, poster, program_time description, program_detail detail, last_epname, view_count, rating, 5000 as vote_count, is_otv, otv_id, otv_api_name FROM tv_program WHERE program_id = ?", showId).Scan(&id, &title, &description, &thumbnail, &poster, &detail, &lastEpname, &viewCount, &rating, &voteCount, &isOtv, &otvId, &otvApiName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	showInfo := ShowInfo{id, title, description, thumbnail, poster, detail, lastEpname, viewCount, rating, voteCount, isOtv, otvId, otvApiName}
+
+	return showInfo
 }

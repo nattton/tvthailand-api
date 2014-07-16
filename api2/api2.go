@@ -45,7 +45,6 @@ func (h *Api2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				if len_path > 3 {
 					start, _ = strconv.Atoi(paths[3])
 				}
-
 				h.GetShowByCategoryID_ServeHTTP(w, r, paths[2], start)
 			}
 
@@ -58,13 +57,28 @@ func (h *Api2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				if len_path > 3 {
 					start, _ = strconv.Atoi(paths[3])
 				}
-
-				h.GetShowByChannelID_ServeHTTP(w, r, paths[2], start)
+				id := paths[2]
+				h.GetShowByChannelID_ServeHTTP(w, r, id, start)
 			}
 			return
 
 		case "radio":
 			h.GetRadios_ServeHTTP(w, r)
+			return
+		case "whatsnew":
+			start := 0
+			if len_path > 2 {
+				start, _ = strconv.Atoi(paths[2])
+			}
+			h.GetShowByCategoryID_ServeHTTP(w, r, "recents", start)
+			return
+		case "episode":
+			start := 0
+			if len_path > 3 {
+				start, _ = strconv.Atoi(paths[3])
+			}
+			id := paths[2]
+			h.GetEpisode_ServeHTTP(w, r, id, start)
 			return
 		}
 	}
@@ -126,6 +140,20 @@ func (h *Api2Handler) GetShowByChannelID_ServeHTTP(w http.ResponseWriter, r *htt
 	shows := h.GetShowByChannelID(id, start, limit)
 	res := &Shows{shows}
 
+	resJ, _ := json.Marshal(res)
+	fmt.Fprintf(w, string(resJ))
+}
+
+func (h *Api2Handler) GetEpisode_ServeHTTP(w http.ResponseWriter, r *http.Request, id string, start int) {
+	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		limit = 20
+	}
+
+	showInfo := h.GetShowInfo(id)
+	episodes := h.GetEpisode(id, start, limit)
+	res := &Episodes{200, showInfo, episodes}
+	res.Info = showInfo
 	resJ, _ := json.Marshal(res)
 	fmt.Fprintf(w, string(resJ))
 }
