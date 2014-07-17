@@ -37,7 +37,7 @@ func (h *Api2Handler) GetAllChannel() []*Channel {
 		if err := rows.Scan(&id, &title, &description, &thumbnail, &url, &has_show); err != nil {
 			log.Fatal(err)
 		}
-		ch := &Channel{id, title, description, thumbnailUrlCat + thumbnail, url, has_show}
+		ch := &Channel{id, title, description, thumbnailUrlCh + thumbnail, url, has_show}
 		channels = append(channels, ch)
 	}
 	if err := rows.Err(); err != nil {

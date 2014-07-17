@@ -129,7 +129,7 @@ func (h *Api2Handler) GetShowInfo(showId string) ShowInfo {
 		log.Fatal(err)
 	}
 
-	showInfo := ShowInfo{id, title, description, thumbnail, poster, detail, lastEpname, viewCount, rating, voteCount, isOtv, otvId, otvApiName}
+	showInfo := ShowInfo{id, title, description, thumbnailUrlTv + thumbnail, poster, detail, lastEpname, viewCount, rating, voteCount, isOtv, otvId, otvApiName}
 
 	return showInfo
 }
