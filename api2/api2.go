@@ -3,12 +3,11 @@ package api2
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 const thumbnailUrlCat = "http://thumbnail.instardara.com/category/"
@@ -90,32 +89,39 @@ func (h *Api2Handler) GetSection_ServeHTTP(w http.ResponseWriter, r *http.Reques
 	categories := h.GetAllCategory()
 	channels := h.GetAllChannel()
 	radios := h.GetAllRadio()
-	res := &Section{categories, channels, radios}
-	resJ, _ := json.Marshal(res)
-	fmt.Fprintf(w, string(resJ))
+	result := &Section{categories, channels, radios}
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		log.Println(err)
+		http.Error(w, "Oops!!!", http.StatusInternalServerError)
+	}
 }
 
 func (h *Api2Handler) GetCategories_ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	categories := h.GetAllCategory()
-	res := &Categories{categories}
-	resJ, _ := json.Marshal(res)
-	fmt.Fprintf(w, string(resJ))
+	result := &Categories{categories}
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		log.Println(err)
+		http.Error(w, "Oops!!!", http.StatusInternalServerError)
+	}
 }
 
 func (h *Api2Handler) GetChannels_ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	channels := h.GetAllChannel()
-	res := &Channels{channels}
-
-	resJ, _ := json.Marshal(res)
-	fmt.Fprintf(w, string(resJ))
+	result := &Channels{channels}
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		log.Println(err)
+		http.Error(w, "Oops!!!", http.StatusInternalServerError)
+	}
 }
 
 func (h *Api2Handler) GetRadios_ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	radios := h.GetAllRadio()
-	res := &Radios{radios}
+	result := &Radios{radios}
 
-	resJ, _ := json.Marshal(res)
-	fmt.Fprintf(w, string(resJ))
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		log.Println(err)
+		http.Error(w, "Oops!!!", http.StatusInternalServerError)
+	}
 }
 
 func (h *Api2Handler) GetShowByCategoryID_ServeHTTP(w http.ResponseWriter, r *http.Request, id string, start int) {
@@ -125,10 +131,12 @@ func (h *Api2Handler) GetShowByCategoryID_ServeHTTP(w http.ResponseWriter, r *ht
 	}
 
 	shows := h.GetShowByCategoryID(id, start, limit)
-	res := &Shows{shows}
+	result := &Shows{shows}
 
-	resJ, _ := json.Marshal(res)
-	fmt.Fprintf(w, string(resJ))
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		log.Println(err)
+		http.Error(w, "Oops!!!", http.StatusInternalServerError)
+	}
 }
 
 func (h *Api2Handler) GetShowByChannelID_ServeHTTP(w http.ResponseWriter, r *http.Request, id string, start int) {
@@ -138,10 +146,12 @@ func (h *Api2Handler) GetShowByChannelID_ServeHTTP(w http.ResponseWriter, r *htt
 	}
 
 	shows := h.GetShowByChannelID(id, start, limit)
-	res := &Shows{shows}
+	result := &Shows{shows}
 
-	resJ, _ := json.Marshal(res)
-	fmt.Fprintf(w, string(resJ))
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		log.Println(err)
+		http.Error(w, "Oops!!!", http.StatusInternalServerError)
+	}
 }
 
 func (h *Api2Handler) GetEpisode_ServeHTTP(w http.ResponseWriter, r *http.Request, id string, start int) {
@@ -152,8 +162,9 @@ func (h *Api2Handler) GetEpisode_ServeHTTP(w http.ResponseWriter, r *http.Reques
 
 	showInfo := h.GetShowInfo(id)
 	episodes := h.GetEpisode(id, start, limit)
-	res := &Episodes{200, showInfo, episodes}
-	res.Info = showInfo
-	resJ, _ := json.Marshal(res)
-	fmt.Fprintf(w, string(resJ))
+	result := &Episodes{200, showInfo, episodes}
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		log.Println(err)
+		http.Error(w, "Oops!!!", http.StatusInternalServerError)
+	}
 }
