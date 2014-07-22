@@ -4,16 +4,20 @@ import (
 	"log"
 )
 
+type Advertises struct {
+	Advertises []*Advertise `json:"ads"`
+}
+
 type Advertise struct {
-	ID          string `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Thumbnail   string `json:"thumbnail"`
+	Name     string `json:"name"`
+	URL      string `json:"utl"`
+	Time     int    `json:"time"`
+	Interval int    `json:"interval"`
 }
 
 func (h *Api2Handler) GetAdvertise() []*Advertise {
 	var advertises []*Advertise
-	rows, err := h.Db.Query("SELECT id, title, description, thumbnail FROM tv_category ORDER BY `order`")
+	rows, err := h.Db.Query("SELECT name, url, time FROM tv_advertise WHERE platform = ?", h.Device)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -21,15 +25,14 @@ func (h *Api2Handler) GetAdvertise() []*Advertise {
 	defer rows.Close()
 	for rows.Next() {
 		var (
-			id          string
-			title       string
-			description string
-			thumbnail   string
+			name string
+			url  string
+			time int
 		)
-		if err := rows.Scan(&id, &title, &description, &thumbnail); err != nil {
+		if err := rows.Scan(&name, &url, &time); err != nil {
 			log.Fatal(err)
 		}
-		advertise := &Advertise{id, title, description, thumbnailUrlCat + thumbnail}
+		advertise := &Advertise{name, url, time, 10000}
 		advertises = append(advertises, advertise)
 	}
 	if err := rows.Err(); err != nil {
