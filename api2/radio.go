@@ -1,6 +1,7 @@
 package api2
 
 import (
+	"database/sql"
 	"log"
 )
 
@@ -17,9 +18,9 @@ type Radio struct {
 	Category    string `json:"category"`
 }
 
-func (h *Api2Handler) GetAllRadio() []*Radio {
+func GetRadio(db *sql.DB) []*Radio {
 	var radios []*Radio
-	rows, err := h.Db.Query("SELECT id, title, description, thumbnail, url, category FROM tv_radio WHERE online = 1 ORDER BY `order`")
+	rows, err := db.Query("SELECT id, title, description, thumbnail, url, category FROM tv_radio WHERE online = 1 ORDER BY `order`")
 	if err != nil {
 		log.Fatal(err)
 	}

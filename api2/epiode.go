@@ -1,6 +1,7 @@
 package api2
 
 import (
+	"database/sql"
 	"log"
 )
 
@@ -22,9 +23,9 @@ type Episode struct {
 	Pwd          string `json:"pwd"`
 }
 
-func (h *Api2Handler) GetEpisode(id string, start int, limit int) []*Episode {
+func GetEpisode(db *sql.DB, id int, start int) []*Episode {
 	var episodes []*Episode
-	rows, err := h.Db.Query("SELECT programlist_id id, programlist_ep ep, programlist_epname title,  programlist_youtube_encrypt video_encrypt, programlist_src_type src_type, programlist_date date, programlist_count view_count, parts, programlist_password pwd FROM tv_programlist WHERE programlist_banned = 0 AND program_id = ? ORDER BY `ep`, `id` DESC LIMIT ?, ?", id, start, limit)
+	rows, err := db.Query("SELECT programlist_id id, programlist_ep ep, programlist_epname title,  programlist_youtube_encrypt video_encrypt, programlist_src_type src_type, programlist_date date, programlist_count view_count, parts, programlist_password pwd FROM tv_programlist WHERE programlist_banned = 0 AND program_id = ? ORDER BY `ep`, `id` DESC LIMIT ?, ?", id, start, 20)
 	if err != nil {
 		log.Fatal(err)
 	}

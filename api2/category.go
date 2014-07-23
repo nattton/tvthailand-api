@@ -1,6 +1,7 @@
 package api2
 
 import (
+	"database/sql"
 	"log"
 )
 
@@ -15,12 +16,12 @@ type Category struct {
 	Thumbnail   string `json:"thumbnail"`
 }
 
-func (h *Api2Handler) GetAllCategory() []*Category {
+func GetCategory(db *sql.DB) []*Category {
 	var categories = []*Category{
 		&Category{"recents", "รายการล่าสุด", "", thumbnailUrlCat + "00_recently.png"},
 		&Category{"tophits", "Top Hits", "", thumbnailUrlCat + "00_cate_tophits.png"},
 	}
-	rows, err := h.Db.Query("SELECT id, title, description, thumbnail FROM tv_category ORDER BY `order`")
+	rows, err := db.Query("SELECT id, title, description, thumbnail FROM tv_category ORDER BY `order`")
 	if err != nil {
 		log.Fatal(err)
 	}

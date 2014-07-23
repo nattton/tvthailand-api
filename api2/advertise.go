@@ -1,6 +1,7 @@
 package api2
 
 import (
+	"database/sql"
 	"log"
 )
 
@@ -15,9 +16,9 @@ type Advertise struct {
 	Interval int    `json:"interval"`
 }
 
-func (h *Api2Handler) GetAdvertise() []*Advertise {
+func GetAdvertise(db *sql.DB, device string) []*Advertise {
 	var advertises []*Advertise
-	rows, err := h.Db.Query("SELECT name, url, time FROM tv_advertise WHERE platform = ?", h.Device)
+	rows, err := db.Query("SELECT name, url, time FROM tv_advertise WHERE platform = ?", device)
 	if err != nil {
 		log.Fatal(err)
 	}

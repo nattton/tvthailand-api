@@ -1,6 +1,7 @@
 package api2
 
 import (
+	"database/sql"
 	"log"
 )
 
@@ -17,9 +18,9 @@ type Channel struct {
 	HasShow     string `json:"has_show"`
 }
 
-func (h *Api2Handler) GetAllChannel() []*Channel {
+func GetChannel(db *sql.DB) []*Channel {
 	var channels []*Channel
-	rows, err := h.Db.Query("SELECT id, title, description, thumbnail, url, has_show FROM tv_channel ORDER BY `order`")
+	rows, err := db.Query("SELECT id, title, description, thumbnail, url, has_show FROM tv_channel ORDER BY `order`")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -5,6 +5,8 @@ import (
 	"log"
 )
 
+const showLimit = 20
+
 type Shows struct {
 	Shows []*Show `json:"programs"`
 }
@@ -36,18 +38,18 @@ type ShowInfo struct {
 	OtvApiName  string `json:"otv_api_name"`
 }
 
-func (h *Api2Handler) GetShowByCategoryID(id string, start int, limit int) []*Show {
+func GetCategoryShow(db *sql.DB, id string, start int) []*Show {
 	var shows []*Show
 	var rows *sql.Rows
 	var err error
 	var sqlQuery = "SELECT program_id id, program_title title, program_time description, program_thumbnail thumbnail, rating, is_otv,     otv_id, otv_api_name FROM tv_program "
 	switch id {
 	case "recents":
-		rows, err = h.Db.Query(sqlQuery+"ORDER BY update_date DESC LIMIT ?, ?", start, limit)
+		rows, err = db.Query(sqlQuery+"ORDER BY update_date DESC LIMIT ?, ?", start, showLimit)
 	case "tophits":
-		rows, err = h.Db.Query(sqlQuery+"ORDER BY view_count DESC LIMIT ?, ?", start, limit)
+		rows, err = db.Query(sqlQuery+"ORDER BY view_count DESC LIMIT ?, ?", start, showLimit)
 	default:
-		rows, err = h.Db.Query(sqlQuery+"WHERE category_id = ? ORDER BY update_date DESC LIMIT ?, ?", id, start, limit)
+		rows, err = db.Query(sqlQuery+"WHERE category_id = ? ORDER BY update_date DESC LIMIT ?, ?", id, start, showLimit)
 	}
 	if err != nil {
 		log.Fatal(err)
@@ -77,9 +79,9 @@ func (h *Api2Handler) GetShowByCategoryID(id string, start int, limit int) []*Sh
 	return shows
 }
 
-func (h *Api2Handler) GetShowByChannelID(id string, start int, limit int) []*Show {
+func GetChannelShow(db *sql.DB, id string, start int) []*Show {
 	var shows []*Show
-	rows, err := h.Db.Query("SELECT program_id id, program_title title, program_time description, program_thumbnail thumbnail, rating, is_otv, otv_id, otv_api_name FROM tv_program WHERE channel_id = ? ORDER BY update_date DESC LIMIT ?, ?", id, start, limit)
+	rows, err := db.Query("SELECT program_id id, program_title title, program_time description, program_thumbnail thumbnail, rating, is_otv, otv_id, otv_api_name FROM tv_program WHERE channel_id = ? ORDER BY update_date DESC LIMIT ?, ?", id, start, showLimit)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -108,7 +110,7 @@ func (h *Api2Handler) GetShowByChannelID(id string, start int, limit int) []*Sho
 	return shows
 }
 
-func (h *Api2Handler) GetShowInfo(showId string) ShowInfo {
+func GetShowInfo(db *sql.DB, showId int) ShowInfo {
 	var (
 		id          string
 		title       string
@@ -124,7 +126,7 @@ func (h *Api2Handler) GetShowInfo(showId string) ShowInfo {
 		otvId       string
 		otvApiName  string
 	)
-	err := h.Db.QueryRow("SELECT program_id id, program_title title, program_thumbnail thumbnail, poster, program_time description, program_detail detail, last_epname, view_count, rating, 5000 as vote_count, is_otv, otv_id, otv_api_name FROM tv_program WHERE program_id = ?", showId).Scan(&id, &title, &description, &thumbnail, &poster, &detail, &lastEpname, &viewCount, &rating, &voteCount, &isOtv, &otvId, &otvApiName)
+	err := db.QueryRow("SELECT program_id id, program_title title, program_thumbnail thumbnail, poster, program_time description, program_detail detail, last_epname, view_count, rating, 5000 as vote_count, is_otv, otv_id, otv_api_name FROM tv_program WHERE program_id = ?", showId).Scan(&id, &title, &description, &thumbnail, &poster, &detail, &lastEpname, &viewCount, &rating, &voteCount, &isOtv, &otvId, &otvApiName)
 	if err != nil {
 		log.Fatal(err)
 	}
