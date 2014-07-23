@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"github.com/code-mobi/tvthailand-api/admin"
 	"github.com/code-mobi/tvthailand-api/api2"
 	"github.com/dropbox/godropbox/memcache"
 	_ "github.com/go-sql-driver/mysql"
@@ -29,6 +30,7 @@ func main() {
 
 	http.Handle("/static/", http.FileServer(http.Dir("./")))
 	http.Handle("/api2/", &api2.Api2Handler{Db: db, MemcacheClient: client})
+	http.Handle("/admin/", &admin.AdminHandler{Db: db})
 	http.HandleFunc("/flush", func(w http.ResponseWriter, r *http.Request) {
 		client.Flush(1)
 		fmt.Fprintf(w, "Flush")
