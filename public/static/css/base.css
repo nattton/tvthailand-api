@@ -1,0 +1,10 @@
+body {
+  padding-top: 50px;
+}
+
+footer {
+  padding: 10px 0 30px;
+  text-align: center;
+  font-size: 11px;
+  z-index: 1;
+}
