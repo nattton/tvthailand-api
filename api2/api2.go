@@ -28,7 +28,7 @@ type Api2Handler struct {
 
 func (h *Api2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(r.URL)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	h.Device = r.URL.Query().Get("device")
 	paths := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
