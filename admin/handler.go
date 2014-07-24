@@ -82,8 +82,9 @@ func EncryptUpdateHandler(db *sql.DB, params martini.Params, req *http.Request, 
 func OtvHandler(r render.Render) {
 	var results []*OtvShowListItem
 	newmap := map[string]interface{}{
-		"message": "",
-		"results": results,
+		"processTypes": OtvProcessOption(),
+		"message":      "",
+		"results":      results,
 	}
 	r.HTML(200, "admin/otv", newmap)
 }
@@ -104,9 +105,16 @@ func OtvProcessHandler(db *sql.DB, r render.Render, req *http.Request) {
 		message = "Please Select Process"
 	}
 
+	processOptions := OtvProcessOption()
+
+	for i, process := range processOptions {
+		processOptions[i].Checked = (process.Value == processType)
+	}
+
 	newmap := map[string]interface{}{
-		"message": message,
-		"results": results,
+		"processTypes": processOptions,
+		"message":      message,
+		"results":      results,
 	}
 
 	r.HTML(200, "admin/otv", newmap)

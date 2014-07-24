@@ -39,6 +39,20 @@ type OtvShowListItem struct {
 	Thumbnail       string `json:"thumbnail"`
 }
 
+type ProcessType struct {
+	Text    string
+	Value   string
+	Checked bool
+}
+
+func OtvProcessOption() []ProcessType {
+	options := []ProcessType{
+		ProcessType{"OTV Update Modified Date", "modified", true},
+		ProcessType{"OTV Existing Show", "existing", false},
+	}
+	return options
+}
+
 func (o *Otv) CheckOtvExisting() []*OtvShowListItem {
 	var shows []*OtvShowListItem
 	c := o.getOtvCategory()
