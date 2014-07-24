@@ -1,0 +1,16 @@
+<div class="jumbotron">
+  <div class="container">
+    <h1>OTV</h1>
+    <form method="post" action="">
+      <input type="radio" name="processType" value="modified"checked> OTV Update Modified<br>
+      <input type="radio" name="processType" value="existing"> OTV Existing<br>
+      <input type="submit" class="btn btn-primary btn-lg" role="button" value="Submit">
+    </form>
+    <h3>{{.message}}</h3>
+    <ul>
+      {{range .results}}
+      <li>{{.ContentSeasonId}} {{.NameTh}} {{.NameEn}} {{.ModifiedDate}} {{.Thumbnail}}</li>
+      {{end}}
+    </ul>
+  </div>
+</div>

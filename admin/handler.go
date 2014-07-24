@@ -78,3 +78,37 @@ func EncryptUpdateHandler(db *sql.DB, params martini.Params, req *http.Request, 
 
 	r.HTML(200, "admin/encrypt", newmap)
 }
+
+func OtvHandler(r render.Render) {
+	var results []*OtvShowListItem
+	newmap := map[string]interface{}{
+		"message": "",
+		"results": results,
+	}
+	r.HTML(200, "admin/otv", newmap)
+}
+
+func OtvProcessHandler(db *sql.DB, r render.Render, req *http.Request) {
+	processType := req.FormValue("processType")
+	var message string
+	var results []*OtvShowListItem
+	otv := &Otv{Db: db}
+	switch processType {
+	case "modified":
+		results = otv.UpdateModified()
+		message = "Update modified date complete."
+	case "existing":
+		results = otv.CheckOtvExisting()
+		message = "Update modified date complete."
+	default:
+		message = "Please Select Process"
+	}
+
+	newmap := map[string]interface{}{
+		"message": message,
+		"results": results,
+	}
+
+	r.HTML(200, "admin/otv", newmap)
+
+}

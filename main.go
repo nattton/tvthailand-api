@@ -7,8 +7,8 @@ import (
 	"github.com/code-mobi/tvthailand-api/admin"
 	"github.com/code-mobi/tvthailand-api/api2"
 	"github.com/dropbox/godropbox/memcache"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-martini/martini"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/martini-contrib/render"
 	"html/template"
 	"log"
@@ -37,7 +37,7 @@ func main() {
 	m.Map(db)
 	m.Map(client)
 	m.Use(render.Renderer(render.Options{
-  	Layout: "layout",
+		Layout: "layout",
 	}))
 
 	m.Get("/", func() string {
@@ -61,6 +61,8 @@ func main() {
 	m.Group("/admin", func(r martini.Router) {
 		r.Get("/encrypt", admin.EncryptHandler)
 		r.Post("/encrypt", admin.EncryptUpdateHandler)
+		r.Get("/otv", admin.OtvHandler)
+		r.Post("/otv", admin.OtvProcessHandler)
 	})
 
 	if err := http.ListenAndServe(":"+*port, m); err != nil {
