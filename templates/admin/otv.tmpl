@@ -10,7 +10,7 @@
     <h3>{{.message}}</h3>
     <ul>
       {{range .results}}
-        <li>{{.ContentSeasonId}} {{.NameTh}} {{.NameEn}} {{.ModifiedDate}} {{.Thumbnail}}</li>
+        <li>{{.ContentSeasonId}} {{.NameTh}} {{.NameEn}} {{.ModifiedDate}} <img src="{{.Thumbnail}}" alt="thumbnail" /></li>
       {{end}}
     </ul>
   </div>
