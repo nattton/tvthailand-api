@@ -37,11 +37,16 @@ func main() {
 	m.Map(db)
 	m.Map(client)
 	m.Use(render.Renderer(render.Options{
-		Layout: "layout",
+		Layout:     "layout",
+		IndentJSON: true,
 	}))
 
-	m.Get("/", func() string {
-		return "Hello world!"
+	// m.Get("/", func() string {
+	// 	return "Hello world!"
+	// })
+
+	m.Get("/", func(r render.Render) {
+		r.JSON(200, map[string]interface{}{"hello": "world สวัสดี"})
 	})
 
 	m.Group("/api2", func(r martini.Router) {
@@ -65,6 +70,11 @@ func main() {
 		r.Post("/otv", admin.OtvProcessHandler)
 	})
 
+	m.Get("/flush", func() string {
+		client.Flush(1)
+		return "Flush!!!"
+	})
+
 	if err := http.ListenAndServe(":"+*port, m); err != nil {
 		panic(err)
 	}
@@ -86,10 +96,6 @@ func main() {
 // 	http.Handle("/static/", http.FileServer(http.Dir("./")))
 // 	http.Handle("/api2/", &api2.Api2Handler{Db: db, MemcacheClient: client})
 // 	http.Handle("/admin/", &admin.AdminHandler{Db: db})
-// 	http.HandleFunc("/flush", func(w http.ResponseWriter, r *http.Request) {
-// 		client.Flush(1)
-// 		fmt.Fprintf(w, "Flush")
-// 	})
 // 	http.HandleFunc("/", HomeHandler)
 // 	if err := http.ListenAndServe(":"+*port, nil); err != nil {
 // 		panic(err)

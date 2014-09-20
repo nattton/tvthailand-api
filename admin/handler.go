@@ -9,9 +9,12 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
-type EnryptResult struct {
+const MTHAI_URL_FMT = "http://video.mthai.com/cool/player/%s.html"
+
+type EncryptResult struct {
 	ShowId  int
 	ListId  int
 	VideoId string
@@ -31,9 +34,12 @@ func EncryptUpdateHandler(db *sql.DB, params martini.Params, req *http.Request, 
 	idType := req.FormValue("idType")
 	id, _ := strconv.Atoi(req.FormValue("id"))
 
-	var results []*EnryptResult
+	var results []*EncryptResult
 
-	if idType == "" || id == 0 {
+	if idType == "mthaiparseurl" {
+		MthaiParseUrl(db, r)
+		return
+	} else if idType == "" || id == 0 {
 		emptymap := map[string]interface{}{
 			"showid":  "",
 			"message": "*Fill the form",
@@ -63,7 +69,7 @@ func EncryptUpdateHandler(db *sql.DB, params martini.Params, req *http.Request, 
 			log.Fatal(err)
 		}
 		updateVideoEncrypt(db, listId, videoId)
-		results = append(results, &EnryptResult{showId, listId, videoId})
+		results = append(results, &EncryptResult{showId, listId, videoId})
 	}
 
 	if err := rows.Err(); err != nil {
@@ -77,6 +83,53 @@ func EncryptUpdateHandler(db *sql.DB, params martini.Params, req *http.Request, 
 	}
 
 	r.HTML(200, "admin/encrypt", newmap)
+}
+
+func MthaiParseUrl(db *sql.DB, r render.Render) {
+	var results []*EncryptResult
+	rows, err := db.Query("SELECT program_id, programlist_id, programlist_youtube youtubeKey FROM tv_programlist WHERE programlist_banned = 0 AND programlist_src_type = 14 ORDER BY programlist_id DESC")
+	if err != nil {
+		panic(err)
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var (
+			programId     int
+			programlistId int
+			youtubeKey    string
+		)
+
+		if err := rows.Scan(&programId, &programlistId, &youtubeKey); err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println(programId, programlistId, youtubeKey)
+		videoIds := strings.Split(youtubeKey, ",")
+
+		var videoUrls []string
+		for _, videoId := range videoIds {
+			videoUrl := fmt.Sprintf(MTHAI_URL_FMT, videoId)
+			videoUrls = append(videoUrls, videoUrl)
+		}
+		videoResult := strings.Join(videoUrls, ",")
+		fmt.Println("videoResult :", videoResult)
+		encryptResult := EncryptVideo(videoResult)
+		fmt.Println("encryptResult :", encryptResult)
+
+		_, err := db.Exec("UPDATE tv_programlist SET programlist_youtube = ?, programlist_youtube_encrypt = ?, programlist_src_type = 11, mthai_video = ? WHERE programlist_id = ? ORDER BY program_id DESC", videoResult, encryptResult, youtubeKey, programlistId)
+		if err != nil {
+			panic(err)
+		}
+		results = append(results, &EncryptResult{programId, programlistId, youtubeKey})
+	}
+
+	emptymap := map[string]interface{}{
+		"showid":  "",
+		"message": "",
+		"results": results,
+	}
+	r.HTML(200, "admin/encrypt", emptymap)
 }
 
 func OtvHandler(r render.Render) {
