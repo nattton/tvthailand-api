@@ -2,7 +2,6 @@ package bot
 
 import (
 	"database/sql"
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 )
@@ -30,7 +29,7 @@ func NewBot(db *sql.DB) *Bot {
 func (b *Bot) CheckYoutubeUser() {
 	youtubeUsers := getYoutubeRobotUsers(b.Db)
 	for _, youtubeUser := range youtubeUsers {
-		fmt.Println(youtubeUser.Username)
+		log.Println(youtubeUser.Username)
 	}
 }
 
