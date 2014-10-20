@@ -153,7 +153,7 @@ func OtvProcessHandler(db *sql.DB, r render.Render, req *http.Request) {
 		message = "Update modified date complete."
 	case "existing":
 		results = otv.CheckOtvExisting()
-		message = "Update modified date complete."
+		message = "Check Otv Existing complete."
 	default:
 		message = "Please Select Process"
 	}
