@@ -28,14 +28,19 @@ func NewBot(db *sql.DB) *Bot {
 
 func (b *Bot) CheckYoutubeUser() {
 	youtubeUsers := getYoutubeRobotUsers(b.Db)
+	y := &Youtube{}
 	for _, youtubeUser := range youtubeUsers {
 		log.Println(youtubeUser.Username)
+		youtubeVideos := y.getVideoByUser(youtubeUser.Username)
+		for _, video := range youtubeVideos {
+			log.Println(video.Username, video.Title, video.VideoId)
+		}
 	}
 }
 
 func getYoutubeRobotUsers(db *sql.DB) []*YoutubeUser {
 	var youtubeUsers = []*YoutubeUser{}
-	rows, err := db.Query("SELECT username, description, user_type FROM tv_youtube_users WHERE bot = 1 ORDER BY username")
+	rows, err := db.Query("SELECT username, description, user_type FROM tv_youtube_users WHERE bot = 1 ORDER BY username LIMIT 0,5")
 	if err != nil {
 		log.Fatal(err)
 	}
