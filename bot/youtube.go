@@ -13,9 +13,10 @@ type Youtube struct {
 }
 
 type YoutubeVideo struct {
-	Username string
-	Title    string
-	VideoId  string
+	Username  string
+	Title     string
+	VideoId   string
+	Published string
 }
 
 type YoutubeAPI struct {
@@ -29,6 +30,7 @@ type Feed struct {
 type Entry struct {
 	Title      Title      `json:"title"`
 	MediaGroup MediaGroup `json:"media$group"`
+	Published  Published  `json:"published"`
 }
 
 type Title struct {
@@ -39,6 +41,10 @@ type MediaGroup struct {
 	VideoId VideoId `json:"yt$videoid"`
 }
 type VideoId struct {
+	Value string `json:"$t"`
+}
+
+type Published struct {
 	Value string `json:"$t"`
 }
 
@@ -63,7 +69,7 @@ func (y *Youtube) getVideoByUser(username string) []*YoutubeVideo {
 
 	if len(api.Feed.Entries) > 0 {
 		for _, entry := range api.Feed.Entries {
-			youtubeVideo := &YoutubeVideo{username, entry.Title.Value, entry.MediaGroup.VideoId.Value}
+			youtubeVideo := &YoutubeVideo{username, entry.Title.Value, entry.MediaGroup.VideoId.Value, entry.Published.Value}
 			youtubeVideos = append(youtubeVideos, youtubeVideo)
 		}
 	}
