@@ -1,0 +1,11 @@
+<div class="jumbotron">
+  <div class="container">
+    <h1>Bot Video</h1>
+    <table>
+      <thead><th>Username</th><th>Title</th><th>VideoId</th><th>Published</th></thead>
+      {{range .results}}
+        <tr><td>{{.Username}}</td><td>{{.Title}}</td><td>{{.VideoId}}</td><td>{{.Published}}</td></tr>
+      {{end}}
+    </table>
+  </div>
+</div>

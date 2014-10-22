@@ -173,3 +173,17 @@ func OtvProcessHandler(db *sql.DB, r render.Render, req *http.Request) {
 	r.HTML(200, "admin/otv", newmap)
 
 }
+
+func BotVideoHandler(db *sql.DB, r render.Render, req *http.Request) {
+	b := NewBotVideo(db)
+	botVideos := b.getBotVideo()
+	for _, video := range botVideos {
+		log.Println(video.Title)
+	}
+
+	newmap := map[string]interface{}{
+		"results": botVideos,
+	}
+
+	r.HTML(200, "admin/botvideo", newmap)
+}
