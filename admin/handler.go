@@ -175,15 +175,37 @@ func OtvProcessHandler(db *sql.DB, r render.Render, req *http.Request) {
 }
 
 func BotVideoHandler(db *sql.DB, r render.Render, req *http.Request) {
+	botStatus, _ := strconv.Atoi(req.FormValue("bot_status"))
+	username := req.FormValue("username")
+
 	b := NewBotVideo(db)
-	botVideos := b.getBotVideo()
+	botStatuses := b.getBotStatuses(botStatus)
+	botUsers := b.getBotUsers(username)
+	botVideos := b.getBotVideos(username)
 	for _, video := range botVideos {
 		log.Println(video.Title)
 	}
 
 	newmap := map[string]interface{}{
-		"results": botVideos,
+		"username": username,
+		"botStatuses": botStatuses,
+		"botUsers":  botUsers,
+		"botVideos": botVideos,
 	}
 
 	r.HTML(200, "admin/botvideo", newmap)
+}
+
+func BotVideoPostHandler(db *sql.DB, r render.Render, req *http.Request) {
+  if err := req.ParseForm(); err != nil {
+     //handle error http.Error() for example
+     return
+  }
+	log.Println(req.Form["bot_video[]"])
+	botVideos := req.Form["bot_video[]"]
+	for _,botVideo := range botVideos {
+		log.Println(botVideo);
+	}
+
+	BotVideoHandler(db, r, req)
 }

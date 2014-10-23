@@ -73,6 +73,7 @@ func main() {
 			r.Get("/otv", admin.OtvHandler)
 			r.Post("/otv", admin.OtvProcessHandler)
 			r.Get("/botvideo", admin.BotVideoHandler)
+			r.Post("/botvideo", admin.BotVideoPostHandler)
 		})
 
 		m.Get("/flush", func() string {

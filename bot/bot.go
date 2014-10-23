@@ -84,7 +84,7 @@ func (b *Bot) checkBotVideoExisting(video *YoutubeVideo) bool {
 }
 
 func (b *Bot) insertBotVideo(video *YoutubeVideo) {
-	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, video_id, video_type, published, is_updated) VALUES (?, ?, ?, 'youtube', ?, 0)", video.Username, video.Title, video.VideoId, video.Published)
+	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, video_id, video_type, published, status) VALUES (?, ?, ?, 'youtube', ?, 0)", video.Username, video.Title, video.VideoId, video.Published)
 	if err != nil {
 		panic(err)
 	}

@@ -1,11 +1,68 @@
+<script type="text/javascript">
+  $(function(){
+    var $sumId = $("#sumId");
+    $(".txt_video_id").click(function(){
+      var $videoId = $(this);
+      $videoId.select();
+      var sumId = $sumId.val()
+      if ($sumId.val() == "") {
+        $sumId.val($videoId.val());
+      } else {
+        $sumId.val($sumId.val() + "," + $videoId.val());
+      }
+  		$("#txt_title").val($videoId.closest("tr").find("td:eq(2)").text().trim());
+    });
+
+    $("#btn_clear").click(function(){
+      $sumId.val("");
+    });
+
+    $("#cb_bot_video").click(function(){
+      $('.cb_bot_video').prop('checked', $(this).prop('checked'));
+    });
+  });
+</script>
+
 <div class="jumbotron">
   <div class="container">
-    <h1>Bot Video</h1>
-    <table>
-      <thead><th>Username</th><th>Title</th><th>VideoId</th><th>Published</th></thead>
-      {{range .results}}
-        <tr><td>{{.Username}}</td><td>{{.Title}}</td><td>{{.VideoId}}</td><td>{{.Published}}</td></tr>
-      {{end}}
-    </table>
+    <fieldset>
+      <legend>Bot Video</legend>
+    <form method="GET" action="">
+      <select name="bot_status">
+        {{range .botStatuses}}
+          <option value="{{.Id}}" {{if .IsSelected}} selected="selected" {{end}}>{{.Name}}</option>
+        {{end}}
+      </select>
+      <select name="username">
+        <option value="">All</option>
+        {{range .botUsers}}
+          <option value="{{.Username}}" {{if .IsSelected}} selected="selected" {{end}}>{{.Description}}</option>
+        {{end}}
+      </select>
+       <input type="submit"/>
+    </form>
+    <br />
+    <h4></h4>
+    <form method="POST" action="">
+      <label>Title :</label> <input type="text" id="txt_title" size="100" value="" /><br />
+      <label>SumId :</label> <input type="text" id="sumId" size="100" value="" />
+      <input type="button" id="btn_update" value="Update" />
+      <input type="button" id="btn_clear" value="Clear" />
+      <br />
+      <br />
+      <input type="submit" value="Deactive" />
+      <table>
+        <thead>
+            <th><input type="checkbox" id="cb_bot_video" /></th>
+            <th>Username</th><th>Title</th><th>VideoId</th><th>Published</th>
+        </thead>
+        {{range .botVideos}}
+          <tr>
+            <td><input type="checkbox" class="cb_bot_video" name="bot_video[]" value="{{.Id}}"/></td>
+            <td>{{.Username}}</td><td>{{.Title}}</td><td><input type="text" class="txt_video_id" size="16" value="{{.VideoId}}" /></td><td>{{.Published}}</td>
+          </tr>
+        {{end}}
+      </table>
+    </form>
   </div>
 </div>
