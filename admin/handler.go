@@ -201,10 +201,15 @@ func BotVideoPostHandler(db *sql.DB, r render.Render, req *http.Request) {
      //handle error http.Error() for example
      return
   }
+
+	b := NewBotVideo(db)
+
 	log.Println(req.Form["bot_video[]"])
 	botVideos := req.Form["bot_video[]"]
-	for _,botVideo := range botVideos {
-		log.Println(botVideo);
+	for _, botVideoId := range botVideos {
+		id, _ := strconv.Atoi(botVideoId)
+		log.Println(id)
+		b.setBotVideoStatus(id, -1)
 	}
 
 	BotVideoHandler(db, r, req)

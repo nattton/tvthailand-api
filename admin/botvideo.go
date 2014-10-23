@@ -74,9 +74,9 @@ func (b *BotVideo) getBotVideos(qUsername string) []*BotVideoRow {
 	var err error
 
 	if qUsername == "" {
-		rows, err = b.Db.Query("SELECT id, username, title, video_id, published, status from tv_bot_videos ORDER BY username, published LIMIT 0, 50")
+		rows, err = b.Db.Query("SELECT id, username, title, video_id, published, status from tv_bot_videos WHERE status = 0 ORDER BY username, published LIMIT 0, 50")
 	} else {
-		rows, err = b.Db.Query("SELECT id, username, title, video_id, published, status from tv_bot_videos WHERE username = ? ORDER BY published", qUsername)
+		rows, err = b.Db.Query("SELECT id, username, title, video_id, published, status from tv_bot_videos WHERE status = 0 AND username = ? ORDER BY published", qUsername)
 	}
 
 	if err != nil {
@@ -100,4 +100,11 @@ func (b *BotVideo) getBotVideos(qUsername string) []*BotVideoRow {
 	}
 
 	return botVideos
+}
+
+func (b *BotVideo) setBotVideoStatus(id int, status int) {
+	_, err := b.Db.Exec("UPDATE tv_bot_videos SET status = ? WHERE id = ?", status, id)
+	if err != nil {
+		panic(err)
+	}
 }
