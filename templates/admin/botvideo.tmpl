@@ -27,30 +27,35 @@
   <div class="container">
     <fieldset>
       <legend>Bot Video</legend>
-    <form method="GET" action="">
-      <select name="bot_status">
-        {{range .botStatuses}}
-          <option value="{{.Id}}" {{if .IsSelected}} selected="selected" {{end}}>{{.Name}}</option>
-        {{end}}
-      </select>
+    <form method="GET" action="/admin/botvideo">
       <select name="username">
         <option value="">All</option>
         {{range .botUsers}}
           <option value="{{.Username}}" {{if .IsSelected}} selected="selected" {{end}}>{{.Description}}</option>
         {{end}}
       </select>
+      <select name="status">
+        {{range .botStatuses}}
+          <option value="{{.Id}}" {{if .IsSelected}} selected="selected" {{end}}>{{.Name}}</option>
+        {{end}}
+      </select>
        <input type="submit"/>
     </form>
     <br />
     <h4></h4>
-    <form method="POST" action="">
+    <form method="POST" action="/admin/botvideo">
+      <input type="hidden" name="username" value="{{.formSearch.Username}}" />
+      <input type="hidden" name="status" value="{{.formSearch.Status}}" />
       <label>Title :</label> <input type="text" id="txt_title" size="100" value="" /><br />
       <label>SumId :</label> <input type="text" id="sumId" size="100" value="" />
       <input type="button" id="btn_update" value="Update" />
       <input type="button" id="btn_clear" value="Clear" />
       <br />
       <br />
-      <input type="submit" value="Reject" />
+      <label>Change status to : </label>
+      <input type="submit" name="update_status" value="Rejected" />
+      <input type="submit" name="update_status" value="Waiting" />
+      <input type="submit" name="update_status" value="Updated" />
       <table>
         <thead>
             <th><input type="checkbox" id="cb_bot_video" /></th>

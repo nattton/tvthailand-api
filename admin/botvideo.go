@@ -3,6 +3,7 @@ package admin
 import (
 	"database/sql"
 	"log"
+	"strconv"
 )
 
 type BotVideo struct {
@@ -13,6 +14,11 @@ func NewBotVideo(db *sql.DB) *BotVideo {
 	b := new(BotVideo)
 	b.Db = db
 	return b
+}
+
+type FormSearchBotUser struct {
+	Username string
+	Status   int
 }
 
 type BotUser struct {
@@ -44,6 +50,17 @@ func (b *BotVideo) getBotStatuses(id int) []*BotStatus {
 	return botStatuses
 }
 
+func (b *BotVideo) getBotStatusId(status string) int {
+	switch status {
+	case "Rejected":
+		return -1
+	case "Updated":
+		return 1
+	default:
+		return 0
+	}
+}
+
 func (b *BotVideo) getBotUsers(selectUsername string) []*BotUser {
 	botUsers := []*BotUser{}
 	rows, err := b.Db.Query("SELECT DISTINCT v.username, u.description from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) ORDER BY description")
@@ -67,16 +84,16 @@ func (b *BotVideo) getBotUsers(selectUsername string) []*BotUser {
 	return botUsers
 }
 
-func (b *BotVideo) getBotVideos(qUsername string) []*BotVideoRow {
+func (b *BotVideo) getBotVideos(f *FormSearchBotUser) []*BotVideoRow {
 	botVideos := []*BotVideoRow{}
 
 	var rows *sql.Rows
 	var err error
 
-	if qUsername == "" {
-		rows, err = b.Db.Query("SELECT id, username, title, video_id, published, status from tv_bot_videos WHERE status = 0 ORDER BY username, published LIMIT 0, 50")
+	if f.Username == "" {
+		rows, err = b.Db.Query("SELECT id, username, title, video_id, published, status from tv_bot_videos WHERE status = ? ORDER BY username, published LIMIT 0, 50", f.Status)
 	} else {
-		rows, err = b.Db.Query("SELECT id, username, title, video_id, published, status from tv_bot_videos WHERE status = 0 AND username = ? ORDER BY published", qUsername)
+		rows, err = b.Db.Query("SELECT id, username, title, video_id, published, status from tv_bot_videos WHERE status = ? AND username = ? ORDER BY published", f.Status, f.Username)
 	}
 
 	if err != nil {
@@ -90,7 +107,7 @@ func (b *BotVideo) getBotVideos(qUsername string) []*BotVideoRow {
 			title     string
 			videoId   string
 			published string
-			status 		int
+			status    int
 		)
 		if err := rows.Scan(&id, &username, &title, &videoId, &published, &status); err != nil {
 			log.Fatal(err)
@@ -106,5 +123,13 @@ func (b *BotVideo) setBotVideoStatus(id int, status int) {
 	_, err := b.Db.Exec("UPDATE tv_bot_videos SET status = ? WHERE id = ?", status, id)
 	if err != nil {
 		panic(err)
+	}
+}
+
+func (b *BotVideo) setBotVideosStatus(videoIds []string, updateStatus string) {
+	statusId := b.getBotStatusId(updateStatus)
+	for _, videoId := range videoIds {
+		id, _ := strconv.Atoi(videoId)
+		b.setBotVideoStatus(id, statusId)
 	}
 }
