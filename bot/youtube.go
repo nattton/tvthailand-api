@@ -17,6 +17,7 @@ type YoutubeVideo struct {
 	Title     string
 	VideoId   string
 	Published string
+	Status    int
 }
 
 type YoutubeAPI struct {
@@ -69,7 +70,7 @@ func (y *Youtube) getVideoByUser(username string) []*YoutubeVideo {
 
 	if len(api.Feed.Entries) > 0 {
 		for _, entry := range api.Feed.Entries {
-			youtubeVideo := &YoutubeVideo{username, entry.Title.Value, entry.MediaGroup.VideoId.Value, entry.Published.Value}
+			youtubeVideo := &YoutubeVideo{username, entry.Title.Value, entry.MediaGroup.VideoId.Value, entry.Published.Value, 0}
 			youtubeVideos = append(youtubeVideos, youtubeVideo)
 		}
 	}

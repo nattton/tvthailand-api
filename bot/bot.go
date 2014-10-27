@@ -26,6 +26,19 @@ func NewBot(db *sql.DB) *Bot {
 	return b
 }
 
+func (b *Bot) CheckYoutubeUserFirst() {
+	youtubeUsers := b.getYoutubeRobotUsers()
+	y := &Youtube{}
+	for _, youtubeUser := range youtubeUsers {
+		log.Println(youtubeUser.Username)
+		youtubeVideos := y.getVideoByUser(youtubeUser.Username)
+		for _, video := range youtubeVideos {
+			log.Println(video.Username, video.Title, video.VideoId)
+			b.checkFirstVideoExistingAndAddBot(video)
+		}
+	}
+}
+
 func (b *Bot) CheckYoutubeUser() {
 	youtubeUsers := b.getYoutubeRobotUsers()
 	y := &Youtube{}
@@ -34,9 +47,7 @@ func (b *Bot) CheckYoutubeUser() {
 		youtubeVideos := y.getVideoByUser(youtubeUser.Username)
 		for _, video := range youtubeVideos {
 			log.Println(video.Username, video.Title, video.VideoId)
-			if !b.checkBotVideoExisting(video) {
-				b.insertBotVideo(video)
-			}
+			b.checkBotVideoExistingAndAddBot(video)
 		}
 	}
 }
@@ -67,24 +78,36 @@ func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
 	return youtubeUsers
 }
 
-func (b *Bot) checkBotVideoExisting(video *YoutubeVideo) bool {
-	var id int32
+func (b *Bot) checkBotVideoExistingAndAddBot(video *YoutubeVideo) {
+	var id int
 	err := b.Db.QueryRow("SELECT id from tv_bot_videos WHERE video_id = ?", video.VideoId).Scan(&id)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			err = b.Db.QueryRow("SELECT programlist_id from tv_programlist WHERE programlist_youtube LIKE ? ", "%"+video.VideoId+"%").Scan(&id)
-			if err != nil {
-				if err.Error() == "sql: no rows in result set" {
-					return false
-				}
-			}
+			video.Status = 0
+			b.insertBotVideo(video)
 		}
 	}
-	return true
+}
+
+func (b *Bot) checkFirstVideoExistingAndAddBot(video *YoutubeVideo) {
+	var id int
+	err := b.Db.QueryRow("SELECT programlist_id from tv_programlist WHERE programlist_youtube LIKE ? ", "%"+video.VideoId+"%").Scan(&id)
+	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			video.Status = 0
+		}
+	} else {
+		video.Status = 1
+	}
+
+	err = b.Db.QueryRow("SELECT id from tv_bot_videos WHERE video_id = ?", video.VideoId).Scan(&id)
+	if err.Error() == "sql: no rows in result set" {
+		b.insertBotVideo(video)
+	}
 }
 
 func (b *Bot) insertBotVideo(video *YoutubeVideo) {
-	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, video_id, video_type, published, status) VALUES (?, ?, ?, 'youtube', ?, 0)", video.Username, video.Title, video.VideoId, video.Published)
+	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, video_id, video_type, published, status) VALUES (?, ?, ?, 'youtube', ?, ?)", video.Username, video.Title, video.VideoId, video.Published, video.Status)
 	if err != nil {
 		panic(err)
 	}

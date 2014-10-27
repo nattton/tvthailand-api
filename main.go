@@ -30,7 +30,11 @@ func main() {
 	}
 	defer db.Close()
 
-	if *command != "" {
+	if *command == "firstrun" {
+		fmt.Println(*command)
+		b := bot.NewBot(db)
+		b.CheckYoutubeUserFirst()
+	} else if *command == "botrun" {
 		fmt.Println(*command)
 		b := bot.NewBot(db)
 		b.CheckYoutubeUser()
