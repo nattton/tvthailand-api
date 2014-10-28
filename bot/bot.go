@@ -79,10 +79,13 @@ func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
 }
 
 func (b *Bot) checkBotVideoExistingAndAddBot(video *YoutubeVideo) {
-	var id int
-	err := b.Db.QueryRow("SELECT id from tv_bot_videos WHERE video_id = ?", video.VideoId).Scan(&id)
+	rows, err := b.Db.Query("SELECT id from tv_bot_videos WHERE video_id = ?", video.VideoId)
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
+		log.Fatal(err)
+	} else {
+		defer rows.Close()
+
+		if !rows.Next() {
 			video.Status = 0
 			b.insertBotVideo(video)
 		}
@@ -90,18 +93,24 @@ func (b *Bot) checkBotVideoExistingAndAddBot(video *YoutubeVideo) {
 }
 
 func (b *Bot) checkFirstVideoExistingAndAddBot(video *YoutubeVideo) {
-	var id int
-	err := b.Db.QueryRow("SELECT programlist_id from tv_programlist WHERE programlist_youtube LIKE ? ", "%"+video.VideoId+"%").Scan(&id)
+	rows, err := b.Db.Query("SELECT programlist_id from tv_programlist WHERE programlist_youtube LIKE ? ", "%"+video.VideoId+"%")
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
-			video.Status = 0
-		}
-	} else {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	if rows.Next() {
 		video.Status = 1
+	} else {
+		video.Status = 0
 	}
 
-	err = b.Db.QueryRow("SELECT id from tv_bot_videos WHERE video_id = ?", video.VideoId).Scan(&id)
-	if err.Error() == "sql: no rows in result set" {
+	rows, err = b.Db.Query("SELECT id from tv_bot_videos WHERE video_id = ?", video.VideoId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	if !rows.Next() {
 		b.insertBotVideo(video)
 	}
 }
