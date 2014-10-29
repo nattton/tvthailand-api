@@ -86,7 +86,16 @@ func (b *Bot) checkBotVideoExistingAndAddBot(video *YoutubeVideo) {
 		defer rows.Close()
 
 		if !rows.Next() {
-			video.Status = 0
+			row2s, err := b.Db.Query("SELECT programlist_id from tv_programlist WHERE programlist_youtube LIKE ? ", "%"+video.VideoId+"%")
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer row2s.Close()
+			if row2s.Next() {
+				video.Status = 1
+			} else {
+				video.Status = 0
+			}
 			b.insertBotVideo(video)
 		}
 	}
