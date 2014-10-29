@@ -5,6 +5,8 @@
   $(function(){
     $("#btn_update").hide();
     $(".chzn-select").chosen();
+    $("#search_time").val($.now());
+
     var $sumId = $("#sumId");
     $(".txt_video_id").click(function(){
       var $videoId = $(this);
@@ -40,7 +42,7 @@
   <div class="container">
     <fieldset>
       <legend>Bot Video</legend>
-    <form method="GET" action="/admin/botvideo">
+    <form if="frmSearch" method="GET" action="/admin/botvideo">
       <select name="username" class="chzn-select" style="width:350px;" data-placeholder="Choose a Username...">
         <option value="all">All</option>
         {{range .botUsers}}
@@ -52,6 +54,7 @@
           <option value="{{.Id}}" {{if .IsSelected}} selected="selected" {{end}}>{{.Name}}</option>
         {{end}}
       </select>
+      <input type="hidden" id="search_time" name="time" value="" />
        <input type="submit" class="btn btn-default" />
     </form>
     <br />
