@@ -42,7 +42,7 @@
       <legend>Bot Video</legend>
     <form method="GET" action="/admin/botvideo">
       <select name="username" class="chzn-select" style="width:350px;" data-placeholder="Choose a Username...">
-        <option value="">All</option>
+        <option value="all">All</option>
         {{range .botUsers}}
           <option value="{{.Username}}" {{if .IsSelected}} selected="selected" {{end}}>{{.Description}} - {{.Username}}</option>
         {{end}}
