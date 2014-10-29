@@ -3,6 +3,7 @@
 <script type="text/javascript"> $(".chzn-select").chosen(); $(".chzn-select-deselect").chosen({allow_single_deselect:true}); </script>
 <script type="text/javascript">
   $(function(){
+    $("#btn_update").hide();
     $(".chzn-select").chosen();
     var $sumId = $("#sumId");
     $(".txt_video_id").click(function(){
@@ -10,15 +11,23 @@
       $videoId.select();
       var sumId = $sumId.val()
       if ($sumId.val() == "") {
-        $sumId.val($videoId.val());
+        sumId = $videoId.val();
       } else {
-        $sumId.val($sumId.val() + "," + $videoId.val());
+        sumId = $sumId.val() + "," + $videoId.val();
       }
-  		$("#txt_title").val($videoId.closest("tr").find("td:eq(2)").text().trim());
+      $sumId.val(sumId)
+
+      var title = $videoId.closest("tr").find("td:eq(2)").text().trim();
+  		$("#txt_title").val(title);
+
+      var urlUpdate = "http://tv-cms.makathon.com/bookmarktv.php?id=" + sumId + "&title=" + title;
+      $("#btn_update").attr("href", urlUpdate);
+      $("#btn_update").show();
     });
 
     $("#btn_clear").click(function(){
       $sumId.val("");
+      $("#btn_update").hide();
     });
 
     $("#cb_bot_video").click(function(){
@@ -35,7 +44,7 @@
       <select name="username" class="chzn-select" style="width:350px;" data-placeholder="Choose a Username...">
         <option value="">All</option>
         {{range .botUsers}}
-          <option value="{{.Username}}" {{if .IsSelected}} selected="selected" {{end}}>{{.Description}}</option>
+          <option value="{{.Username}}" {{if .IsSelected}} selected="selected" {{end}}>{{.Description}} - {{.Username}}</option>
         {{end}}
       </select>
       <select name="status">
@@ -43,32 +52,34 @@
           <option value="{{.Id}}" {{if .IsSelected}} selected="selected" {{end}}>{{.Name}}</option>
         {{end}}
       </select>
-       <input type="submit"/>
+       <input type="submit" class="btn btn-default" />
     </form>
     <br />
     <h4></h4>
     <form method="POST" action="/admin/botvideo">
       <input type="hidden" name="username" value="{{.formSearch.Username}}" />
       <input type="hidden" name="status" value="{{.formSearch.Status}}" />
-      <label>Title :</label> <input type="text" id="txt_title" size="100" value="" /><br />
-      <label>SumId :</label> <input type="text" id="sumId" size="100" value="" />
-      <input type="button" id="btn_update" value="Update" />
-      <input type="button" id="btn_clear" value="Clear" />
+      <label>Title :</label> <input type="text" id="txt_title" size="100" value="" /><br /><br />
+      <label>Id :</label> <input type="text" id="sumId" size="100" value="" />
+      <a class="btn btn-success" id="btn_update" target="_blank" href="" >Update</a>
+      <input type="button" class="btn btn-warning" id="btn_clear" value="Clear" />
       <br />
       <br />
       <label>Change status to : </label>
-      <input type="submit" name="update_status" value="Rejected" />
-      <input type="submit" name="update_status" value="Waiting" />
-      <input type="submit" name="update_status" value="Updated" />
-      <table>
+      <input type="submit" class="btn btn-danger" name="update_status" value="Rejected" />
+      <input type="submit" class="btn btn-primary" name="update_status" value="Waiting" />
+      <input type="submit" class="btn btn-success" name="update_status" value="Updated" />
+      <table class="table table-striped">
         <thead>
             <th><input type="checkbox" id="cb_bot_video" /></th>
             <th>Username</th><th>Title</th><th>VideoId</th><th>Published</th>
+            <th>Update</th>
         </thead>
         {{range .botVideos}}
           <tr>
             <td><input type="checkbox" class="cb_bot_video" name="bot_video[]" value="{{.Id}}"/></td>
-            <td>{{.Username}}</td><td>{{.Title}}</td><td><input type="text" class="txt_video_id" size="16" value="{{.VideoId}}" /></td><td>{{.Published}}</td>
+            <td>{{.Description}}</td><td>{{.Title}}</td><td><input type="text" class="txt_video_id" size="16" value="{{.VideoId}}" /></td><td>{{.Published}}</td>
+            <td><a target="_blank" class="btn btn-default" href="http://tv-cms.makathon.com/bookmarktv.php?url=http://www.youtube.com/watch?v={{.VideoId}}">Update</a>
           </tr>
         {{end}}
       </table>
