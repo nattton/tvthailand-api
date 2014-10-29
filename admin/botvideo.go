@@ -94,7 +94,7 @@ func (b *BotVideo) getBotVideos(f *FormSearchBotUser) []*BotVideoRow {
 
 	log.Println(f.Username, f.Status)
 
-	if f.Username == "all" {
+	if f.Username == "all" || f.Username == "" {
 		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.user_type, v.title, video_id, published, status from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE status = ? ORDER BY v.username, published DESC LIMIT 0, 50", f.Status)
 	} else {
 		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.user_type, v.title, video_id, published, status from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE status = ? AND v.username = ? ORDER BY published DESC", f.Status, f.Username)

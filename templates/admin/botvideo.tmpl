@@ -98,7 +98,7 @@
       <label>Change status to : </label>
       <input type="submit" class="btn btn-danger" name="update_status" value="Rejected" />
       <input type="submit" class="btn btn-primary" name="update_status" value="Waiting" />
-      <input type="submit" class="btn btn-success" name="update_status" value="Updated" />
+      <input type="submit" class="btn btn-info" name="update_status" value="Updated" />
       <table class="table table-striped">
         <thead>
             <th><input type="checkbox" id="cb_bot_video" /></th>
@@ -113,7 +113,7 @@
             <td><a target="_blank" href="http://www.thetvthailand.com/cms/findvideo/?url=https://www.youtube.com/{{.UserType}}/{{.Username}}/videos">{{.Description}}</a>
               <a href="/admin/botvideo?username={{.Username}}&status={{.Status}}"><span class="glyphicon glyphicon-th-list"></span>
             </td>
-            <td>{{.Title}}</td><td><input type="text" class="txt_video_id" size="16" value="{{.VideoId}}" /></td>
+            <td>{{.Title}}</td><td><input type="text" class="txt_video_id" size="10" value="{{.VideoId}}" /></td>
             <td><a target="_blank" href="https://www.youtube.com/watch?v={{.VideoId}}"><span class="glyphicon glyphicon-play-circle"></span></a></td>
             <td>{{.Published}}</td>
             <td><a target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?url=http://www.youtube.com/watch?v={{.VideoId}}"><span class="glyphicon glyphicon-thumbs-up"></span></a>
