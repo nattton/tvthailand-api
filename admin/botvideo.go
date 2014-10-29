@@ -37,7 +37,7 @@ type BotVideoRow struct {
 	Id          int32
 	Username    string
 	Description string
-	UserType string
+	UserType    string
 	Title       string
 	VideoId     string
 	Published   string
@@ -109,7 +109,7 @@ func (b *BotVideo) getBotVideos(f *FormSearchBotUser) []*BotVideoRow {
 			id          int32
 			username    string
 			description string
-			userType string
+			userType    string
 			title       string
 			videoId     string
 			published   string
