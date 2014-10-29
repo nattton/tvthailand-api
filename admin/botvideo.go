@@ -37,6 +37,7 @@ type BotVideoRow struct {
 	Id          int32
 	Username    string
 	Description string
+	UserType string
 	Title       string
 	VideoId     string
 	Published   string
@@ -94,9 +95,9 @@ func (b *BotVideo) getBotVideos(f *FormSearchBotUser) []*BotVideoRow {
 	log.Println(f.Username, f.Status)
 
 	if f.Username == "all" {
-		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, v.title, video_id, published, status from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE status = ? ORDER BY v.username, published DESC LIMIT 0, 50", f.Status)
+		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.user_type, v.title, video_id, published, status from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE status = ? ORDER BY v.username, published DESC LIMIT 0, 50", f.Status)
 	} else {
-		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, v.title, video_id, published, status from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE status = ? AND v.username = ? ORDER BY published DESC", f.Status, f.Username)
+		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.user_type, v.title, video_id, published, status from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE status = ? AND v.username = ? ORDER BY published DESC", f.Status, f.Username)
 	}
 
 	if err != nil {
@@ -108,15 +109,16 @@ func (b *BotVideo) getBotVideos(f *FormSearchBotUser) []*BotVideoRow {
 			id          int32
 			username    string
 			description string
+			userType string
 			title       string
 			videoId     string
 			published   string
 			status      int
 		)
-		if err := rows.Scan(&id, &username, &description, &title, &videoId, &published, &status); err != nil {
+		if err := rows.Scan(&id, &username, &description, &userType, &title, &videoId, &published, &status); err != nil {
 			log.Fatal(err)
 		}
-		botVideo := &BotVideoRow{id, username, description, title, videoId, published, status}
+		botVideo := &BotVideoRow{id, username, description, userType, title, videoId, published, status}
 		botVideos = append(botVideos, botVideo)
 	}
 

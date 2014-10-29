@@ -72,14 +72,21 @@
       <table class="table table-striped">
         <thead>
             <th><input type="checkbox" id="cb_bot_video" /></th>
-            <th>Username</th><th>Title</th><th>VideoId</th><th>Published</th>
-            <th>Update</th>
+            <th>Username</th><th>Title</th><th>VideoId</th>
+            <th><span class="glyphicon glyphicon-play-circle"></span></th>
+            <th>Published</th>
+            <th><span class="glyphicon glyphicon-thumbs-up"></span></th>
         </thead>
         {{range .botVideos}}
           <tr>
             <td><input type="checkbox" class="cb_bot_video" name="bot_video[]" value="{{.Id}}"/></td>
-            <td>{{.Description}}</td><td>{{.Title}}</td><td><input type="text" class="txt_video_id" size="16" value="{{.VideoId}}" /></td><td>{{.Published}}</td>
-            <td><a target="_blank" class="btn btn-default" href="http://tv-cms.makathon.com/bookmarktv.php?url=http://www.youtube.com/watch?v={{.VideoId}}">Update</a>
+            <td><a target="_blank" href="http://www.thetvthailand.com/cms/findvideo/?url=https://www.youtube.com/{{.UserType}}/{{.Username}}/videos">{{.Description}}</a>
+              <a href="/admin/botvideo?username={{.Username}}"><span class="glyphicon glyphicon-th-list"></span>
+            </td>
+            <td>{{.Title}}</td><td><input type="text" class="txt_video_id" size="16" value="{{.VideoId}}" /></td>
+            <td><a target="_blank" href="https://www.youtube.com/watch?v={{.VideoId}}"><span class="glyphicon glyphicon-play-circle"></span></a></td>
+            <td>{{.Published}}</td>
+            <td><a target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?url=http://www.youtube.com/watch?v={{.VideoId}}"><span class="glyphicon glyphicon-thumbs-up"></span></a>
           </tr>
         {{end}}
       </table>
