@@ -111,7 +111,7 @@
           <tr>
             <td><input type="checkbox" class="cb_bot_video" name="bot_video[]" value="{{.Id}}"/></td>
             <td><a target="_blank" href="http://www.thetvthailand.com/cms/findvideo/?url=https://www.youtube.com/{{.UserType}}/{{.Username}}/videos">{{.Description}}</a>
-              <a href="/admin/botvideo?username={{.Username}}"><span class="glyphicon glyphicon-th-list"></span>
+              <a href="/admin/botvideo?username={{.Username}}&status={{.Status}}"><span class="glyphicon glyphicon-th-list"></span>
             </td>
             <td>{{.Title}}</td><td><input type="text" class="txt_video_id" size="16" value="{{.VideoId}}" /></td>
             <td><a target="_blank" href="https://www.youtube.com/watch?v={{.VideoId}}"><span class="glyphicon glyphicon-play-circle"></span></a></td>
