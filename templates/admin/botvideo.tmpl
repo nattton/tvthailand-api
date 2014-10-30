@@ -1,6 +1,5 @@
-{{ define "title" }}TV Thailand - Bot Video{{ end }}
-<link rel="stylesheet" href="/static/chosen/chosen.min.css" />
-<div class="jumbotron">
+{[{ define "title" }]}TV Thailand - Bot Video{[{ end }]}
+<div ng-controller="BotVideoCtrl" class="jumbotron">
   <div class="container">
     <fieldset>
       <legend><a href="/admin/botvideo">Bot Video</a>
@@ -13,46 +12,45 @@
       <div class="form-group">
         <label for="inputUsername" class="col-sm-2 control-label">Username</label>
         <div class="col-sm-10">
-          <select id="inputUsername" name="username" class="chosen-select" style="width:350px;">
-            <option value="all">All</option>
-            {{range .botUsers}}
-              <option value="{{.Username}}" {{if .IsSelected}} selected="selected" {{end}}>{{.Description}} - {{.Username}}</option>
-            {{end}}
+          <select id="inputUsername" name="username" ng-model="username" ng-change="loadData()" class="chosen-select" style="width:350px;">
+            <option value="">All</option>
+            {[{range .botUsers}]}
+              <option value="{[{.Username}]}" {[{if .IsSelected}]} selected="selected" {[{end}]}>{[{.Description}]} - {[{.Username}]}</option>
+            {[{end}]}
           </select>
 
-          <select id="inputStatus" name="status">
-            {{range .botStatuses}}
-              <option value="{{.Id}}" {{if .IsSelected}} selected="selected" {{end}}>{{.Name}}</option>
-            {{end}}
+          <select id="inputStatus" name="status" ng-model="status" ng-change="loadData()" >
+            {[{range .botStatuses}]}
+              <option value="{[{.Id}]}" {[{if .IsSelected}]} selected="selected" {[{end}]}>{[{.Name}]}</option>
+            {[{end}]}
           </select>
 
-          <input type="submit" class="btn btn-default" value="Search" />
+          <input type="button" ng-click="loadData()" class="btn btn-default" value="Search" />
         </div>
       </div>
-      <input type="hidden" id="search_time" name="time" value="" />
     </form>
     <br />
     <h4></h4>
     <form class="form-horizontal" role="form" method="POST" action="/admin/botvideo">
-      <input type="hidden" name="username" value="{{.formSearch.Username}}" />
-      <input type="hidden" name="status" value="{{.formSearch.Status}}" />
+      <input type="hidden" name="username" value="{{username}}" />
+      <input type="hidden" name="status" value="{{status}}" />
 
       <div class="form-group">
         <label for="inputTitle" class="col-sm-2 control-label">Title</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="inputTitle" placeholder="">
+          <input type="text" ng-model="sumTitle" class="form-control" id="inputTitle" placeholder="">
         </div>
       </div>
       <div class="form-group">
-        <label for="sumId" class="col-sm-2 control-label">Sum Id</label>
+        <label for="sumId" class="col-sm-2 control-label">Sum Id [ {{countSumId}} ]</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="sumId" placeholder="">
+          <input type="text" ng-model="sumId" class="form-control" id="sumId" placeholder="">
         </div>
       </div>
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-          <a class="btn btn-success" id="btn_update" target="_blank" href="" >Update</a>
-          <input type="button" class="btn btn-warning" id="btn_clear" value="Clear" />
+          <a class="btn btn-success" id="btn_update" target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?id={{sumId}}&amp;title={{sumTitle}}" ng-show="sumId">Update</a>
+          <input type="button" ng-click="clearSum()" class="btn btn-warning" id="btn_clear" value="Clear" />
         </div>
       </div>
       <br />
@@ -60,6 +58,7 @@
       <input type="submit" class="btn btn-danger" name="update_status" value="Rejected" />
       <input type="submit" class="btn btn-primary" name="update_status" value="Waiting" />
       <input type="submit" class="btn btn-info" name="update_status" value="Updated" />
+
       <table class="table table-striped">
         <thead>
             <th><input type="checkbox" id="cb_bot_video" /></th>
@@ -68,54 +67,67 @@
             <th>Published</th>
             <th><span class="glyphicon glyphicon-thumbs-up"></span></th>
         </thead>
-        {{range .botVideos}}
-          <tr>
-            <td><input type="checkbox" class="cb_bot_video" name="bot_video[]" value="{{.Id}}"/></td>
-            <td><a target="_blank" href="http://www.thetvthailand.com/cms/findvideo/?url=https://www.youtube.com/{{.UserType}}/{{.Username}}/videos">{{.Description}}</a>
-              <a href="/admin/botvideo?username={{.Username}}&amp;status={{.Status}}"><span class="glyphicon glyphicon-th-list"></span>
+          <tr ng-repeat="video in videos">
+            <td><input type="checkbox" class="cb_bot_video" name="bot_video[]" value="{{video.Id}}"/></td>
+            <td><a target="_blank" href="http://www.thetvthailand.com/cms/findvideo/?url=https://www.youtube.com/{{video.UserType}}/{{video.Username}}/videos">{{video.Description}}</a>
+              <a href="#"><span class="glyphicon glyphicon-th-list" ng-click="selectUsername(video)"></span></a>
             </td>
-            <td>{{.Title}}</td><td><input type="text" class="txt_video_id" size="10" value="{{.VideoId}}" /></td>
-            <td><a target="_blank" href="https://www.youtube.com/watch?v={{.VideoId}}"><span class="glyphicon glyphicon-play-circle"></span></a></td>
-            <td>{{.Published}}</td>
-            <td><a target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?url=http://www.youtube.com/watch?v={{.VideoId}}"><span class="glyphicon glyphicon-thumbs-up"></span></a>
+            <td>{{video.Title}}</td><td><input type="text" ng-click="setSumId(video)" size="10" value="{{video.VideoId}}" /></td>
+            <td><a target="_blank" href="https://www.youtube.com/watch?v={{video.VideoId}}"><span class="glyphicon glyphicon-play-circle"></span></a></td>
+            <td>{{video.Published}}</td>
+            <td><a target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?url=http://www.youtube.com/watch?v={{video.VideoId}}"><span class="glyphicon glyphicon-thumbs-up"></span></a></td>
           </tr>
-        {{end}}
       </table>
     </form>
   </div>
 </div>
 
+<script>
+var tvModule = angular.module('TVThailand', []);
+tvModule.controller('BotVideoCtrl', function ($scope, $http) {
+    $scope.username = "{[{.formSearch.Username}]}";
+    $scope.status = {[{.formSearch.Status}]};
+    $scope.sumId = "";
+    $scope.countSumId = 0;
+    $scope.videos = [];
+
+    $scope.setSumId = function(video){
+      if($scope.sumId.length > 0) {
+        $scope.sumId += ","
+      }
+      $scope.sumId += video.VideoId;
+      $scope.sumTitle = video.Title;
+      $scope.countSumId = $scope.sumId.split(",").length
+    };
+    $scope.clearSum = function(){
+      $scope.sumTitle = "";
+      $scope.sumId = "";
+      $scope.countSumId = 0;
+    };
+
+    $scope.loadData = function(){
+      $http.get('/admin/botvideo.json', { params:{username: $scope.username, status: $scope.status, time: Date.now()}}).
+        success(function(data){
+          $scope.videos = data;
+        });
+    };
+
+    $scope.selectUsername = function(video){
+      $("#inputUsername_chosen span").html(video.Description + " - " + video.Username);
+      $scope.username = video.Username;
+      $scope.loadData();
+    };
+
+    $scope.loadData();
+  });
+</script>
+
+<link rel="stylesheet" href="/static/chosen/chosen.min.css" />
 <script src="/static/chosen/chosen.1.0.jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript">
+
   $(function(){
     $(".chosen-select").chosen();
-    $("#btn_update").hide();
-    $("#search_time").val($.now());
-
-    var $sumId = $("#sumId");
-    $(".txt_video_id").click(function(){
-      var $videoId = $(this);
-      $videoId.select();
-      var sumId = $sumId.val()
-      if ($sumId.val() == "") {
-        sumId = $videoId.val();
-      } else {
-        sumId = $sumId.val() + "," + $videoId.val();
-      }
-      $sumId.val(sumId)
-
-      var title = $videoId.closest("tr").find("td:eq(2)").text().trim();
-      $("#inputTitle").val(title);
-
-      var urlUpdate = "http://tv-cms.makathon.com/bookmarktv.php?id=" + sumId + "&title=" + title;
-      $("#btn_update").attr("href", urlUpdate);
-      $("#btn_update").show();
-    });
-
-    $("#btn_clear").click(function(){
-      $sumId.val("");
-      $("#btn_update").hide();
-    });
 
     $("#cb_bot_video").click(function(){
       $('.cb_bot_video').prop('checked', $(this).prop('checked'));

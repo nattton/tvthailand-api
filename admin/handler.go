@@ -182,13 +182,13 @@ func BotVideoHandler(db *sql.DB, r render.Render, req *http.Request) {
 	b := NewBotVideo(db)
 	botStatuses := b.getBotStatuses(formSearch.Status)
 	botUsers := b.getBotUsers(formSearch.Username)
-	botVideos := b.getBotVideos(formSearch)
+	// botVideos := b.getBotVideos(formSearch)
 
 	newmap := map[string]interface{}{
 		"formSearch":  formSearch,
 		"botStatuses": botStatuses,
 		"botUsers":    botUsers,
-		"botVideos":   botVideos,
+		// "botVideos":   botVideos,
 	}
 
 	r.HTML(200, "admin/botvideo", newmap)
@@ -208,4 +208,14 @@ func BotVideoPostHandler(db *sql.DB, r render.Render, req *http.Request) {
 	b.setBotVideosStatus(botVideos, updateStatus)
 
 	BotVideoHandler(db, r, req)
+}
+
+func BotVideoJsonHandler(db *sql.DB, r render.Render, req *http.Request) {
+	username := req.FormValue("username")
+	status, _ := strconv.Atoi(req.FormValue("status"))
+	formSearch := &FormSearchBotUser{username, status}
+
+	b := NewBotVideo(db)
+	botVideos := b.getBotVideos(formSearch)
+	r.JSON(200, botVideos)
 }

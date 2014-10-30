@@ -4,15 +4,16 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{ template "title" . }}</title>
+        <title>{[{ template "title" . }]}</title>
 
         <!-- Bootstrap -->
         <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
         <link href="/static/css/base.css" rel="stylesheet">
         <script src="/static/jquery/jquery.min.js"></script>
+        <script src="/static/angularjs/angular.js"></script>
         <script src="/static/bootstrap/js/bootstrap.min.js"></script>
     </head>
-    <body>
+    <body ng-app="TVThailand">
       <div class="navbar navbar-inverse navbar-static-top" role="navigation">
         <div class="container">
           <div class="navbar-header">
@@ -39,7 +40,7 @@
       </div>
 
       <div id="content" role="main">
-          {{ yield }}
+          {[{ yield }]}
 
           <footer id="footer">
               Code Mobi © 2014

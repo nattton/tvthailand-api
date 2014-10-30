@@ -2,16 +2,16 @@
   <div class="container">
     <h1>OTV</h1>
     <form method="post" action="">
-      {{range .processTypes}}
-        <input type="radio" name="processType" value="{{.Value}}" {{if .Checked}} checked {{end}}> {{.Text}}<br>
-      {{end}}
+      {[{range .processTypes}]}
+        <input type="radio" name="processType" value="{[{.Value}]}" {[{if .Checked}]} checked {[{end}]}> {[{.Text}]}<br>
+      {[{end}]}
       <input type="submit" class="btn btn-primary btn-lg" role="button" value="Submit">
     </form>
-    <h3>{{.message}}</h3>
+    <h3>{[{.message}]}</h3>
     <ul>
-      {{range .results}}
-        <li>{{.ContentSeasonId}} {{.NameTh}} {{.NameEn}} {{.ModifiedDate}} <img src="{{.Thumbnail}}" alt="thumbnail" /></li>
-      {{end}}
+      {[{range .results}]}
+        <li>{[{.ContentSeasonId}]} {[{.NameTh}]} {[{.NameEn}]} {[{.ModifiedDate}]} <img src="{[{.Thumbnail}]}" alt="thumbnail" /></li>
+      {[{end}]}
     </ul>
   </div>
 </div>
