@@ -12,20 +12,20 @@
       <div class="form-group">
         <label for="inputUsername" class="col-sm-2 control-label">Username</label>
         <div class="col-sm-10">
-          <select id="inputUsername" name="username" ng-model="username" ng-change="loadData()" class="chosen-select" style="width:350px;">
+          <select id="inputUsername" name="username" ng-model="username" ng-change="loadData(0)" class="chosen-select" style="width:350px;">
             <option value="">All</option>
             {[{range .botUsers}]}
               <option value="{[{.Username}]}" {[{if .IsSelected}]} selected="selected" {[{end}]}>{[{.Description}]} - {[{.Username}]}</option>
             {[{end}]}
           </select>
 
-          <select id="inputStatus" name="status" ng-model="status" ng-change="loadData()" >
+          <select id="inputStatus" name="status" ng-model="status" ng-change="loadData(0)" >
             {[{range .botStatuses}]}
               <option value="{[{.Id}]}" {[{if .IsSelected}]} selected="selected" {[{end}]}>{[{.Name}]}</option>
             {[{end}]}
           </select>
 
-          <input type="button" ng-click="loadData()" class="btn btn-default" value="Search" />
+          <input type="button" ng-click="loadData(0)" class="btn btn-default" value="Search" />
         </div>
       </div>
     </form>
@@ -78,6 +78,9 @@
             <td><a target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?url=http://www.youtube.com/watch?v={{video.VideoId}}"><span class="glyphicon glyphicon-thumbs-up"></span></a></td>
           </tr>
       </table>
+      <div class="row">
+        <div class="col-md-2 col-md-offset-5"><input type="button" ng-click="loadData(nextPage)" ng-show="isNext" class="btn btn-default" value="Load More..." /></div>
+      </div>
     </form>
   </div>
 </div>
@@ -90,6 +93,9 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
     $scope.sumId = "";
     $scope.countSumId = 0;
     $scope.videos = [];
+    $scope.isNext = false;
+
+    $scope.nextPage = 1;
 
     $scope.setSumId = function(video){
       if($scope.sumId.length > 0) {
@@ -105,10 +111,27 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       $scope.countSumId = 0;
     };
 
-    $scope.loadData = function(){
-      $http.get('/admin/botvideo.json', { params:{username: $scope.username, status: $scope.status, time: Date.now()}}).
+    $scope.loadData = function(page){
+      $http.get('/admin/botvideo.json', { params:{
+                                            username: $scope.username,
+                                            status: $scope.status,
+                                            page: page,
+                                            time: Date.now()}}).
         success(function(data){
-          $scope.videos = data;
+          if (data.CurrentPage == 0) {
+            $scope.videos = data.Videos;
+          } else {
+            angular.forEach(data.Videos, function(video) {
+              $scope.videos.push(video)
+            });
+          }
+
+          if(data.MaxPage > data.CurrentPage) {
+            $scope.isNext = true;
+            $scope.nextPage = data.CurrentPage+1;
+          } else {
+            $scope.isNext = false;
+          }
         });
     };
 

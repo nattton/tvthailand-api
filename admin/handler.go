@@ -177,7 +177,8 @@ func OtvProcessHandler(db *sql.DB, r render.Render, req *http.Request) {
 func BotVideoHandler(db *sql.DB, r render.Render, req *http.Request) {
 	username := req.FormValue("username")
 	status, _ := strconv.Atoi(req.FormValue("status"))
-	formSearch := &FormSearchBotUser{username, status}
+	page, _ := strconv.Atoi(req.FormValue("page"))
+	formSearch := &FormSearchBotUser{username, status, int32(page)}
 
 	b := NewBotVideo(db)
 	botStatuses := b.getBotStatuses(formSearch.Status)
@@ -213,7 +214,8 @@ func BotVideoPostHandler(db *sql.DB, r render.Render, req *http.Request) {
 func BotVideoJsonHandler(db *sql.DB, r render.Render, req *http.Request) {
 	username := req.FormValue("username")
 	status, _ := strconv.Atoi(req.FormValue("status"))
-	formSearch := &FormSearchBotUser{username, status}
+	page, _ := strconv.Atoi(req.FormValue("page"))
+	formSearch := &FormSearchBotUser{username, status, int32(page)}
 
 	b := NewBotVideo(db)
 	botVideos := b.getBotVideos(formSearch)
