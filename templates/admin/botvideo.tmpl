@@ -112,11 +112,15 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
     };
 
     $scope.loadData = function(page){
+      $scope.isNext = false;
       $http.get('/admin/botvideo.json', { params:{
                                             username: $scope.username,
                                             status: $scope.status,
                                             page: page,
                                             time: Date.now()}}).
+        error(function(){
+          $scope.isNext = (page > 0);
+        }).
         success(function(data){
           if (data.CurrentPage == 0) {
             $scope.videos = data.Videos;
