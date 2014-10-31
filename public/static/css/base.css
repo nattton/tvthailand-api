@@ -1,5 +1,5 @@
 body {
-  
+
 }
 
 .navbar-static-top {
@@ -11,4 +11,8 @@ footer {
   text-align: center;
   font-size: 11px;
   z-index: 1;
+}
+
+.selected-text {
+  background-color: #d0ffd3;
 }

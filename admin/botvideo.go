@@ -3,9 +3,11 @@ package admin
 import (
 	"database/sql"
 	"log"
-	"strconv"
 	"math"
+	"strconv"
 )
+
+const limitRow int32 = 40
 
 type BotVideo struct {
 	Db *sql.DB
@@ -20,7 +22,7 @@ func NewBotVideo(db *sql.DB) *BotVideo {
 type FormSearchBotUser struct {
 	Username string
 	Status   int
-	Page 		int32
+	Page     int32
 }
 
 type BotUser struct {
@@ -36,10 +38,10 @@ type BotStatus struct {
 }
 
 type BotVideos struct {
-	Videos []*BotVideoRow
-	CountRow int32
+	Videos      []*BotVideoRow
+	CountRow    int32
 	CurrentPage int32
-	MaxPage int32
+	MaxPage     int32
 }
 
 type BotVideoRow struct {
@@ -97,7 +99,6 @@ func (b *BotVideo) getBotUsers(selectUsername string) []*BotUser {
 
 func (b *BotVideo) getBotVideos(f *FormSearchBotUser) *BotVideos {
 	var countRow int32 = 0
-	var limitRow int32 = 60
 	botVideos := []*BotVideoRow{}
 
 	var rows *sql.Rows

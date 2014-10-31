@@ -50,7 +50,7 @@ func main() {
 		m.Map(client)
 		m.Use(render.Renderer(render.Options{
 			Layout:     "layout",
-			Delims: render.Delims{"{[{", "}]}"},
+			Delims:     render.Delims{"{[{", "}]}"},
 			IndentJSON: true,
 		}))
 
