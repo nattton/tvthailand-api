@@ -116,6 +116,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
     };
 
     $scope.loadData = function(page){
+      if(page == 0) $scope.clearSum();
       $scope.isNext = false;
       $scope.isLoading = true;
       $http.get('/admin/botvideo.json', { params:{
