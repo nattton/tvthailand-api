@@ -1,5 +1,81 @@
 {[{ define "title" }]}TV Thailand - Bot Video{[{ end }]}
-<div ng-controller="BotVideoCtrl" class="jumbotron">
+<script>
+$(function(){
+  $(".chosen-select").chosen();
+
+  $("#cb_bot_video").click(function(){
+    $('.cb_bot_video').prop('checked', $(this).prop('checked'));
+  });
+});
+
+var tvModule = angular.module('TVThailand', []);
+tvModule.controller('BotVideoCtrl', function ($scope, $http) {
+    $scope.status = {[{.formSearch.Status}]};
+    $scope.sumId = "";
+    $scope.countSumId = 0;
+    $scope.videos = [];
+    $scope.isNext = false;
+    $scope.isLoading = false;
+
+    $scope.nextPage = 1;
+
+    $scope.setSumId = function(video){
+      if($scope.sumId.length > 0) {
+        $scope.sumId += ","
+      }
+      $scope.sumId += video.VideoId;
+      $scope.sumTitle = video.Title;
+      $scope.countSumId = $scope.sumId.split(",").length
+    };
+    $scope.clearSum = function(){
+      $scope.sumTitle = "";
+      $scope.sumId = "";
+      $scope.countSumId = 0;
+    };
+
+    $scope.loadData = function(page){
+      if(page == 0) $scope.clearSum();
+      $scope.isNext = false;
+      $scope.isLoading = true;
+      $http.get('/admin/botvideo.json', { params:{
+                                            username: $scope.username,
+                                            status: $scope.status,
+                                            page: page,
+                                            time: Date.now()}}).
+        error(function(){
+          $scope.isLoading = false;
+          $scope.isNext = (page > 0);
+        }).
+        success(function(data){
+          $scope.isLoading = false;
+          if (data.CurrentPage == 0) {
+            $scope.videos = data.Videos;
+          } else {
+            angular.forEach(data.Videos, function(video) {
+              $scope.videos.push(video)
+            });
+          }
+
+          if(data.MaxPage > data.CurrentPage) {
+            $scope.isNext = true;
+            $scope.nextPage = data.CurrentPage+1;
+          } else {
+            $scope.isNext = false;
+          }
+        });
+    };
+
+    $scope.selectUsername = function(video){
+      $("#inputUsername_chosen span").html(video.Description + " - " + video.Username);
+      $scope.username = video.Username;
+      $scope.loadData();
+    };
+
+    $scope.loadData();
+  });
+
+</script>
+<div ng-controller="BotVideoCtrl" data-ng-init="username = '{[{.formSearch.Username}]}'" class="jumbotron">
   <div class="container">
     <fieldset>
       <legend><a href="/admin/botvideo">Bot Video</a>
@@ -87,85 +163,3 @@
     </form>
   </div>
 </div>
-
-<script>
-var tvModule = angular.module('TVThailand', []);
-tvModule.controller('BotVideoCtrl', function ($scope, $http) {
-    $scope.username = "{[{.formSearch.Username}]}";
-    $scope.status = {[{.formSearch.Status}]};
-    $scope.sumId = "";
-    $scope.countSumId = 0;
-    $scope.videos = [];
-    $scope.isNext = false;
-    $scope.isLoading = false;
-
-    $scope.nextPage = 1;
-
-    $scope.setSumId = function(video){
-      if($scope.sumId.length > 0) {
-        $scope.sumId += ","
-      }
-      $scope.sumId += video.VideoId;
-      $scope.sumTitle = video.Title;
-      $scope.countSumId = $scope.sumId.split(",").length
-    };
-    $scope.clearSum = function(){
-      $scope.sumTitle = "";
-      $scope.sumId = "";
-      $scope.countSumId = 0;
-    };
-
-    $scope.loadData = function(page){
-      if(page == 0) $scope.clearSum();
-      $scope.isNext = false;
-      $scope.isLoading = true;
-      $http.get('/admin/botvideo.json', { params:{
-                                            username: $scope.username,
-                                            status: $scope.status,
-                                            page: page,
-                                            time: Date.now()}}).
-        error(function(){
-          $scope.isLoading = false;
-          $scope.isNext = (page > 0);
-        }).
-        success(function(data){
-          $scope.isLoading = false;
-          if (data.CurrentPage == 0) {
-            $scope.videos = data.Videos;
-          } else {
-            angular.forEach(data.Videos, function(video) {
-              $scope.videos.push(video)
-            });
-          }
-
-          if(data.MaxPage > data.CurrentPage) {
-            $scope.isNext = true;
-            $scope.nextPage = data.CurrentPage+1;
-          } else {
-            $scope.isNext = false;
-          }
-        });
-    };
-
-    $scope.selectUsername = function(video){
-      $("#inputUsername_chosen span").html(video.Description + " - " + video.Username);
-      $scope.username = video.Username;
-      $scope.loadData();
-    };
-
-    $scope.loadData();
-  });
-</script>
-
-<link rel="stylesheet" href="/static/chosen/chosen.min.css" />
-<script src="/static/chosen/chosen.1.0.jquery.min.js" type="text/javascript"></script>
-<script type="text/javascript">
-
-  $(function(){
-    $(".chosen-select").chosen();
-
-    $("#cb_bot_video").click(function(){
-      $('.cb_bot_video').prop('checked', $(this).prop('checked'));
-    });
-  });
-</script>
