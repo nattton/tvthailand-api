@@ -18,6 +18,7 @@ type YoutubeUser struct {
 	Username    string
 	Description string
 	UserType    string
+	BotLimit    int
 }
 
 func NewBot(db *sql.DB) *Bot {
@@ -31,7 +32,7 @@ func (b *Bot) CheckYoutubeUserFirst() {
 	y := &Youtube{}
 	for _, youtubeUser := range youtubeUsers {
 		log.Println(youtubeUser.Username)
-		youtubeVideos := y.getVideoByUser(youtubeUser.Username)
+		youtubeVideos := y.getVideoByUser(youtubeUser.Username, youtubeUser.BotLimit)
 		for _, video := range youtubeVideos {
 			log.Println(video.Username, video.Title, video.VideoId)
 			b.checkFirstVideoExistingAndAddBot(video)
@@ -44,7 +45,7 @@ func (b *Bot) CheckYoutubeUser() {
 	y := &Youtube{}
 	for _, youtubeUser := range youtubeUsers {
 		log.Println(youtubeUser.Username)
-		youtubeVideos := y.getVideoByUser(youtubeUser.Username)
+		youtubeVideos := y.getVideoByUser(youtubeUser.Username, youtubeUser.BotLimit)
 		for _, video := range youtubeVideos {
 			log.Println(video.Username, video.Title, video.VideoId)
 			b.checkBotVideoExistingAndAddBot(video)
@@ -54,7 +55,7 @@ func (b *Bot) CheckYoutubeUser() {
 
 func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
 	var youtubeUsers = []*YoutubeUser{}
-	rows, err := b.Db.Query("SELECT username, description, user_type FROM tv_youtube_users WHERE bot = 1 ORDER BY username")
+	rows, err := b.Db.Query("SELECT username, description, user_type, bot_limit FROM tv_youtube_users WHERE bot = 1 ORDER BY username")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -65,11 +66,12 @@ func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
 			username    string
 			description string
 			userType    string
+			botLimit    int
 		)
-		if err := rows.Scan(&username, &description, &userType); err != nil {
+		if err := rows.Scan(&username, &description, &userType, &botLimit); err != nil {
 			log.Fatal(err)
 		}
-		youtubeUser := &YoutubeUser{username, description, userType}
+		youtubeUser := &YoutubeUser{username, description, userType, botLimit}
 		youtubeUsers = append(youtubeUsers, youtubeUser)
 	}
 	if err := rows.Err(); err != nil {

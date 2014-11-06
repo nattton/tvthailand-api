@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-const YOUTUBE_API_URL = "https://gdata.youtube.com/feeds/api/videos?author=%s&orderby=published&start-index=1&max-results=10&v=2&alt=json"
+const YOUTUBE_API_URL = "https://gdata.youtube.com/feeds/api/videos?author=%s&orderby=published&start-index=1&max-results=%d&v=2&alt=json"
 
 type Youtube struct {
 }
@@ -49,9 +49,9 @@ type Published struct {
 	Value string `json:"$t"`
 }
 
-func (y *Youtube) getVideoByUser(username string) []*YoutubeVideo {
+func (y *Youtube) getVideoByUser(username string, botLimit int) []*YoutubeVideo {
 	youtubeVideos := []*YoutubeVideo{}
-	apiUrl := fmt.Sprintf(YOUTUBE_API_URL, username)
+	apiUrl := fmt.Sprintf(YOUTUBE_API_URL, username, botLimit)
 	resp, err := http.Get(apiUrl)
 	if err != nil {
 		panic(err)
