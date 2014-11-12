@@ -65,6 +65,14 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
         });
     };
 
+    $scope.linkUpdate = function(video){
+      var paramProgramId = ""
+      if (video.ProgramId > 0) {
+        paramProgramId = "&program_id=" + video.ProgramId;
+      }
+      return "http://tv-cms.makathon.com/bookmarktv.php?url=http://www.youtube.com/watch?v=" + video.VideoId + paramProgramId;
+    };
+
     $scope.selectUsername = function(video){
       $("#inputUsername_chosen span").html(video.Description + " - " + video.Username);
       $scope.username = video.Username;
@@ -151,7 +159,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
             <td>{{video.Title}}</td><td><input type="text" ng-click="setSumId(video); style='selected-text'"  ng-class="style" size="10" value="{{video.VideoId}}" /></td>
             <td><a target="_blank" href="https://www.youtube.com/watch?v={{video.VideoId}}"><span class="glyphicon glyphicon-play-circle"></span></a></td>
             <td>{{video.Published}}</td>
-            <td><a target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?url=http://www.youtube.com/watch?v={{video.VideoId}}"><span class="glyphicon glyphicon-thumbs-up"></span></a></td>
+            <td><a target="_blank" href="{{linkUpdate(video)}}"><span class="glyphicon glyphicon-thumbs-up"></span></a></td>
           </tr>
       </table>
       <div class="row">

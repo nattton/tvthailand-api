@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
 	"fmt"
 	"html/template"
@@ -13,6 +12,7 @@ import (
 	"github.com/code-mobi/tvthailand-api/admin"
 	"github.com/code-mobi/tvthailand-api/api2"
 	"github.com/code-mobi/tvthailand-api/bot"
+	"github.com/code-mobi/tvthailand-api/utils"
 	"github.com/dropbox/godropbox/memcache"
 	"github.com/go-martini/martini"
 	_ "github.com/go-sql-driver/mysql"
@@ -24,17 +24,13 @@ func main() {
 	command := flag.String("command", "", "COMMAND")
 	flag.Parse()
 
-	db, err := sql.Open("mysql", os.Getenv("DATABASE_URL"))
+	db, err := utils.OpenDB()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	if *command == "firstrun" {
-		fmt.Println(*command)
-		b := bot.NewBot(db)
-		b.CheckYoutubeUserFirst()
-	} else if *command == "botrun" {
+	if *command == "botrun" {
 		fmt.Println(*command)
 		b := bot.NewBot(db)
 		b.CheckYoutubeUser()
@@ -49,8 +45,10 @@ func main() {
 		m.Map(db)
 		m.Map(client)
 		m.Use(render.Renderer(render.Options{
+			Directory:  "templates",
 			Layout:     "layout",
 			Delims:     render.Delims{"{[{", "}]}"},
+			Charset:    "UTF-8",
 			IndentJSON: true,
 		}))
 

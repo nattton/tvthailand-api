@@ -27,19 +27,6 @@ func NewBot(db *sql.DB) *Bot {
 	return b
 }
 
-func (b *Bot) CheckYoutubeUserFirst() {
-	youtubeUsers := b.getYoutubeRobotUsers()
-	y := &Youtube{}
-	for _, youtubeUser := range youtubeUsers {
-		log.Println(youtubeUser.Username)
-		youtubeVideos := y.getVideoByUser(youtubeUser.Username, youtubeUser.BotLimit)
-		for _, video := range youtubeVideos {
-			log.Println(video.Username, video.Title, video.VideoId)
-			b.checkFirstVideoExistingAndAddBot(video)
-		}
-	}
-}
-
 func (b *Bot) CheckYoutubeUser() {
 	youtubeUsers := b.getYoutubeRobotUsers()
 	y := &Youtube{}
@@ -100,29 +87,6 @@ func (b *Bot) checkBotVideoExistingAndAddBot(video *YoutubeVideo) {
 			}
 			b.insertBotVideo(video)
 		}
-	}
-}
-
-func (b *Bot) checkFirstVideoExistingAndAddBot(video *YoutubeVideo) {
-	rows, err := b.Db.Query("SELECT programlist_id from tv_programlist WHERE programlist_youtube LIKE ? ", "%"+video.VideoId+"%")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-
-	if rows.Next() {
-		video.Status = 1
-	} else {
-		video.Status = 0
-	}
-
-	rows, err = b.Db.Query("SELECT id from tv_bot_videos WHERE video_id = ?", video.VideoId)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-	if !rows.Next() {
-		b.insertBotVideo(video)
 	}
 }
 

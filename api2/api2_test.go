@@ -1,20 +1,19 @@
 package api2
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/code-mobi/tvthailand-api/utils"
 	_ "github.com/go-sql-driver/mysql"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 )
 
 func TestGetCategories_ServeHTTP(t *testing.T) {
-	db, err := sql.Open("mysql", os.Getenv("DATABASE_URL"))
+	db, err := utils.OpenDB()
 	if err != nil {
 		log.Fatal(err)
 	}
