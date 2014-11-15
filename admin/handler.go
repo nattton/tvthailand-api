@@ -3,21 +3,22 @@ package admin
 import (
 	"database/sql"
 	"fmt"
-	"github.com/go-martini/martini"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/martini-contrib/render"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/go-martini/martini"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/martini-contrib/render"
 )
 
-const MTHAI_URL_FMT = "http://video.mthai.com/cool/player/%s.html"
+const MThaiPlayerURL = "http://video.mthai.com/cool/player/%s.html"
 
 type EncryptResult struct {
-	ShowId  int
-	ListId  int
-	VideoId string
+	ShowID  int
+	ListID  int
+	VideoID string
 }
 
 func EncryptHandler(r render.Render) {
@@ -37,7 +38,7 @@ func EncryptUpdateHandler(db *sql.DB, params martini.Params, req *http.Request, 
 	var results []*EncryptResult
 
 	if idType == "mthaiparseurl" {
-		MthaiParseUrl(db, r)
+		MthaiParseURL(db, r)
 		return
 	} else if idType == "" || id == 0 {
 		emptymap := map[string]interface{}{
@@ -61,15 +62,15 @@ func EncryptUpdateHandler(db *sql.DB, params martini.Params, req *http.Request, 
 	defer rows.Close()
 	for rows.Next() {
 		var (
-			showId  int
-			listId  int
-			videoId string
+			showID  int
+			listID  int
+			videoID string
 		)
-		if err := rows.Scan(&showId, &listId, &videoId); err != nil {
+		if err := rows.Scan(&showID, &listID, &videoID); err != nil {
 			log.Fatal(err)
 		}
-		updateVideoEncrypt(db, listId, videoId)
-		results = append(results, &EncryptResult{showId, listId, videoId})
+		updateVideoEncrypt(db, listID, videoID)
+		results = append(results, &EncryptResult{showID, listID, videoID})
 	}
 
 	if err := rows.Err(); err != nil {
@@ -85,7 +86,7 @@ func EncryptUpdateHandler(db *sql.DB, params martini.Params, req *http.Request, 
 	r.HTML(200, "admin/encrypt", newmap)
 }
 
-func MthaiParseUrl(db *sql.DB, r render.Render) {
+func MthaiParseURL(db *sql.DB, r render.Render) {
 	var results []*EncryptResult
 	rows, err := db.Query("SELECT program_id, programlist_id, programlist_youtube youtubeKey FROM tv_programlist WHERE programlist_banned = 0 AND programlist_src_type = 14 ORDER BY programlist_id DESC")
 	if err != nil {
@@ -95,33 +96,33 @@ func MthaiParseUrl(db *sql.DB, r render.Render) {
 	defer rows.Close()
 	for rows.Next() {
 		var (
-			programId     int
-			programlistId int
+			programID     int
+			programlistID int
 			youtubeKey    string
 		)
 
-		if err := rows.Scan(&programId, &programlistId, &youtubeKey); err != nil {
+		if err := rows.Scan(&programID, &programlistID, &youtubeKey); err != nil {
 			log.Fatal(err)
 		}
 
-		fmt.Println(programId, programlistId, youtubeKey)
-		videoIds := strings.Split(youtubeKey, ",")
+		fmt.Println(programID, programlistID, youtubeKey)
+		videoIDs := strings.Split(youtubeKey, ",")
 
-		var videoUrls []string
-		for _, videoId := range videoIds {
-			videoUrl := fmt.Sprintf(MTHAI_URL_FMT, videoId)
-			videoUrls = append(videoUrls, videoUrl)
+		var videoURLs []string
+		for _, videoID := range videoIDs {
+			videoURL := fmt.Sprintf(MThaiPlayerURL, videoID)
+			videoURLs = append(videoURLs, videoURL)
 		}
-		videoResult := strings.Join(videoUrls, ",")
+		videoResult := strings.Join(videoURLs, ",")
 		fmt.Println("videoResult :", videoResult)
 		encryptResult := EncryptVideo(videoResult)
 		fmt.Println("encryptResult :", encryptResult)
 
-		_, err := db.Exec("UPDATE tv_programlist SET programlist_youtube = ?, programlist_youtube_encrypt = ?, programlist_src_type = 11, mthai_video = ? WHERE programlist_id = ? ORDER BY program_id DESC", videoResult, encryptResult, youtubeKey, programlistId)
+		_, err := db.Exec("UPDATE tv_programlist SET programlist_youtube = ?, programlist_youtube_encrypt = ?, programlist_src_type = 11, mthai_video = ? WHERE programlist_id = ? ORDER BY program_id DESC", videoResult, encryptResult, youtubeKey, programlistID)
 		if err != nil {
 			panic(err)
 		}
-		results = append(results, &EncryptResult{programId, programlistId, youtubeKey})
+		results = append(results, &EncryptResult{programID, programlistID, youtubeKey})
 	}
 
 	emptymap := map[string]interface{}{
@@ -211,7 +212,7 @@ func BotVideoPostHandler(db *sql.DB, r render.Render, req *http.Request) {
 	BotVideoHandler(db, r, req)
 }
 
-func BotVideoJsonHandler(db *sql.DB, r render.Render, req *http.Request) {
+func BotVideoJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
 	username := req.FormValue("username")
 	status, _ := strconv.Atoi(req.FormValue("status"))
 	page, _ := strconv.Atoi(req.FormValue("page"))

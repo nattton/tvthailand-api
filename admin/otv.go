@@ -4,13 +4,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"io/ioutil"
 	"net/http"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
-const OTV_CATEGORY_URL = "http://api.otv.co.th/api/index.php/CategoryList/index/15/1.0/2.0.1.2"
-const OTV_SHOW_LIST_URL = "http://api.otv.co.th/api/index.php/Lists/index/15/1.0/2.0.1.2/%s/0/50"
+const OtvCategoryURL = "http://api.otv.co.th/api/index.php/v202/Category/index/15/1.0/2.0.2"
+const OtvShowListURL = "http://api.otv.co.th/api/index.php/v202/Lists/index/15/1.0/2.0.2/%s/0/50"
 
 type Otv struct {
 	Db *sql.DB
@@ -22,7 +23,7 @@ type OtvCategory struct {
 
 type OtvCategoryItem struct {
 	ID      string `json:"id"`
-	ApiName string `json:"api_name"`
+	APIName string `json:"api_name"`
 	NameTh  string `json:"name_th"`
 	NameEn  string `json:"name_en"`
 }
@@ -32,7 +33,7 @@ type OtvShowList struct {
 }
 
 type OtvShowListItem struct {
-	ContentSeasonId int    `json:"content_season_id"`
+	ContentSeasonID string `json:"content_season_id"`
 	NameTh          string `json:"name_th"`
 	NameEn          string `json:"name_en"`
 	ModifiedDate    string `json:"modified_date"`
@@ -57,7 +58,7 @@ func (o *Otv) CheckOtvExisting() []*OtvShowListItem {
 	var shows []*OtvShowListItem
 	c := o.getOtvCategory()
 	for _, cat := range c.Items {
-		fmt.Println("#####", cat.ID, cat.ApiName, cat.NameEn, "#####")
+		fmt.Println("#####", cat.ID, cat.APIName, cat.NameEn, "#####")
 		if cat.ID != "5" {
 			s := o.getOtvShowList(cat.ID)
 			for _, show := range s.Items {
@@ -74,7 +75,7 @@ func (o *Otv) UpdateModified() []*OtvShowListItem {
 	var shows []*OtvShowListItem
 	c := o.getOtvCategory()
 	for _, cat := range c.Items {
-		fmt.Println("#####", cat.ID, cat.ApiName, cat.NameEn, "#####")
+		fmt.Println("#####", cat.ID, cat.APIName, cat.NameEn, "#####")
 		if cat.ID != "5" {
 			s := o.getOtvShowList(cat.ID)
 			for _, show := range s.Items {
@@ -95,10 +96,10 @@ func (o *Otv) UpdateModified() []*OtvShowListItem {
 
 func (o *Otv) checkExisting(show *OtvShowListItem) bool {
 	var title string
-	err := o.Db.QueryRow("SELECT program_title from tv_program WHERE otv_id = ?", show.ContentSeasonId).Scan(&title)
+	err := o.Db.QueryRow("SELECT program_title from tv_program WHERE otv_id = ?", show.ContentSeasonID).Scan(&title)
 	if err != nil {
 		fmt.Println("##### Not Found #####")
-		fmt.Println(show.ContentSeasonId, show.NameTh)
+		fmt.Println(show.ContentSeasonID, show.NameTh)
 		fmt.Println("ModifiedDate", show.ModifiedDate)
 		fmt.Println("Thumbanil", show.Thumbnail)
 		return false
@@ -108,10 +109,10 @@ func (o *Otv) checkExisting(show *OtvShowListItem) bool {
 
 func (o *Otv) updateModifiedDate(show *OtvShowListItem) (int64, error) {
 	fmt.Println("##### Update #####")
-	fmt.Println(show.ContentSeasonId, show.NameTh)
+	fmt.Println(show.ContentSeasonID, show.NameTh)
 	fmt.Println("ModifiedDate", show.ModifiedDate)
 
-	result, err := o.Db.Exec("UPDATE tv_program SET update_date = ? WHERE otv_id = ?", show.ModifiedDate, show.ContentSeasonId)
+	result, err := o.Db.Exec("UPDATE tv_program SET update_date = ? WHERE otv_id = ?", show.ModifiedDate, show.ContentSeasonID)
 	if err != nil {
 		panic(err)
 	}
@@ -119,7 +120,7 @@ func (o *Otv) updateModifiedDate(show *OtvShowListItem) (int64, error) {
 }
 
 func (o *Otv) getOtvCategory() OtvCategory {
-	resp, err := http.Get(OTV_CATEGORY_URL)
+	resp, err := http.Get(OtvCategoryURL)
 	if err != nil {
 		panic(err)
 	}
@@ -137,9 +138,9 @@ func (o *Otv) getOtvCategory() OtvCategory {
 	return c
 }
 
-func (o *Otv) getOtvShowList(catId string) OtvShowList {
-	apiUrl := fmt.Sprintf(OTV_SHOW_LIST_URL, catId)
-	resp, err := http.Get(apiUrl)
+func (o *Otv) getOtvShowList(catID string) OtvShowList {
+	apiURL := fmt.Sprintf(OtvShowListURL, catID)
+	resp, err := http.Get(apiURL)
 	if err != nil {
 		panic(err)
 	}

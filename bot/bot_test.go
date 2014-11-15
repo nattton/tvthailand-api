@@ -1,8 +1,9 @@
 package bot
 
 import (
-	"github.com/code-mobi/tvthailand-api/utils"
 	"testing"
+
+	"github.com/code-mobi/tvthailand-api/utils"
 )
 
 func TestGetYoutubeRobotUsers(t *testing.T) {

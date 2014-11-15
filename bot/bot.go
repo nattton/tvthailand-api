@@ -2,8 +2,9 @@ package bot
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Bot struct {
@@ -34,7 +35,7 @@ func (b *Bot) CheckYoutubeUser() {
 		log.Println(youtubeUser.Username)
 		youtubeVideos := y.getVideoByUser(youtubeUser.Username, youtubeUser.BotLimit)
 		for _, video := range youtubeVideos {
-			log.Println(video.Username, video.Title, video.VideoId)
+			log.Println(video.Username, video.Title, video.VideoID)
 			b.checkBotVideoExistingAndAddBot(video)
 		}
 	}
@@ -68,14 +69,14 @@ func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
 }
 
 func (b *Bot) checkBotVideoExistingAndAddBot(video *YoutubeVideo) {
-	rows, err := b.Db.Query("SELECT id from tv_bot_videos WHERE video_id = ?", video.VideoId)
+	rows, err := b.Db.Query("SELECT id from tv_bot_videos WHERE video_id = ?", video.VideoID)
 	if err != nil {
 		log.Fatal(err)
 	} else {
 		defer rows.Close()
 
 		if !rows.Next() {
-			row2s, err := b.Db.Query("SELECT programlist_id from tv_programlist WHERE programlist_youtube LIKE ? ", "%"+video.VideoId+"%")
+			row2s, err := b.Db.Query("SELECT programlist_id from tv_programlist WHERE programlist_youtube LIKE ? ", "%"+video.VideoID+"%")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -91,9 +92,9 @@ func (b *Bot) checkBotVideoExistingAndAddBot(video *YoutubeVideo) {
 }
 
 func (b *Bot) insertBotVideo(video *YoutubeVideo) {
-	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, video_id, video_type, published, status) VALUES (?, ?, ?, 'youtube', ?, ?)", video.Username, video.Title, video.VideoId, video.Published, video.Status)
+	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, video_id, video_type, published, status) VALUES (?, ?, ?, 'youtube', ?, ?)", video.Username, video.Title, video.VideoID, video.Published, video.Status)
 	if err != nil {
 		panic(err)
 	}
-	log.Println("Insert Bot Video ### ", video.Username, video.Title, video.VideoId, video.Published, "###")
+	log.Println("Insert Bot Video ### ", video.Username, video.Title, video.VideoID, video.Published, "###")
 }

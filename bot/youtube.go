@@ -15,7 +15,7 @@ type Youtube struct {
 type YoutubeVideo struct {
 	Username  string
 	Title     string
-	VideoId   string
+	VideoID   string
 	Published string
 	Status    int
 }
@@ -39,9 +39,9 @@ type Title struct {
 }
 
 type MediaGroup struct {
-	VideoId VideoId `json:"yt$videoid"`
+	VideoID VideoID `json:"yt$videoid"`
 }
-type VideoId struct {
+type VideoID struct {
 	Value string `json:"$t"`
 }
 
@@ -51,8 +51,8 @@ type Published struct {
 
 func (y *Youtube) getVideoByUser(username string, botLimit int) []*YoutubeVideo {
 	youtubeVideos := []*YoutubeVideo{}
-	apiUrl := fmt.Sprintf(YOUTUBE_API_URL, username, botLimit)
-	resp, err := http.Get(apiUrl)
+	apiURL := fmt.Sprintf(YOUTUBE_API_URL, username, botLimit)
+	resp, err := http.Get(apiURL)
 	if err != nil {
 		panic(err)
 	}
@@ -65,12 +65,12 @@ func (y *Youtube) getVideoByUser(username string, botLimit int) []*YoutubeVideo 
 	var api YoutubeAPI
 	err = json.Unmarshal(body, &api)
 	if err != nil {
-		fmt.Println("### Json Parser Error", apiUrl, "###")
+		fmt.Println("### Json Parser Error", apiURL, "###")
 	}
 
 	if len(api.Feed.Entries) > 0 {
 		for _, entry := range api.Feed.Entries {
-			youtubeVideo := &YoutubeVideo{username, entry.Title.Value, entry.MediaGroup.VideoId.Value, entry.Published.Value, 0}
+			youtubeVideo := &YoutubeVideo{username, entry.Title.Value, entry.MediaGroup.VideoID.Value, entry.Published.Value, 0}
 			youtubeVideos = append(youtubeVideos, youtubeVideo)
 		}
 	}

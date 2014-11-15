@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-func updateVideoEncrypt(db *sql.DB, listId int, videoId string) {
-	encryptId := EncryptVideo(videoId)
-	_, err := db.Exec("UPDATE tv_programlist SET programlist_youtube_encrypt = ? WHERE programlist_id = ?", encryptId, listId)
+func updateVideoEncrypt(db *sql.DB, listID int, videoID string) {
+	encryptID := EncryptVideo(videoID)
+	_, err := db.Exec("UPDATE tv_programlist SET programlist_youtube_encrypt = ? WHERE programlist_id = ?", encryptID, listID)
 	if err != nil {
 		panic(err)
 	}
@@ -38,7 +38,7 @@ var re = strings.NewReplacer(
 	"s", "?",
 )
 
-func EncryptVideo(videoId string) string {
-	encrypt := base64.StdEncoding.EncodeToString([]byte(videoId))
+func EncryptVideo(videoID string) string {
+	encrypt := base64.StdEncoding.EncodeToString([]byte(videoID))
 	return re.Replace(encrypt)
 }

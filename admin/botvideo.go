@@ -32,7 +32,7 @@ type BotUser struct {
 }
 
 type BotStatus struct {
-	Id         int32
+	ID         int32
 	Name       string
 	IsSelected bool
 }
@@ -45,13 +45,13 @@ type BotVideos struct {
 }
 
 type BotVideoRow struct {
-	Id          int32
+	ID          int32
 	Username    string
 	Description string
-	ProgramId   int32
+	ProgramID   int32
 	UserType    string
 	Title       string
-	VideoId     string
+	VideoID     string
 	Published   string
 	Status      int
 }
@@ -64,7 +64,7 @@ func (b *BotVideo) getBotStatuses(id int) []*BotStatus {
 	return botStatuses
 }
 
-func (b *BotVideo) getBotStatusId(status string) int {
+func (b *BotVideo) getBotStatusID(status string) int {
 	switch status {
 	case "Rejected":
 		return -1
@@ -99,7 +99,7 @@ func (b *BotVideo) getBotUsers(selectUsername string) []*BotUser {
 }
 
 func (b *BotVideo) getBotVideos(f *FormSearchBotUser) *BotVideos {
-	var countRow int32 = 0
+	var countRow int32
 	botVideos := []*BotVideoRow{}
 
 	var rows *sql.Rows
@@ -126,17 +126,17 @@ func (b *BotVideo) getBotVideos(f *FormSearchBotUser) *BotVideos {
 			id          int32
 			username    string
 			description string
-			programId   int32
+			programID   int32
 			userType    string
 			title       string
-			videoId     string
+			videoID     string
 			published   string
 			status      int
 		)
-		if err := rows.Scan(&id, &username, &description, &programId, &userType, &title, &videoId, &published, &status); err != nil {
+		if err := rows.Scan(&id, &username, &description, &programID, &userType, &title, &videoID, &published, &status); err != nil {
 			log.Fatal(err)
 		}
-		botVideo := &BotVideoRow{id, username, description, programId, userType, title, videoId, published, status}
+		botVideo := &BotVideoRow{id, username, description, programID, userType, title, videoID, published, status}
 		botVideos = append(botVideos, botVideo)
 	}
 
@@ -151,10 +151,10 @@ func (b *BotVideo) setBotVideoStatus(id int, status int) {
 	}
 }
 
-func (b *BotVideo) setBotVideosStatus(videoIds []string, updateStatus string) {
-	statusId := b.getBotStatusId(updateStatus)
-	for _, videoId := range videoIds {
-		id, _ := strconv.Atoi(videoId)
-		b.setBotVideoStatus(id, statusId)
+func (b *BotVideo) setBotVideosStatus(videoIDs []string, updateStatus string) {
+	statusID := b.getBotStatusID(updateStatus)
+	for _, videoID := range videoIDs {
+		id, _ := strconv.Atoi(videoID)
+		b.setBotVideoStatus(id, statusID)
 	}
 }
