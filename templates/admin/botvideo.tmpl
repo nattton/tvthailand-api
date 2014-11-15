@@ -68,7 +68,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
     $scope.linkUpdate = function(video){
       var paramProgramID = ""
       if (video.ProgramID > 0) {
-        paramProgramID = "&program_ID=" + video.ProgramID;
+        paramProgramID = "&program_id=" + video.ProgramID;
       }
       return "http://tv-cms.makathon.com/bookmarktv.php?url=http://www.youtube.com/watch?v=" + video.VideoID + paramProgramID;
     };
@@ -96,14 +96,14 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       <div class="form-group">
         <label for="inputUsername" class="col-sm-2 control-label">Username</label>
         <div class="col-sm-10">
-          <select ID="inputUsername" name="username" ng-model="username" ng-change="loadData(0)" class="chosen-select" style="wIDth:350px;">
+          <select id="inputUsername" name="username" ng-model="username" ng-change="loadData(0)" class="chosen-select" style="wIDth:350px;">
             <option value="">All</option>
             {[{range .botUsers}]}
               <option value="{[{.Username}]}" {[{if .IsSelected}]} selected="selected" {[{end}]}>{[{.Description}]} - {[{.Username}]}</option>
             {[{end}]}
           </select>
 
-          <select ID="inputStatus" name="status" ng-model="status" ng-change="loadData(0)" >
+          <select id="inputStatus" name="status" ng-model="status" ng-change="loadData(0)" >
             {[{range .botStatuses}]}
               <option value="{[{.ID}]}" {[{if .IsSelected}]} selected="selected" {[{end}]}>{[{.Name}]}</option>
             {[{end}]}
@@ -122,19 +122,19 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       <div class="form-group">
         <label for="inputTitle" class="col-sm-2 control-label">Title</label>
         <div class="col-sm-10">
-          <input type="text" ng-model="sumTitle" class="form-control" ID="inputTitle" placeholder="">
+          <input type="text" ng-model="sumTitle" class="form-control" id="inputTitle" placeholder="">
         </div>
       </div>
       <div class="form-group">
         <label for="sumID" class="col-sm-2 control-label">Sum ID [ {{countSumID}} ]</label>
         <div class="col-sm-10">
-          <input type="text" ng-model="sumID" class="form-control" ID="sumID" placeholder="">
+          <input type="text" ng-model="sumID" class="form-control" id="sumID" placeholder="">
         </div>
       </div>
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-          <a class="btn btn-success" ID="btn_update" target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?ID={{sumID}}&amp;title={{sumTitle}}" ng-show="sumID">Update</a>
-          <input type="button" ng-click="clearSum()" class="btn btn-warning" ID="btn_clear" value="Clear" />
+          <a class="btn btn-success" id="btn_update" target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?id={{sumID}}&amp;title={{sumTitle}}" ng-show="sumID">Update</a>
+          <input type="button" ng-click="clearSum()" class="btn btn-warning" id="btn_clear" value="Clear" />
         </div>
       </div>
       <br />
@@ -145,7 +145,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
 
       <table class="table table-striped">
         <thead>
-            <th><input type="checkbox" ID="cb_bot_video" /></th>
+            <th><input type="checkbox" id="cb_bot_video" /></th>
             <th>Username</th><th>Title</th><th>VideoID</th>
             <th><span class="glyphicon glyphicon-play-circle"></span></th>
             <th>Published</th>
