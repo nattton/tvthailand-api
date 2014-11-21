@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/code-mobi/tvthailand-api/utils"
 )
 
-const YOUTUBE_API_URL = "https://gdata.youtube.com/feeds/api/videos?author=%s&orderby=published&start-index=1&max-results=%d&v=2&alt=json"
+const YoutubeAPIURL = "https://gdata.youtube.com/feeds/api/videos?author=%s&orderby=published&start-index=1&max-results=%d&v=2&alt=json&random=%s"
 
 type Youtube struct {
 }
@@ -51,7 +53,7 @@ type Published struct {
 
 func (y *Youtube) getVideoByUser(username string, botLimit int) []*YoutubeVideo {
 	youtubeVideos := []*YoutubeVideo{}
-	apiURL := fmt.Sprintf(YOUTUBE_API_URL, username, botLimit)
+	apiURL := fmt.Sprintf(YoutubeAPIURL, username, botLimit, utils.GetTimeStamp())
 	resp, err := http.Get(apiURL)
 	if err != nil {
 		panic(err)
