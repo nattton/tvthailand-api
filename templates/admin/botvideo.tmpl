@@ -2,21 +2,17 @@
 <script>
 $(function(){
   $(".chosen-select").chosen();
-
-  $("#cb_bot_video").click(function(){
-    $('.cb_bot_video').prop('checked', $(this).prop('checked'));
-  });
 });
 
 var tvModule = angular.module('TVThailand', []);
 tvModule.controller('BotVideoCtrl', function ($scope, $http) {
+    $scope.cbAll = false;
     $scope.status = {[{.formSearch.Status}]};
     $scope.sumID = "";
     $scope.countSumID = 0;
     $scope.videos = [];
     $scope.isNext = false;
     $scope.isLoading = false;
-
     $scope.nextPage = 1;
 
     $scope.setSumID = function(video){
@@ -27,13 +23,13 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       $scope.sumTitle = video.Title;
       $scope.countSumID = $scope.sumID.split(",").length
     };
-    $scope.clearSum = function(){
+    $scope.clearSum = function() {
       $scope.sumTitle = "";
       $scope.sumID = "";
       $scope.countSumID = 0;
     };
 
-    $scope.loadData = function(page){
+    $scope.loadData = function(page) {
       if(page == 0) $scope.clearSum();
       $scope.isNext = false;
       $scope.isLoading = true;
@@ -49,12 +45,13 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
         success(function(data){
           $scope.isLoading = false;
           if (data.CurrentPage == 0) {
-            $scope.videos = data.Videos;
-          } else {
-            angular.forEach(data.Videos, function(video) {
-              $scope.videos.push(video)
-            });
+            $scope.videos = [];
           }
+
+          angular.forEach(data.Videos, function(video) {
+            video.selected = false;
+            $scope.videos.push(video)
+          });
 
           if(data.MaxPage > data.CurrentPage) {
             $scope.isNext = true;
@@ -65,18 +62,35 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
         });
     };
 
-    $scope.linkUpdate = function(video){
-      var paramProgramID = ""
+    $scope.linkUpdate = function(video) {
+      var paramProgramID = "";
       if (video.ProgramID > 0) {
         paramProgramID = "&program_id=" + video.ProgramID;
       }
       return "http://tv-cms.makathon.com/bookmarktv.php?url=http://www.youtube.com/watch?v=" + video.VideoID + paramProgramID;
     };
 
-    $scope.selectUsername = function(video){
+    $scope.selectUsername = function(video) {
       $("#inputUsername_chosen span").html(video.Description + " - " + video.Username);
       $scope.username = video.Username;
       $scope.loadData();
+    };
+
+    $scope.wrapVideoID = function() {
+      $scope.clearSum();
+      for(i = $scope.videos.length - 1; i > -1; i--) {
+        var video = $scope.videos[i];
+        if(video.selected) {
+          $scope.setSumID(video);
+        }
+      }
+
+    };
+
+    $scope.checkAll = function() {
+      angular.forEach($scope.videos, function(video){
+        video.selected = $scope.cbAll;
+      });
     };
 
     $scope.loadData();
@@ -116,8 +130,8 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
     <br />
     <h4></h4>
     <form class="form-horizontal" role="form" method="POST" action="/admin/botvideo">
-      <input type="hIDden" name="username" value="{{username}}" />
-      <input type="hIDden" name="status" value="{{status}}" />
+      <input type="hidden" name="username" value="{{username}}" />
+      <input type="hidden" name="status" value="{{status}}" />
 
       <div class="form-group">
         <label for="inputTitle" class="col-sm-2 control-label">Title</label>
@@ -142,22 +156,24 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       <input type="submit" class="btn btn-danger" name="update_status" value="Rejected" />
       <input type="submit" class="btn btn-primary" name="update_status" value="Waiting" />
       <input type="submit" class="btn btn-info" name="update_status" value="Updated" />
+      <label>Action : </label>
+      <input type="button" class="btn btn-info" value="Wrap" ng-click="wrapVideoID()" />
 
       <table class="table table-striped">
         <thead>
-            <th><input type="checkbox" id="cb_bot_video" /></th>
+            <th><input type="checkbox" id="cb_bot_video" ng-model="cbAll" ng-change="checkAll()" /></th>
             <th>Username</th><th>Title</th><th>VideoID</th>
             <th><span class="glyphicon glyphicon-play-circle"></span></th>
             <th>Published</th>
             <th><span class="glyphicon glyphicon-thumbs-up"></span></th>
         </thead>
           <tr ng-repeat="video in videos">
-            <td><input type="checkbox" class="cb_bot_video" name="bot_video[]" value="{{video.ID}}"/></td>
+            <td><input type="checkbox" class="cb_bot_video" name="bot_video[]" value="{{video.ID}}" ng-model="video.selected" /></td>
             <td><a target="_blank" href="http://www.thetvthailand.com/cms/findvideo/?url=https://www.youtube.com/{{video.UserType}}/{{video.Username}}/videos">{{video.Description}}</a>
               <a  target="_blank" href="https://www.youtube.com/{{video.UserType}}/{{video.Username}}/videos"><span class="glyphicon glyphicon-new-window"></span></a>
               <a href="#"><span class="glyphicon glyphicon-th-list" ng-click="selectUsername(video)"></span></a>
             </td>
-            <td>{{video.Title}}</td><td><input type="text" ng-click="setSumID(video); style='selected-text'"  ng-class="style" size="10" value="{{video.VideoID}}" /></td>
+            <td>{{video.Title}}</td><td><input type="text" ng-click="setSumID(video); style='selected-text'" ng-class="style" size="10" value="{{video.VideoID}}" /></td>
             <td><a target="_blank" href="https://www.youtube.com/watch?v={{video.VideoID}}"><span class="glyphicon glyphicon-play-circle"></span></a></td>
             <td>{{video.Published}}</td>
             <td><a target="_blank" href="{{linkUpdate(video)}}"><span class="glyphicon glyphicon-thumbs-up"></span></a></td>
