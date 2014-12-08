@@ -28,16 +28,20 @@ func NewBot(db *sql.DB) *Bot {
 	return b
 }
 
-func (b *Bot) CheckYoutubeUser() {
+func (b *Bot) CheckAllYoutubeUser() {
 	youtubeUsers := b.getYoutubeRobotUsers()
-	y := &Youtube{}
 	for _, youtubeUser := range youtubeUsers {
 		log.Println(youtubeUser.Username)
-		youtubeVideos := y.getVideoByUser(youtubeUser.Username, youtubeUser.BotLimit)
-		for _, video := range youtubeVideos {
-			log.Println(video.Username, video.Title, video.VideoID)
-			b.checkBotVideoExistingAndAddBot(video)
-		}
+		b.CheckYoutubeUser(youtubeUser.Username, youtubeUser.BotLimit)
+	}
+}
+
+func (b *Bot) CheckYoutubeUser(username string, botLimit int) {
+	y := &Youtube{}
+	youtubeVideos := y.getVideoByUser(username, botLimit)
+	for _, video := range youtubeVideos {
+		log.Println(video.Username, video.Title, video.VideoID)
+		b.checkBotVideoExistingAndAddBot(video)
 	}
 }
 

@@ -22,6 +22,7 @@ import (
 func main() {
 	port := flag.String("port", "9000", "PORT")
 	command := flag.String("command", "", "COMMAND")
+	user := flag.String("user", "", "USER")
 	flag.Parse()
 
 	db, err := utils.OpenDB()
@@ -33,7 +34,12 @@ func main() {
 	if *command == "botrun" {
 		fmt.Println(*command)
 		b := bot.NewBot(db)
-		b.CheckYoutubeUser()
+		if *user == "" {
+			b.CheckAllYoutubeUser()
+		} else {
+			b.CheckYoutubeUser(*user, 30)
+		}
+
 	} else {
 		conn, err := net.Dial("tcp", os.Getenv("MEMCACHED_HOST"))
 		if err != nil {

@@ -6,7 +6,7 @@ $(function(){
 
 var tvModule = angular.module('TVThailand', []);
 tvModule.controller('BotVideoCtrl', function ($scope, $http) {
-    $scope.cbAll = false;
+    $scope.toggleSelected = false;
     $scope.status = {[{.formSearch.Status}]};
     $scope.sumID = "";
     $scope.countSumID = 0;
@@ -87,9 +87,9 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
 
     };
 
-    $scope.checkAll = function() {
+    $scope.toggleCheckAll = function() {
       angular.forEach($scope.videos, function(video){
-        video.selected = $scope.cbAll;
+        video.selected = $scope.toggleSelected;
       });
     };
 
@@ -161,7 +161,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
 
       <table class="table table-striped">
         <thead>
-            <th><input type="checkbox" id="cb_bot_video" ng-model="cbAll" ng-change="checkAll()" /></th>
+            <th><input type="checkbox" id="cb_bot_video" ng-model="toggleSelected" ng-change="toggleCheckAll()" /></th>
             <th>Username</th><th>Title</th><th>VideoID</th>
             <th><span class="glyphicon glyphicon-play-circle"></span></th>
             <th>Published</th>
