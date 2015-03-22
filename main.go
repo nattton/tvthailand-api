@@ -27,7 +27,7 @@ func main() {
 
 	db, err := utils.OpenDB()
 	if err != nil {
-		log.Fatal(err)
+		panic(err.Error())
 	}
 	defer db.Close()
 
@@ -37,7 +37,16 @@ func main() {
 		if *user == "" {
 			b.CheckAllYoutubeUser()
 		} else {
-			b.CheckYoutubeUser(*user, 30)
+			b.CheckYoutubeUser(*user, 1, 30)
+		}
+
+	} else if *command == "botrunvideo" {
+		fmt.Println(*command)
+		b := bot.NewBot(db)
+		if *user == "" {
+			fmt.Println("Must have -user=...")
+		} else {
+			b.CheckAllVideoInYoutubeUser(*user)
 		}
 
 	} else {
@@ -84,6 +93,11 @@ func main() {
 			r.Get("/botvideo", admin.BotVideoHandler)
 			r.Post("/botvideo", admin.BotVideoPostHandler)
 			r.Get("/botvideo.json", admin.BotVideoJSONHandler)
+			r.Get("/show.json", admin.ShowJSONHandler)
+			r.Get("/youtube", admin.YoutubeHandler)
+			r.Get("/youtube.json", admin.YoutubeJSONHandler)
+			r.Get("/showlist", admin.ShowListHandler)
+
 		})
 
 		m.Get("/flush", func() string {

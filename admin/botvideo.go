@@ -7,8 +7,6 @@ import (
 	"strconv"
 )
 
-const limitRow int32 = 40
-
 type BotVideo struct {
 	Db *sql.DB
 }

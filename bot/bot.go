@@ -32,16 +32,26 @@ func (b *Bot) CheckAllYoutubeUser() {
 	youtubeUsers := b.getYoutubeRobotUsers()
 	for _, youtubeUser := range youtubeUsers {
 		log.Println(youtubeUser.Username)
-		b.CheckYoutubeUser(youtubeUser.Username, youtubeUser.BotLimit)
+		b.CheckYoutubeUser(youtubeUser.Username, 1, youtubeUser.BotLimit)
 	}
 }
 
-func (b *Bot) CheckYoutubeUser(username string, botLimit int) {
-	y := &Youtube{}
-	youtubeVideos := y.getVideoByUser(username, botLimit)
+func (b *Bot) CheckYoutubeUser(username string, start int, botLimit int) {
+	y := NewYoutube()
+	_, youtubeVideos := y.GetVideoByUser(username, start, botLimit)
 	for _, video := range youtubeVideos {
 		log.Println(video.Username, video.Title, video.VideoID)
 		b.checkBotVideoExistingAndAddBot(video)
+	}
+}
+
+func (b *Bot) CheckAllVideoInYoutubeUser(username string) {
+	y := NewYoutube()
+	botLimit := 50
+	total, _ := y.GetVideoByUser(username, 1, botLimit)
+	totalLoop := (total / botLimit) + 1
+	for i := 0; i < totalLoop; i++ {
+		b.CheckYoutubeUser(username, (i*botLimit)+1, botLimit)
 	}
 }
 

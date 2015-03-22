@@ -9,9 +9,14 @@ import (
 	"github.com/code-mobi/tvthailand-api/utils"
 )
 
-const YoutubeAPIURL = "https://gdata.youtube.com/feeds/api/videos?author=%s&orderby=published&start-index=1&max-results=%d&v=2&alt=json&random=%s"
+const YoutubeAPIURL = "https://gdata.youtube.com/feeds/api/videos?author=%s&orderby=published&start-index=%d&max-results=%d&v=2&alt=json&random=%s"
 
 type Youtube struct {
+}
+
+func NewYoutube() *Youtube {
+	y := new(Youtube)
+	return y
 }
 
 type YoutubeVideo struct {
@@ -27,13 +32,18 @@ type YoutubeAPI struct {
 }
 
 type Feed struct {
-	Entries []*Entry `json:"entry"`
+	Entries     []*Entry     `json:"entry"`
+	TotalResult TotalResults `json:"openSearch$totalResults"`
 }
 
 type Entry struct {
 	Title      Title      `json:"title"`
 	MediaGroup MediaGroup `json:"media$group"`
 	Published  Published  `json:"published"`
+}
+
+type TotalResults struct {
+	Value int `json:"$t"`
 }
 
 type Title struct {
@@ -51,9 +61,9 @@ type Published struct {
 	Value string `json:"$t"`
 }
 
-func (y *Youtube) getVideoByUser(username string, botLimit int) []*YoutubeVideo {
-	youtubeVideos := []*YoutubeVideo{}
-	apiURL := fmt.Sprintf(YoutubeAPIURL, username, botLimit, utils.GetTimeStamp())
+func (y *Youtube) GetVideoByUser(username string, start int, botLimit int) (totalResults int, youtubeVideos []*YoutubeVideo) {
+	youtubeVideos = []*YoutubeVideo{}
+	apiURL := fmt.Sprintf(YoutubeAPIURL, username, start, botLimit, utils.GetTimeStamp())
 	resp, err := http.Get(apiURL)
 	if err != nil {
 		panic(err)
@@ -76,5 +86,6 @@ func (y *Youtube) getVideoByUser(username string, botLimit int) []*YoutubeVideo 
 			youtubeVideos = append(youtubeVideos, youtubeVideo)
 		}
 	}
-	return youtubeVideos
+	totalResults = api.Feed.TotalResult.Value
+	return
 }

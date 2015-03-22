@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/code-mobi/tvthailand-api/bot"
 	"github.com/go-martini/martini"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/martini-contrib/render"
@@ -221,4 +222,49 @@ func BotVideoJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
 	b := NewBotVideo(db)
 	botVideos := b.getBotVideos(formSearch)
 	r.JSON(200, botVideos)
+}
+
+func YoutubeHandler(db *sql.DB, r render.Render, req *http.Request) {
+	username := req.FormValue("username")
+	status, _ := strconv.Atoi(req.FormValue("status"))
+	page, _ := strconv.Atoi(req.FormValue("page"))
+	formSearch := &FormSearchBotUser{username, status, int32(page)}
+
+	b := NewBotVideo(db)
+	botStatuses := b.getBotStatuses(formSearch.Status)
+	botUsers := b.getBotUsers(formSearch.Username)
+	// botVideos := b.getBotVideos(formSearch)
+
+	newmap := map[string]interface{}{
+		"formSearch":  formSearch,
+		"botStatuses": botStatuses,
+		"botUsers":    botUsers,
+		// "botVideos":   botVideos,
+	}
+
+	r.HTML(200, "admin/youtube", newmap)
+}
+
+func YoutubeJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
+	username := req.FormValue("username")
+	y := bot.NewYoutube()
+	_, youtubeVideos := y.GetVideoByUser(username, 1, 40)
+	r.JSON(200, youtubeVideos)
+}
+
+func ShowJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
+
+}
+
+func ShowListHandler(db *sql.DB, r render.Render, req *http.Request) {
+	showID, _ := strconv.Atoi(req.FormValue("show_id"))
+	showList := &ShowList{db}
+	shows := showList.getProgram()
+	results := showList.getData(showID)
+	newmap := map[string]interface{}{
+		"shows":   shows,
+		"results": results,
+	}
+
+	r.HTML(200, "admin/showlist", newmap)
 }
