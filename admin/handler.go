@@ -41,6 +41,8 @@ func EncryptUpdateHandler(db *sql.DB, params martini.Params, req *http.Request, 
 	if idType == "mthaiparseurl" {
 		MthaiParseURL(db, r)
 		return
+	} else if idType == "empty" {
+
 	} else if idType == "" || id == 0 {
 		emptymap := map[string]interface{}{
 			"showid":  "",
@@ -54,6 +56,8 @@ func EncryptUpdateHandler(db *sql.DB, params martini.Params, req *http.Request, 
 	var rows *sql.Rows
 
 	switch idType {
+	case "empty":
+		rows, _ = db.Query("SELECT program_id, programlist_id, programlist_youtube FROM tv_programlist WHERE programlist_youtube_encrypt = '' ORDER BY programlist_id DESC")
 	case "showid":
 		rows, _ = db.Query("SELECT program_id, programlist_id, programlist_youtube FROM tv_programlist WHERE program_id = ? ORDER BY programlist_id DESC", id)
 	case "listid":
