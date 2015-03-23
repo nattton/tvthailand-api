@@ -18,10 +18,11 @@ func NewBotVideo(db *sql.DB) *BotVideo {
 }
 
 type FormSearchBotUser struct {
-	Username string
-	Q        string
-	Status   int
-	Page     int32
+	Username     string
+	Q            string
+	Status       int
+	Page         int32
+	IsOrderTitle bool
 }
 
 type BotUser struct {
@@ -110,10 +111,15 @@ func (b *BotVideo) getBotVideos(f *FormSearchBotUser) *BotVideos {
 		err = b.Db.QueryRow("SELECT count(id) from tv_bot_videos WHERE status = ? AND username = ? AND title LIKE ?", f.Status, f.Username, "%"+f.Q+"%").Scan(&countRow)
 	}
 
+	extendedOrder := ""
+	if f.IsOrderTitle {
+		extendedOrder = " v.title ASC,"
+	}
+
 	if f.Username == "all" || f.Username == "" {
-		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, DATE_ADD(published, INTERVAL 7 HOUR), status from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE status = ? AND title LIKE ? ORDER BY v.username, published DESC LIMIT ?, ?", f.Status, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
+		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, DATE_ADD(published, INTERVAL 7 HOUR), status from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE status = ? AND title LIKE ? ORDER BY  u.official DESC, v.username ASC,"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
 	} else {
-		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, DATE_ADD(published, INTERVAL 7 HOUR), status from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE status = ? AND v.username = ? AND title LIKE ? ORDER BY published DESC LIMIT ?, ?", f.Status, f.Username, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
+		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, DATE_ADD(published, INTERVAL 7 HOUR), status from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE status = ? AND v.username = ? AND title LIKE ? ORDER BY"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, f.Username, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
 	}
 
 	if err != nil {

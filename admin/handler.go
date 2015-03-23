@@ -181,7 +181,8 @@ func BotVideoHandler(db *sql.DB, r render.Render, req *http.Request) {
 	q := req.FormValue("q")
 	status, _ := strconv.Atoi(req.FormValue("status"))
 	page, _ := strconv.Atoi(req.FormValue("page"))
-	formSearch := &FormSearchBotUser{username, q, status, int32(page)}
+	isOrderTitle := req.FormValue("isOrderTitle") == "true"
+	formSearch := &FormSearchBotUser{username, q, status, int32(page), isOrderTitle}
 
 	b := NewBotVideo(db)
 	botStatuses := b.getBotStatuses(formSearch.Status)
@@ -219,7 +220,8 @@ func BotVideoJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
 	q := req.FormValue("q")
 	status, _ := strconv.Atoi(req.FormValue("status"))
 	page, _ := strconv.Atoi(req.FormValue("page"))
-	formSearch := &FormSearchBotUser{username, q, status, int32(page)}
+	isOrderTitle := req.FormValue("isOrderTitle") == "true"
+	formSearch := &FormSearchBotUser{username, q, status, int32(page), isOrderTitle}
 
 	b := NewBotVideo(db)
 	botVideos := b.getBotVideos(formSearch)
@@ -231,7 +233,8 @@ func YoutubeHandler(db *sql.DB, r render.Render, req *http.Request) {
 	q := req.FormValue("q")
 	status, _ := strconv.Atoi(req.FormValue("status"))
 	page, _ := strconv.Atoi(req.FormValue("page"))
-	formSearch := &FormSearchBotUser{username, q, status, int32(page)}
+	isOrderTitle := req.FormValue("isOrderTitle") == "true"
+	formSearch := &FormSearchBotUser{username, q, status, int32(page), isOrderTitle}
 
 	b := NewBotVideo(db)
 	botStatuses := b.getBotStatuses(formSearch.Status)
