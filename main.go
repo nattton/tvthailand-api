@@ -23,6 +23,7 @@ func main() {
 	port := flag.String("port", "9000", "PORT")
 	command := flag.String("command", "", "COMMAND")
 	user := flag.String("user", "", "USER")
+	keyword := flag.String("keyword", "", "KEYWORD")
 	flag.Parse()
 
 	db, err := utils.OpenDB()
@@ -46,7 +47,7 @@ func main() {
 		if *user == "" {
 			fmt.Println("Must have -user=...")
 		} else {
-			b.CheckAllVideoInYoutubeUser(*user)
+			b.CheckAllVideoInYoutubeUserAndKeyword(*user, *keyword)
 		}
 
 	} else {

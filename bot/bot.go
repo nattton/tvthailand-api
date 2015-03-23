@@ -2,6 +2,7 @@ package bot
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -37,21 +38,32 @@ func (b *Bot) CheckAllYoutubeUser() {
 }
 
 func (b *Bot) CheckYoutubeUser(username string, start int, botLimit int) {
+	b.CheckYoutubeUserAndKeyword(username, start, botLimit, "")
+}
+
+func (b *Bot) CheckYoutubeUserAndKeyword(username string, start int, botLimit int, keyword string) {
 	y := NewYoutube()
-	_, youtubeVideos := y.GetVideoByUser(username, start, botLimit)
+	_, youtubeVideos := y.GetVideoByUserAndKeyword(username, start, botLimit, keyword)
 	for _, video := range youtubeVideos {
 		log.Println(video.Username, video.Title, video.VideoID)
 		b.checkBotVideoExistingAndAddBot(video)
 	}
 }
 
-func (b *Bot) CheckAllVideoInYoutubeUser(username string) {
+func (b *Bot) CheckAllVideoInYoutubeUserAndKeyword(username string, keyword string) {
 	y := NewYoutube()
 	botLimit := 50
-	total, _ := y.GetVideoByUser(username, 1, botLimit)
+	var total int
+	if keyword != "" {
+		fmt.Println(keyword)
+		total, _ = y.GetVideoByUserAndKeyword(username, 1, botLimit, keyword)
+	} else {
+		total, _ = y.GetVideoByUser(username, 1, botLimit)
+	}
+
 	totalLoop := (total / botLimit) + 1
 	for i := 0; i < totalLoop; i++ {
-		b.CheckYoutubeUser(username, (i*botLimit)+1, botLimit)
+		b.CheckYoutubeUserAndKeyword(username, (i*botLimit)+1, botLimit, keyword)
 	}
 }
 

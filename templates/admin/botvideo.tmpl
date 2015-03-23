@@ -8,6 +8,7 @@ var tvModule = angular.module('TVThailand', []);
 tvModule.controller('BotVideoCtrl', function ($scope, $http) {
     $scope.toggleSelected = false;
     $scope.status = {[{.formSearch.Status}]};
+    $scope.q = "";
     $scope.sumID = "";
     $scope.countSumID = 0;
     $scope.videos = [];
@@ -36,6 +37,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       $http.get('/admin/botvideo.json', { params:{
                                             username: $scope.username,
                                             status: $scope.status,
+                                            q: $scope.q,
                                             page: page,
                                             time: Date.now()}}).
         error(function(){
@@ -125,6 +127,12 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
 
           <input type="button" ng-click="loadData(0)" class="btn btn-default" value="Search" />
           <a class="btn btn-success" id="btn_youtube_api" target="_blank"  ng-show="username" href="/admin/youtube.json?username={{username}}">Youtube API</a>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputKeyword" class="col-sm-2 control-label">Keyword</label>
+        <div class="col-sm-10">
+        <input type="text" id="inputKeyword" ng-model="q" ng-keyup="$event.keyCode == 13 && loadData()" />
         </div>
       </div>
     </form>
