@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"strings"
 )
 
 const YoutubeAPIURL = "https://gdata.youtube.com/feeds/api/videos?author=%s&orderby=published&start-index=%d&max-results=%d&v=2&q=%s&alt=json"
@@ -65,6 +67,9 @@ func (y *Youtube) GetVideoByUser(username string, start int, botLimit int) (tota
 
 func (y *Youtube) GetVideoByUserAndKeyword(username string, start int, botLimit int, keyword string) (totalResults int, youtubeVideos []*YoutubeVideo) {
 	youtubeVideos = []*YoutubeVideo{}
+	if strings.Contains(keyword, " ") {
+		keyword = url.QueryEscape(keyword)
+	}
 	apiURL := fmt.Sprintf(YoutubeAPIURL, username, start, botLimit, keyword)
 	fmt.Println(apiURL)
 	resp, err := http.Get(apiURL)
