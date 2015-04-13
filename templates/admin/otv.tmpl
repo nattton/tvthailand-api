@@ -10,7 +10,10 @@
     <h3>{[{.message}]}</h3>
     <ul>
       {[{range .results}]}
-        <li>{[{.ContentSeasonID}]} {[{.NameTh}]} {[{.NameEn}]} {[{.ModifiedDate}]} <img src="{[{.Thumbnail}]}" alt="thumbnail" /></li>
+        <li>
+          {[{.ContentSeasonID}]} {[{.NameTh}]} {[{.NameEn}]} {[{.ModifiedDate}]} <img src="{[{.Thumbnail}]}" alt="thumbnail" />
+          <a target="_blank" href="http://api.otv.co.th/api/index.php/v202/Content/index/15/1.0/2.0.2/{[{.ContentSeasonID}]}/0/50">Link API</a>
+        </li>
       {[{end}]}
     </ul>
   </div>
