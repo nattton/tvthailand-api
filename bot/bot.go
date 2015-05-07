@@ -83,7 +83,7 @@ func (b *Bot) CheckAllVideoInYoutubeUserAndKeyword(username string, keyword stri
 
 func (b *Bot) getYoutubeRobotChannels() []*YoutubeUser {
 	var youtubeUsers = []*YoutubeUser{}
-	rows, err := b.Db.Query("SELECT username, channel_id, description, user_type, bot_limit FROM tv_youtube_users WHERE channel_id != '' AND bot = 1 ORDER BY username")
+	rows, err := b.Db.Query("SELECT username, channel_id, description, user_type, bot_limit FROM tv_youtube_users WHERE channel_id != '' AND bot = 1 ORDER BY official DESC, username ASC")
 	if err != nil {
 		log.Fatal(err)
 	}
