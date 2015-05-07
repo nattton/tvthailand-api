@@ -18,6 +18,7 @@ type YoutubeUsers struct {
 
 type YoutubeUser struct {
 	Username    string
+	ChannelID   string
 	Description string
 	UserType    string
 	BotLimit    int
@@ -27,6 +28,19 @@ func NewBot(db *sql.DB) *Bot {
 	b := new(Bot)
 	b.Db = db
 	return b
+}
+
+func (b *Bot) CheckRobotChannel() {
+	youtubeUsers := b.getYoutubeRobotChannels()
+	for _, youtubeUser := range youtubeUsers {
+		log.Println(youtubeUser.Username)
+		y := NewYoutube()
+		_, youtubeVideos := y.GetVideoByChannelID(youtubeUser.Username, youtubeUser.ChannelID, youtubeUser.BotLimit)
+		for _, video := range youtubeVideos {
+			log.Println(video.Username, video.Title, video.VideoID)
+			b.checkBotVideoExistingAndAddBot(video)
+		}
+	}
 }
 
 func (b *Bot) CheckAllYoutubeUser() {
@@ -58,7 +72,7 @@ func (b *Bot) CheckAllVideoInYoutubeUserAndKeyword(username string, keyword stri
 		fmt.Println(keyword)
 		total, _ = y.GetVideoByUserAndKeyword(username, 1, botLimit, keyword)
 	} else {
-		total, _ = y.GetVideoByUser(username, 1, botLimit)
+		// total, _ = y.GetVideoByUser(username, 1, botLimit)
 	}
 
 	totalLoop := (total / botLimit) + 1
@@ -67,9 +81,9 @@ func (b *Bot) CheckAllVideoInYoutubeUserAndKeyword(username string, keyword stri
 	}
 }
 
-func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
+func (b *Bot) getYoutubeRobotChannels() []*YoutubeUser {
 	var youtubeUsers = []*YoutubeUser{}
-	rows, err := b.Db.Query("SELECT username, description, user_type, bot_limit FROM tv_youtube_users WHERE bot = 1 ORDER BY username")
+	rows, err := b.Db.Query("SELECT username, channel_id, description, user_type, bot_limit FROM tv_youtube_users WHERE channel_id != '' AND bot = 1 ORDER BY username")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -78,20 +92,62 @@ func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
 	for rows.Next() {
 		var (
 			username    string
+			channelID   string
 			description string
 			userType    string
 			botLimit    int
 		)
-		if err := rows.Scan(&username, &description, &userType, &botLimit); err != nil {
+		if err := rows.Scan(&username, &channelID, &description, &userType, &botLimit); err != nil {
 			log.Fatal(err)
 		}
-		youtubeUser := &YoutubeUser{username, description, userType, botLimit}
+		youtubeUser := &YoutubeUser{username, channelID, description, userType, botLimit}
 		youtubeUsers = append(youtubeUsers, youtubeUser)
 	}
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
 	}
 	return youtubeUsers
+}
+
+func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
+	var youtubeUsers = []*YoutubeUser{}
+	rows, err := b.Db.Query("SELECT username, channel_id, description, user_type, bot_limit FROM tv_youtube_users WHERE bot = 1 ORDER BY username")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var (
+			username    string
+			channelID   string
+			description string
+			userType    string
+			botLimit    int
+		)
+		if err := rows.Scan(&username, &channelID, &description, &userType, &botLimit); err != nil {
+			log.Fatal(err)
+		}
+		youtubeUser := &YoutubeUser{username, channelID, description, userType, botLimit}
+		youtubeUsers = append(youtubeUsers, youtubeUser)
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return youtubeUsers
+}
+
+func (b *Bot) FindChannel() {
+	y := NewYoutube()
+	youtubeUsers := b.getYoutubeRobotUsers()
+	for _, youtubeUser := range youtubeUsers {
+		channelID := y.GetChannelIDByUser(youtubeUser.Username)
+		fmt.Printf("Username, %s, ChannelID : %s\n", youtubeUser.Username, channelID)
+		_, err := b.Db.Exec("UPDATE tv_youtube_users SET channel_id = ? WHERE username = ?", channelID, youtubeUser.Username)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
 func (b *Bot) checkBotVideoExistingAndAddBot(video *YoutubeVideo) {

@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/code-mobi/tvthailand-api/bot"
 	"github.com/go-martini/martini"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/martini-contrib/render"
@@ -255,12 +254,12 @@ func YoutubeHandler(db *sql.DB, r render.Render, req *http.Request) {
 	r.HTML(200, "admin/youtube", newmap)
 }
 
-func YoutubeJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
-	username := req.FormValue("username")
-	y := bot.NewYoutube()
-	_, youtubeVideos := y.GetVideoByUser(username, 1, 40)
-	r.JSON(200, youtubeVideos)
-}
+// func YoutubeJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
+// 	username := req.FormValue("username")
+// 	y := bot.NewYoutube()
+// 	_, youtubeVideos := y.GetVideoByUser(username, 1, 40)
+// 	r.JSON(200, youtubeVideos)
+// }
 
 func ShowJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
 

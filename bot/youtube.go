@@ -5,72 +5,62 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
-	"strings"
+	"os"
 )
 
-const YoutubeAPIURL = "https://gdata.youtube.com/feeds/api/videos?author=%s&orderby=published&start-index=%d&max-results=%d&v=2&q=%s&alt=json"
+const YoutubeAPIURL = "https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet&fields=pageInfo,items(id(videoId),snippet(title,publishedAt,channelTitle))&order=date&maxResults=%d"
 
 type Youtube struct {
+	apiKey string
 }
 
 func NewYoutube() *Youtube {
 	y := new(Youtube)
+	y.apiKey = os.Getenv("YOUTUBE_API_KEY")
 	return y
 }
 
 type YoutubeVideo struct {
 	Username  string
-	Title     string
+	ChannelID string
 	VideoID   string
+	Title     string
 	Published string
 	Status    int
 }
 
 type YoutubeAPI struct {
-	Feed Feed `json:"feed"`
+	PageInfo  PageInfo  `json:"pageInfo"`
+	Items     []*Item   `json:"items"`
+	ErrorInfo ErrorInfo `json:"error"`
 }
 
-type Feed struct {
-	Entries     []*Entry     `json:"entry"`
-	TotalResult TotalResults `json:"openSearch$totalResults"`
+type ErrorInfo struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
-type Entry struct {
-	Title      Title      `json:"title"`
-	MediaGroup MediaGroup `json:"media$group"`
-	Published  Published  `json:"published"`
+type PageInfo struct {
+	TotalResults   int `json:"totalResults"`
+	ResultsPerPage int `json:"resultsPerPage"`
 }
 
-type TotalResults struct {
-	Value int `json:"$t"`
+type Item struct {
+	ID      ItemID  `json:"id"`
+	Snippet Snippet `json:"snippet"`
 }
 
-type Title struct {
-	Value string `json:"$t"`
+type ItemID struct {
+	VideoID string `json:"videoId"`
 }
 
-type MediaGroup struct {
-	VideoID VideoID `json:"yt$videoid"`
-}
-type VideoID struct {
-	Value string `json:"$t"`
+type Snippet struct {
+	Title       string `json:"title"`
+	PublishedAt string `json:"publishedAt"`
 }
 
-type Published struct {
-	Value string `json:"$t"`
-}
-
-func (y *Youtube) GetVideoByUser(username string, start int, botLimit int) (totalResults int, youtubeVideos []*YoutubeVideo) {
-	return y.GetVideoByUserAndKeyword(username, start, botLimit, "")
-}
-
-func (y *Youtube) GetVideoByUserAndKeyword(username string, start int, botLimit int, keyword string) (totalResults int, youtubeVideos []*YoutubeVideo) {
-	youtubeVideos = []*YoutubeVideo{}
-	if strings.Contains(keyword, " ") {
-		keyword = url.QueryEscape(keyword)
-	}
-	apiURL := fmt.Sprintf(YoutubeAPIURL, username, start, botLimit, keyword)
+func (y *Youtube) GetVideoByChannelID(username string, channelID string, botLimit int) (totalResults int, youtubeVideos []*YoutubeVideo) {
+	apiURL := fmt.Sprintf(YoutubeAPIURL, y.apiKey, channelID, botLimit)
 	fmt.Println(apiURL)
 	resp, err := http.Get(apiURL)
 	if err != nil {
@@ -88,12 +78,74 @@ func (y *Youtube) GetVideoByUserAndKeyword(username string, start int, botLimit 
 		fmt.Println("### Json Parser Error", apiURL, "###")
 	}
 
-	if len(api.Feed.Entries) > 0 {
-		for _, entry := range api.Feed.Entries {
-			youtubeVideo := &YoutubeVideo{username, entry.Title.Value, entry.MediaGroup.VideoID.Value, entry.Published.Value, 0}
+	if len(api.Items) > 0 {
+		for _, item := range api.Items {
+			youtubeVideo := &YoutubeVideo{username, channelID, item.ID.VideoID, item.Snippet.Title, item.Snippet.PublishedAt, 0}
 			youtubeVideos = append(youtubeVideos, youtubeVideo)
 		}
 	}
-	totalResults = api.Feed.TotalResult.Value
+	totalResults = api.PageInfo.TotalResults
+	return
+}
+
+// func (y *Youtube) GetVideoByUser(username string, botLimit int) (totalResults int, youtubeVideos []*YoutubeVideo) {
+// 	apiURL := fmt.Sprintf(YoutubeAPIURL, username, botLimit)
+// 	fmt.Println(apiURL)
+// 	resp, err := http.Get(apiURL)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer resp.Body.Close()
+// 	body, err := ioutil.ReadAll(resp.Body)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+//
+// 	var api YoutubeAPI
+// 	err = json.Unmarshal(body, &api)
+// 	if err != nil {
+// 		fmt.Println("### Json Parser Error", apiURL, "###")
+// 	}
+//
+// 	if len(api.Items) > 0 {
+// 		for _, item := range api.Items {
+// 			youtubeVideo := &YoutubeVideo{username, entry.Title.Value, entry.MediaGroup.VideoID.Value, entry.Published.Value, 0}
+// 			youtubeVideos = append(youtubeVideos, youtubeVideo)
+// 		}
+// 	}
+// 	totalResults = api.Feed.TotalResult.Value
+// 	return
+// }
+
+func (y *Youtube) GetVideoByUserAndKeyword(username string, start int, botLimit int, keyword string) (totalResults int, youtubeVideos []*YoutubeVideo) {
+	// youtubeVideos = []*YoutubeVideo{}
+	// if strings.Contains(keyword, " ") {
+	// 	keyword = url.QueryEscape(keyword)
+	// }
+	// apiURL := fmt.Sprintf(YoutubeAPIURL, username, start, botLimit, keyword)
+	// fmt.Println(apiURL)
+	// resp, err := http.Get(apiURL)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer resp.Body.Close()
+	// body, err := ioutil.ReadAll(resp.Body)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	//
+	// var api YoutubeAPI
+	// err = json.Unmarshal(body, &api)
+	// if err != nil {
+	// 	fmt.Println("### Json Parser Error", apiURL, "###")
+	// }
+	//
+	// if len(api.Items) > 0 {
+	// 	for _, item := range api.Items {
+	// 		youtubeVideo := &YoutubeVideo{username, entry.Title.Value, entry.MediaGroup.VideoID.Value, entry.Published.Value, 0}
+	// 		youtubeVideos = append(youtubeVideos, youtubeVideo)
+	// 	}
+	// }
+	// totalResults = api.Feed.TotalResult.Value
 	return
 }

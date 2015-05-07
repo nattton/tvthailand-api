@@ -36,9 +36,16 @@ func main() {
 		fmt.Println(*command)
 		b := bot.NewBot(db)
 		if *user == "" {
-			b.CheckAllYoutubeUser()
+			b.CheckRobotChannel()
 		} else {
 			b.CheckYoutubeUser(*user, 1, 30)
+		}
+
+	} else if *command == "findchannel" {
+		fmt.Println(*command)
+		b := bot.NewBot(db)
+		if *user == "" {
+			b.FindChannel()
 		}
 
 	} else if *command == "botrunvideo" {
@@ -96,7 +103,7 @@ func main() {
 			r.Get("/botvideo.json", admin.BotVideoJSONHandler)
 			r.Get("/show.json", admin.ShowJSONHandler)
 			r.Get("/youtube", admin.YoutubeHandler)
-			r.Get("/youtube.json", admin.YoutubeJSONHandler)
+			// r.Get("/youtube.json", admin.YoutubeJSONHandler)
 			r.Get("/showlist", admin.ShowListHandler)
 
 		})
