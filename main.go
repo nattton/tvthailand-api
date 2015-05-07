@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -60,7 +59,7 @@ func main() {
 	} else {
 		conn, err := net.Dial("tcp", os.Getenv("MEMCACHED_HOST"))
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 		client := memcache.NewRawClient(0, conn)
 
