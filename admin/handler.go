@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/code-mobi/tvthailand-api/bot"
 	"github.com/go-martini/martini"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/martini-contrib/render"
@@ -252,6 +253,24 @@ func YoutubeHandler(db *sql.DB, r render.Render, req *http.Request) {
 	}
 
 	r.HTML(200, "admin/youtube", newmap)
+}
+
+func YoutubeSearchChannelJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
+
+	channelId := req.FormValue("channelId")
+	maxResults, atoiErr := strconv.Atoi(req.FormValue("maxResults"))
+	if atoiErr != nil {
+		maxResults = 40
+	}
+	pageToken := req.FormValue("pageToken")
+
+	y := bot.NewYoutube()
+	api, err := y.GetVideoJsonByChannelID(channelId, maxResults, pageToken)
+	if err != nil {
+		r.JSON(404, err)
+	} else {
+		r.JSON(200, api)
+	}
 }
 
 // func YoutubeJSONHandler(db *sql.DB, r render.Render, req *http.Request) {

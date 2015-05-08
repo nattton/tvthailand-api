@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-const YoutubeAPIURL = "https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet&fields=pageInfo,items(id(videoId),snippet(title,publishedAt,channelTitle))&order=date&maxResults=%d"
+const YoutubeAPIURL = "https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet&fields=prevPageToken,nextPageToken,pageInfo,items(id(videoId),snippet(title,publishedAt,channelTitle))&order=date&maxResults=%d&pageToken=%s"
 
 type Youtube struct {
 	apiKey string
@@ -30,9 +30,11 @@ type YoutubeVideo struct {
 }
 
 type YoutubeAPI struct {
-	PageInfo  PageInfo  `json:"pageInfo"`
-	Items     []*Item   `json:"items"`
-	ErrorInfo ErrorInfo `json:"error"`
+	PrevPageToken string    `json:"prevPageToken"`
+	NextPageToken string    `json:"nextPageToken"`
+	PageInfo      PageInfo  `json:"pageInfo"`
+	Items         []*Item   `json:"items"`
+	ErrorInfo     ErrorInfo `json:"error"`
 }
 
 type ErrorInfo struct {
@@ -59,8 +61,8 @@ type Snippet struct {
 	PublishedAt string `json:"publishedAt"`
 }
 
-func (y *Youtube) GetVideoByChannelID(username string, channelID string, botLimit int) (totalResults int, youtubeVideos []*YoutubeVideo) {
-	apiURL := fmt.Sprintf(YoutubeAPIURL, y.apiKey, channelID, botLimit)
+func (y *Youtube) GetVideoJsonByChannelID(channelID string, botLimit int, pageToken string) (api YoutubeAPI, err error) {
+	apiURL := fmt.Sprintf(YoutubeAPIURL, y.apiKey, channelID, botLimit, pageToken)
 	fmt.Println(apiURL)
 	resp, err := http.Get(apiURL)
 	if err != nil {
@@ -71,13 +73,20 @@ func (y *Youtube) GetVideoByChannelID(username string, channelID string, botLimi
 	if err != nil {
 		panic(err)
 	}
-
-	var api YoutubeAPI
 	err = json.Unmarshal(body, &api)
 	if err != nil {
-		fmt.Println("### Json Parser Error", apiURL, "###")
+		fmt.Println("### Json Parser Error ", apiURL, " ###")
 	}
+	return
+}
 
+func (y *Youtube) GetVideoByChannelID(username string, channelID string, botLimit int, pageToken string) (totalResults int, youtubeVideos []*YoutubeVideo, prevPageToken string, nextPageToken string) {
+	api, err := y.GetVideoJsonByChannelID(channelID, botLimit, pageToken)
+	if err != nil {
+		panic(err)
+	}
+	prevPageToken = api.PrevPageToken
+	nextPageToken = api.NextPageToken
 	if len(api.Items) > 0 {
 		for _, item := range api.Items {
 			youtubeVideo := &YoutubeVideo{username, channelID, item.ID.VideoID, item.Snippet.Title, item.Snippet.PublishedAt, 0}

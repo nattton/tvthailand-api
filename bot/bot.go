@@ -34,7 +34,7 @@ func (b *Bot) CheckRobotChannel() {
 	for _, youtubeUser := range youtubeUsers {
 		fmt.Println(youtubeUser.Username)
 		y := NewYoutube()
-		_, youtubeVideos := y.GetVideoByChannelID(youtubeUser.Username, youtubeUser.ChannelID, youtubeUser.BotLimit)
+		_, youtubeVideos, _, _ := y.GetVideoByChannelID(youtubeUser.Username, youtubeUser.ChannelID, youtubeUser.BotLimit, "")
 		for _, video := range youtubeVideos {
 			fmt.Println(video.Username, video.Title, video.VideoID)
 			b.checkBotVideoExistingAndAddBot(video)
