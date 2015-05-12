@@ -109,12 +109,21 @@ func (b *Bot) getYoutubeRobotChannels() []*YoutubeUser {
 }
 
 func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
+	q := "SELECT username, channel_id, description, user_type, bot_limit FROM tv_youtube_users WHERE bot = 1 ORDER BY username"
+	return b.queryYoutubeUsers(q)
+}
+
+func (b *Bot) getEmptyChannel() []*YoutubeUser {
+	q := "SELECT username, channel_id, description, user_type, bot_limit FROM tv_youtube_users WHERE bot = 1 AND user_type = 'user' AND channel_id = ''"
+	return b.queryYoutubeUsers(q)
+}
+
+func (b *Bot) queryYoutubeUsers(q string) []*YoutubeUser {
 	var youtubeUsers = []*YoutubeUser{}
-	rows, err := b.Db.Query("SELECT username, channel_id, description, user_type, bot_limit FROM tv_youtube_users WHERE bot = 1 ORDER BY username")
+	rows, err := b.Db.Query(q)
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	defer rows.Close()
 	for rows.Next() {
 		var (
@@ -138,7 +147,7 @@ func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
 
 func (b *Bot) FindChannel() {
 	y := NewYoutube()
-	youtubeUsers := b.getYoutubeRobotUsers()
+	youtubeUsers := b.getEmptyChannel()
 	for _, youtubeUser := range youtubeUsers {
 		channelID := y.GetChannelIDByUser(youtubeUser.Username)
 		fmt.Printf("Username, %s, ChannelID : %s\n", youtubeUser.Username, channelID)
