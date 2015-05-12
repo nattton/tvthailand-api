@@ -63,6 +63,24 @@ func (b *Bot) CheckYoutubeUserAndKeyword(username string, start int, botLimit in
 	}
 }
 
+func (b *Bot) CheckVideoInChannel(channelID string) {
+	y := NewYoutube()
+	botLimit := 50
+
+	nextPageToken := ""
+	for {
+		_, youtubeVideos, _, nextToken := y.GetVideoByChannelID(channelID, channelID, botLimit, nextPageToken)
+		nextPageToken = nextToken
+		for _, video := range youtubeVideos {
+			fmt.Println(video.Username, video.Title, video.VideoID)
+			b.checkBotVideoExistingAndAddBot(video)
+		}
+		if nextPageToken == "" {
+			break
+		}
+	}
+}
+
 func (b *Bot) CheckAllVideoInYoutubeUserAndKeyword(username string, keyword string) {
 	y := NewYoutube()
 	botLimit := 50

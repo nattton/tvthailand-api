@@ -22,6 +22,7 @@ func main() {
 	port := flag.String("port", "9000", "PORT")
 	command := flag.String("command", "", "COMMAND")
 	user := flag.String("user", "", "USER")
+	channel := flag.String("channel", "", "CHANNEL")
 	keyword := flag.String("keyword", "", "KEYWORD")
 	flag.Parse()
 
@@ -45,6 +46,15 @@ func main() {
 		b := bot.NewBot(db)
 		if *user == "" {
 			b.FindChannel()
+		}
+
+	} else if *command == "findvideochannel" {
+		fmt.Println(*command)
+		b := bot.NewBot(db)
+		if *channel == "" {
+			fmt.Println("Must have -channel=...")
+		} else {
+			b.CheckVideoInChannel(*channel)
 		}
 
 	} else if *command == "botrunvideo" {
