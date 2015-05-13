@@ -48,7 +48,7 @@ type BotVideoRow struct {
 	ID          int32
 	Username    string
 	Description string
-	ProgramID   int32
+	ProgramID   int64
 	UserType    string
 	Title       string
 	VideoID     string
@@ -128,19 +128,37 @@ func (b *BotVideo) getBotVideos(f *FormSearchBotUser) *BotVideos {
 	defer rows.Close()
 	for rows.Next() {
 		var (
-			id          int32
-			username    string
-			description string
-			programID   int32
-			userType    string
-			title       string
-			videoID     string
-			published   string
-			status      int
+			id           int32
+			username     string
+			sDescription sql.NullString
+			description  string
+			sProgramID   sql.NullInt64
+			programID    int64
+			sUserType    sql.NullString
+			userType     string
+			title        string
+			videoID      string
+			published    string
+			status       int
 		)
-		if err := rows.Scan(&id, &username, &description, &programID, &userType, &title, &videoID, &published, &status); err != nil {
+		if err := rows.Scan(&id, &username, &sDescription, &sProgramID, &sUserType, &title, &videoID, &published, &status); err != nil {
 			log.Fatal(err)
 		}
+
+		if sDescription.Valid {
+			description = sDescription.String
+		}
+
+		if sProgramID.Valid {
+			programID = sProgramID.Int64
+		}
+
+		if sUserType.Valid {
+			userType = sUserType.String
+		} else {
+			userType = "channel"
+		}
+
 		botVideo := &BotVideoRow{id, username, description, programID, userType, title, videoID, published, status}
 		botVideos = append(botVideos, botVideo)
 	}

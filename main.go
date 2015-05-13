@@ -51,10 +51,10 @@ func main() {
 	} else if *command == "findvideochannel" {
 		fmt.Println(*command)
 		b := bot.NewBot(db)
-		if *channel == "" {
-			fmt.Println("Must have -channel=...")
+		if *user == "" || *channel == "" {
+			fmt.Println("Must have -user=... -channel=...")
 		} else {
-			b.CheckVideoInChannel(*channel)
+			b.CheckVideoInChannel(*user, *channel)
 		}
 
 	} else if *command == "botrunvideo" {
