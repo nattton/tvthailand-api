@@ -3,6 +3,7 @@ package admin
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -11,12 +12,13 @@ type Krobkruakao struct {
 	Title    string
 	Url      string
 	ShortUrl string
+	Date     string
 }
 
 func ExampleKrobkruakao() {
 	krobkruakaos := Krobkruakaos()
 	for _, kr := range krobkruakaos {
-		fmt.Printf("%s - %s\nShort Url : %s\n", kr.Title, kr.Url, kr.ShortUrl)
+		fmt.Printf("%s - %s\nShort Url : %s, Date : %s\n", kr.Title, kr.Url, kr.ShortUrl, kr.Date)
 	}
 }
 
@@ -30,15 +32,15 @@ func Krobkruakaos() (krobkruakaos []Krobkruakao) {
 		img := s.Find("img").Eq(0)
 		title, _ := img.Attr("title")
 		if b {
-			shortUrl := FindGooUrl(url)
-			kr := Krobkruakao{title, url, shortUrl}
+			shortUrl, date := FindGooUrl(url)
+			kr := Krobkruakao{title, url, shortUrl, date}
 			krobkruakaos = append(krobkruakaos, kr)
 		}
 	})
 	return
 }
 
-func FindGooUrl(url string) (shortUrl string) {
+func FindGooUrl(url string) (shortUrl string, date string) {
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
 		log.Fatal(err)
@@ -46,7 +48,11 @@ func FindGooUrl(url string) (shortUrl string) {
 
 	doc.Find(".copy_url span").Each(func(i int, s *goquery.Selection) {
 		shortUrl = s.Text()
-		return
 	})
+
+	doc.Find(".top-space-8").Each(func(i int, s *goquery.Selection) {
+		date = strings.Replace(s.Find("p").Eq(1).Text(), "วันที่ ", "", -1)
+	})
+
 	return
 }

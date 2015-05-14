@@ -193,7 +193,8 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
               <a target="_blank" href="https://www.youtube.com/{{video.UserType}}/{{video.Username}}/videos"><span class="glyphicon glyphicon-new-window"></span></a>
               <a href="#"><span class="glyphicon glyphicon-th-list" ng-click="selectUsername(video)"></span></a>
             </td>
-            <td>{{video.Title}}</td><td><input type="text" ng-click="setSumID(video); style='selected-text'" ng-class="style" size="10" value="{{video.VideoID}}" /></td>
+            <td>{{video.Title}}</td>
+            <td><input type="text" ng-click="setSumID(video); style='selected-text'" ng-class="style" size="10" value="{{video.VideoID}}" /></td>
             <td><a target="_blank" href="https://www.youtube.com/watch?v={{video.VideoID}}"><span class="glyphicon glyphicon-play-circle"></span></a></td>
             <td>{{video.Published}}</td>
             <td><a target="_blank" href="{{linkUpdate(video)}}"><span class="glyphicon glyphicon-thumbs-up"></span></a></td>

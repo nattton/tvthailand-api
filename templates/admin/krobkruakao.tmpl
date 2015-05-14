@@ -17,7 +17,7 @@
       </div>
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-          <a class="btn btn-success" id="btn_update" target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?id={{sumID}}&amp;title={{sumTitle}}" ng-show="sumID">Update</a>
+          <a class="btn btn-success" id="btn_update" target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?src_type=11&id={{sumID}}&amp;title={{sumTitle}}" ng-show="sumID">Update</a>
           <input type="button" ng-click="clearSum()" class="btn btn-warning" id="btn_clear" value="Clear" />
         </div>
       </div>
@@ -25,12 +25,14 @@
     <br />
     <table class="table table-striped">
       <thead>
-          <th>Title</th><th>Url</th><th>ShortUrl</th>
+          <th>Title</th><th>ShortUrl</th><th>Url</th><th>Date</th><th></th>
       </thead>
         <tr ng-repeat="kr in krobkruakaos">
           <td>{{kr.Title}}</td>
-          <td>{{kr.Url}}</td>
           <td><input type="text" ng-click="setSumID(kr); style='selected-text'" ng-class="style" size="10" value="{{kr.ShortUrl}}" /></td>
+          <td><a target="_blank" href="{{kr.Url}}"><span class="glyphicon glyphicon-play-circle"></span></a></td>
+          <td>{{kr.Date}}</td>
+          <td><a target="_blank" href="{{linkUpdate(kr)}}"><span class="glyphicon glyphicon-thumbs-up"></span></a></td>
         </tr>
     </table>
   </div>
@@ -61,6 +63,9 @@ tvModule.controller('KrobkruakaoCtrl', function ($scope, $http) {
     $scope.sumTitle = "";
     $scope.sumID = "";
     $scope.countSumID = 0;
+  };
+  $scope.linkUpdate = function(kr) {
+    return "http://tv-cms.makathon.com/bookmarktv.php?src_type=11&id=" + kr.ShortUrl + "&title=" + kr.Title;
   };
   $scope.loadData();
 });
