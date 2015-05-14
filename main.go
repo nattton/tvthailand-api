@@ -32,7 +32,9 @@ func main() {
 	}
 	defer db.Close()
 
-	if *command == "botrun" {
+	if *command == "krobkruakao" {
+		admin.ExampleKrobkruakao()
+	} else if *command == "botrun" {
 		fmt.Println(*command)
 		b := bot.NewBot(db)
 		if *user == "" {
@@ -115,6 +117,8 @@ func main() {
 			r.Get("/youtube.search.channel", admin.YoutubeSearchChannelJSONHandler)
 			// r.Get("/youtube.json", admin.YoutubeJSONHandler)
 			r.Get("/showlist", admin.ShowListHandler)
+			r.Get("/krobkruakao", admin.KrobkruakaoHandler)
+			r.Get("/krobkruakao.json", admin.KrobkruakaoJSONHandler)
 
 		})
 

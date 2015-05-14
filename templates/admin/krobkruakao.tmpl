@@ -1,0 +1,67 @@
+<div ng-controller="KrobkruakaoCtrl" class="jumbotron">
+  <div class="container">
+
+    <fieldset>
+      <legend><a href="/admin/krobkruakao">Krobkruakao</a></legend>
+      <div class="form-group">
+        <label for="inputTitle" class="col-sm-2 control-label">Title</label>
+        <div class="col-sm-10">
+          <input type="text" ng-model="sumTitle" class="form-control" id="inputTitle" placeholder="">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="sumID" class="col-sm-2 control-label">Sum ID [ {{countSumID}} ]</label>
+        <div class="col-sm-10">
+          <input type="text" ng-model="sumID" class="form-control" id="sumID" placeholder="">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <a class="btn btn-success" id="btn_update" target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?id={{sumID}}&amp;title={{sumTitle}}" ng-show="sumID">Update</a>
+          <input type="button" ng-click="clearSum()" class="btn btn-warning" id="btn_clear" value="Clear" />
+        </div>
+      </div>
+    </fieldset>
+    <br />
+    <table class="table table-striped">
+      <thead>
+          <th>Title</th><th>Url</th><th>ShortUrl</th>
+      </thead>
+        <tr ng-repeat="kr in krobkruakaos">
+          <td>{{kr.Title}}</td>
+          <td>{{kr.Url}}</td>
+          <td><input type="text" ng-click="setSumID(kr); style='selected-text'" ng-class="style" size="10" value="{{kr.ShortUrl}}" /></td>
+        </tr>
+    </table>
+  </div>
+</div>
+
+<script>
+var tvModule = angular.module('TVThailand', []);
+tvModule.controller('KrobkruakaoCtrl', function ($scope, $http) {
+  $scope.sumID = "";
+  $scope.countSumID = 0;
+  $scope.countSumTitle = "";
+  $scope.krobkruakaos = [];
+  $scope.loadData = function() {
+    $http.get('/admin/krobkruakao.json').
+    success(function(data){
+      $scope.krobkruakaos = data;
+    });
+  };
+  $scope.setSumID = function(kr){
+    if($scope.sumID.length > 0) {
+      $scope.sumID += ","
+    }
+    $scope.sumID += kr.ShortUrl;
+    $scope.sumTitle = kr.Title;
+    $scope.countSumID = $scope.sumID.split(",").length
+  };
+  $scope.clearSum = function() {
+    $scope.sumTitle = "";
+    $scope.sumID = "";
+    $scope.countSumID = 0;
+  };
+  $scope.loadData();
+});
+</script>

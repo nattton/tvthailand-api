@@ -296,3 +296,11 @@ func ShowListHandler(db *sql.DB, r render.Render, req *http.Request) {
 
 	r.HTML(200, "admin/showlist", newmap)
 }
+
+func KrobkruakaoHandler(r render.Render) {
+	r.HTML(200, "admin/krobkruakao", map[string]interface{}{})
+}
+
+func KrobkruakaoJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
+	r.JSON(200, Krobkruakaos())
+}

@@ -98,8 +98,7 @@ func (b *Bot) CheckAllVideoInYoutubeUserAndKeyword(username string, keyword stri
 	}
 }
 
-func (b *Bot) getYoutubeRobotChannels() []*YoutubeUser {
-	var youtubeUsers = []*YoutubeUser{}
+func (b *Bot) getYoutubeRobotChannels() (youtubeUsers []YoutubeUser) {
 	rows, err := b.Db.Query("SELECT username, channel_id, description, user_type, bot_limit FROM tv_youtube_users WHERE channel_id != '' AND bot = 1 ORDER BY official DESC, username ASC")
 	if err != nil {
 		fmt.Println(err)
@@ -107,17 +106,10 @@ func (b *Bot) getYoutubeRobotChannels() []*YoutubeUser {
 
 	defer rows.Close()
 	for rows.Next() {
-		var (
-			username    string
-			channelID   string
-			description string
-			userType    string
-			botLimit    int
-		)
-		if err := rows.Scan(&username, &channelID, &description, &userType, &botLimit); err != nil {
+		youtubeUser := YoutubeUser{}
+		if err := rows.Scan(&youtubeUser.Username, &youtubeUser.ChannelID, &youtubeUser.Description, &youtubeUser.UserType, &youtubeUser.BotLimit); err != nil {
 			fmt.Println(err)
 		}
-		youtubeUser := &YoutubeUser{username, channelID, description, userType, botLimit}
 		youtubeUsers = append(youtubeUsers, youtubeUser)
 	}
 	if err := rows.Err(); err != nil {
