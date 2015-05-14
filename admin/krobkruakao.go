@@ -16,14 +16,15 @@ type Krobkruakao struct {
 }
 
 func ExampleKrobkruakao() {
-	krobkruakaos := Krobkruakaos()
+	krobkruakaos := Krobkruakaos(0)
 	for _, kr := range krobkruakaos {
 		fmt.Printf("%s - %s\nShort Url : %s, Date : %s\n", kr.Title, kr.Url, kr.ShortUrl, kr.Date)
 	}
 }
 
-func Krobkruakaos() (krobkruakaos []Krobkruakao) {
-	doc, err := goquery.NewDocument("http://www.krobkruakao.com/%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%82%E0%B9%88%E0%B8%B2%E0%B8%A7%E0%B8%A2%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%87/")
+func Krobkruakaos(start int) (krobkruakaos []Krobkruakao) {
+	url := fmt.Sprintf("http://www.krobkruakao.com/video_update.php?&starting=%d", start)
+	doc, err := goquery.NewDocument(url)
 	if err != nil {
 		log.Fatal(err)
 	}

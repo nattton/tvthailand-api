@@ -302,5 +302,6 @@ func KrobkruakaoHandler(r render.Render) {
 }
 
 func KrobkruakaoJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
-	r.JSON(200, Krobkruakaos())
+	start, _ := strconv.Atoi(req.FormValue("start"))
+	r.JSON(200, Krobkruakaos(start))
 }

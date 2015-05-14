@@ -35,6 +35,12 @@
           <td><a target="_blank" href="{{linkUpdate(kr)}}"><span class="glyphicon glyphicon-thumbs-up"></span></a></td>
         </tr>
     </table>
+    <div class="row">
+      <div class="col-md-2 col-md-offset-5">
+        <input type="button" ng-click="loadData()" ng-show="isNext" class="btn btn-default" value="Load More..." />
+        <img ng-show="isLoading" src="/static/images/loading.gif" />
+      </div>
+    </div>
   </div>
 </div>
 
@@ -45,10 +51,19 @@ tvModule.controller('KrobkruakaoCtrl', function ($scope, $http) {
   $scope.countSumID = 0;
   $scope.countSumTitle = "";
   $scope.krobkruakaos = [];
+  $scope.isNext = false;
+  $scope.isLoading = false;
   $scope.loadData = function() {
-    $http.get('/admin/krobkruakao.json').
+    $scope.isNext = false;
+    $scope.isLoading = true;
+    $http.get('/admin/krobkruakao.json', { params:{
+                                          start: $scope.krobkruakaos.length}}).
     success(function(data){
-      $scope.krobkruakaos = data;
+      angular.forEach(data, function(kr) {
+        $scope.krobkruakaos.push(kr)
+      });
+      $scope.isNext = true;
+      $scope.isLoading = false;
     });
   };
   $scope.setSumID = function(kr){
