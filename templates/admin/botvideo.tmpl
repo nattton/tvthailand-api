@@ -80,10 +80,17 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       if (video.ProgramID > 0) {
         paramProgramID = "&program_id=" + video.ProgramID;
       }
-      if (video.VideoType == "url") {
-        return "http://tv-cms.makathon.com/bookmarktv.php?src_type=11&id=" + video.VideoID + "&title=" + video.Title + paramProgramID;
+      if (video.VideoType == "youtube") {
+        return "http://tv-cms.makathon.com/bookmarktv.php?src_type=0&url=http://www.youtube.com/watch?v=" + video.VideoID + paramProgramID;
       }
-      return "http://tv-cms.makathon.com/bookmarktv.php?src_type=0&url=http://www.youtube.com/watch?v=" + video.VideoID + paramProgramID;
+      return "http://tv-cms.makathon.com/bookmarktv.php?src_type=11&id=" + video.VideoID + "&title=" + video.Title + paramProgramID;
+    };
+
+    $scope.linkWatch = function(video) {
+      if (video.VideoType == "youtube") {
+        return "https://www.youtube.com/watch?v=" + video.VideoID;
+      }
+      return video.VideoID;
     };
 
     $scope.selectUsername = function(video) {
@@ -204,7 +211,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
             </td>
             <td>{{video.Title}}</td>
             <td><input type="text" ng-click="setSumID(video); style='selected-text'" ng-class="style" size="10" value="{{video.VideoID}}" /></td>
-            <td><a target="_blank" href="https://www.youtube.com/watch?v={{video.VideoID}}"><span class="glyphicon glyphicon-play-circle"></span></a></td>
+            <td><a target="_blank" href="{{linkWatch(video)}}"><span class="glyphicon glyphicon-play-circle"></span></a></td>
             <td>{{video.Published}}</td>
             <td><a target="_blank" href="{{linkUpdate(video)}}"><span class="glyphicon glyphicon-thumbs-up"></span></a></td>
           </tr>
