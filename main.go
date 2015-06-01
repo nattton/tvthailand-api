@@ -24,6 +24,7 @@ func main() {
 	user := flag.String("user", "", "USER")
 	channel := flag.String("channel", "", "CHANNEL")
 	keyword := flag.String("keyword", "", "KEYWORD")
+	start := flag.Int("start", 0, "START")
 	flag.Parse()
 
 	db, err := utils.OpenDB()
@@ -42,14 +43,16 @@ func main() {
 		} else {
 			b.CheckYoutubeUser(*user, 1, 30)
 		}
-
+	} else if *command == "botkrobkruakao" {
+		fmt.Println(*command)
+		b := bot.NewBot(db)
+		b.CheckKrobkruakao(*start)
 	} else if *command == "findchannel" {
 		fmt.Println(*command)
 		b := bot.NewBot(db)
 		if *user == "" {
 			b.FindChannel()
 		}
-
 	} else if *command == "findvideochannel" {
 		fmt.Println(*command)
 		b := bot.NewBot(db)

@@ -191,10 +191,49 @@ func (b *Bot) checkBotVideoExistingAndAddBot(video *YoutubeVideo) {
 	}
 }
 
+func (b *Bot) CheckKrobkruakao(start int) {
+	krobkruakaos := Krobkruakaos(start)
+	for _, kr := range krobkruakaos {
+		fmt.Printf("%s - %s\nShort Url : %s, Date : %s\n", kr.Title, kr.Url, kr.ShortUrl, kr.Date)
+		b.checkBotKrobkruakaoExistingAndAddBot(kr)
+	}
+}
+
+func (b *Bot) checkBotKrobkruakaoExistingAndAddBot(video *Krobkruakao) {
+	rows, err := b.Db.Query("SELECT id from tv_bot_videos WHERE url = ?", video.Url)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		defer rows.Close()
+
+		if !rows.Next() {
+			row2s, err := b.Db.Query("SELECT programlist_id from tv_programlist WHERE programlist_youtube LIKE ? ", "%"+video.ShortUrl+"%")
+			if err != nil {
+				fmt.Println(err)
+			}
+			defer row2s.Close()
+			if row2s.Next() {
+				video.Status = 1
+			} else {
+				video.Status = 0
+			}
+			b.insertBotKrobkruakao(video)
+		}
+	}
+}
+
 func (b *Bot) insertBotVideo(video *YoutubeVideo) {
 	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, video_id, video_type, published, status) VALUES (?, ?, ?, 'youtube', ?, ?)", video.Username, video.Title, video.VideoID, video.Published, video.Status)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("Insert Bot Video ### ", video.Username, video.Title, video.VideoID, video.Published, "###")
+}
+
+func (b *Bot) insertBotKrobkruakao(video *Krobkruakao) {
+	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, url, video_id, video_type, published, status) VALUES ('krobkruakao3', ?, ?, ?, 'url', NOW(), ?)", video.Title+" - "+video.Date, video.Url, video.ShortUrl, video.Status)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Insert Bot Krobkruakao ### ", video.Title, video.Url, video.ShortUrl, video.Date, "###")
 }
