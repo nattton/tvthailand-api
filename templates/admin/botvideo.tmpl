@@ -83,7 +83,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       if (video.VideoType == "url") {
         return "http://tv-cms.makathon.com/bookmarktv.php?src_type=11&id=" + video.VideoID + "&title=" + video.Title + paramProgramID;
       }
-      return "http://tv-cms.makathon.com/bookmarktv.php?src_type=0url=http://www.youtube.com/watch?v=" + video.VideoID + paramProgramID;
+      return "http://tv-cms.makathon.com/bookmarktv.php?src_type=0&url=http://www.youtube.com/watch?v=" + video.VideoID + paramProgramID;
     };
 
     $scope.selectUsername = function(video) {
