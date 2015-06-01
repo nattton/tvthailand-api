@@ -231,7 +231,7 @@ func (b *Bot) insertBotVideo(video *YoutubeVideo) {
 }
 
 func (b *Bot) insertBotKrobkruakao(video *Krobkruakao) {
-	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, url, video_id, video_type, published, status) VALUES ('krobkruakao3', ?, ?, ?, 'url', NOW(), ?)", video.Title+" - "+video.Date, video.Url, video.ShortUrl, video.Status)
+	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, url, video_id, video_type, published, status) VALUES ('krobkruakao3', ?, ?, ?, 'url', NOW(), ?)", video.Title+" | "+video.Date, video.Url, video.ShortUrl, video.Status)
 	if err != nil {
 		panic(err)
 	}
