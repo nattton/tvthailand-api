@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/code-mobi/tvthailand-api/bot"
+	"github.com/code-mobi/tvthailand-api/youtube"
 	"github.com/go-martini/martini"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/martini-contrib/render"
@@ -257,15 +257,15 @@ func YoutubeHandler(db *sql.DB, r render.Render, req *http.Request) {
 
 func YoutubeSearchChannelJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
 
-	channelId := req.FormValue("channelId")
+	channelID := req.FormValue("channelId")
 	maxResults, atoiErr := strconv.Atoi(req.FormValue("maxResults"))
 	if atoiErr != nil {
 		maxResults = 40
 	}
 	pageToken := req.FormValue("pageToken")
 
-	y := bot.NewYoutube()
-	api, err := y.GetVideoJsonByChannelID(channelId, maxResults, pageToken)
+	y := youtube.NewYoutube()
+	api, err := y.GetVideoJsonByChannelID(channelID, maxResults, pageToken)
 	if err != nil {
 		r.JSON(404, err)
 	} else {
@@ -273,12 +273,23 @@ func YoutubeSearchChannelJSONHandler(db *sql.DB, r render.Render, req *http.Requ
 	}
 }
 
-// func YoutubeJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
-// 	username := req.FormValue("username")
-// 	y := bot.NewYoutube()
-// 	_, youtubeVideos := y.GetVideoByUser(username, 1, 40)
-// 	r.JSON(200, youtubeVideos)
-// }
+func YoutubePlaylistItemJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
+
+	playlistID := req.FormValue("playlistId")
+	maxResults, atoiErr := strconv.Atoi(req.FormValue("maxResults"))
+	if atoiErr != nil {
+		maxResults = 40
+	}
+	pageToken := req.FormValue("pageToken")
+
+	y := youtube.NewYoutube()
+	api, err := y.GetVideoJsonByPlaylistID(playlistID, maxResults, pageToken)
+	if err != nil {
+		r.JSON(404, err)
+	} else {
+		r.JSON(200, api)
+	}
+}
 
 func ShowJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
 

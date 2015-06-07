@@ -118,7 +118,7 @@ func main() {
 			r.Get("/show.json", admin.ShowJSONHandler)
 			r.Get("/youtube", admin.YoutubeHandler)
 			r.Get("/youtube.search.channel", admin.YoutubeSearchChannelJSONHandler)
-			// r.Get("/youtube.json", admin.YoutubeJSONHandler)
+			r.Get("/youtube.playlistItems", admin.YoutubePlaylistItemJSONHandler)
 			r.Get("/showlist", admin.ShowListHandler)
 			r.Get("/krobkruakao", admin.KrobkruakaoHandler)
 			r.Get("/krobkruakao.json", admin.KrobkruakaoJSONHandler)
