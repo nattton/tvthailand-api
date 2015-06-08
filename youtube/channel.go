@@ -1,4 +1,4 @@
-package bot
+package youtube
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-const ChannelYoutubeAPIURL = "https://www.googleapis.com/youtube/v3/channels?key=%s&forUsername=%s&part=snippet"
+const YoutubeChannelAPIURL = "https://www.googleapis.com/youtube/v3/channels?key=%s&forUsername=%s&part=snippet"
 
 type ChannelYoutubeAPI struct {
 	Items []*ChannelItem `json:"items"`
@@ -18,7 +18,7 @@ type ChannelItem struct {
 }
 
 func (y *Youtube) GetChannelIDByUser(username string) string {
-	apiURL := fmt.Sprintf(ChannelYoutubeAPIURL, y.apiKey, username)
+	apiURL := fmt.Sprintf(YoutubeChannelAPIURL, y.apiKey, username)
 	fmt.Println(apiURL)
 	resp, err := http.Get(apiURL)
 	if err != nil {

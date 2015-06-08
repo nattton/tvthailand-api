@@ -23,7 +23,6 @@ func main() {
 	command := flag.String("command", "", "COMMAND")
 	user := flag.String("user", "", "USER")
 	channel := flag.String("channel", "", "CHANNEL")
-	keyword := flag.String("keyword", "", "KEYWORD")
 	start := flag.Int("start", 0, "START")
 	flag.Parse()
 
@@ -38,11 +37,7 @@ func main() {
 	} else if *command == "botrun" {
 		fmt.Println(*command)
 		b := bot.NewBot(db)
-		if *user == "" {
-			b.CheckRobotChannel()
-		} else {
-			b.CheckYoutubeUser(*user, 1, 30)
-		}
+		b.CheckRobotChannel()
 	} else if *command == "botkrobkruakao" {
 		fmt.Println(*command)
 		b := bot.NewBot(db)
@@ -60,15 +55,6 @@ func main() {
 			fmt.Println("Must have -user=... -channel=...")
 		} else {
 			b.CheckVideoInChannel(*user, *channel)
-		}
-
-	} else if *command == "botrunvideo" {
-		fmt.Println(*command)
-		b := bot.NewBot(db)
-		if *user == "" {
-			fmt.Println("Must have -user=...")
-		} else {
-			b.CheckAllVideoInYoutubeUserAndKeyword(*user, *keyword)
 		}
 
 	} else {

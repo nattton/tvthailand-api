@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/code-mobi/tvthailand-api/youtube"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -33,7 +34,7 @@ func (b *Bot) CheckRobotChannel() {
 	youtubeUsers := b.getYoutubeRobotChannels()
 	for _, youtubeUser := range youtubeUsers {
 		fmt.Println(youtubeUser.Username)
-		y := NewYoutube()
+		y := youtube.NewYoutube()
 		_, youtubeVideos, _, _ := y.GetVideoByChannelID(youtubeUser.Username, youtubeUser.ChannelID, youtubeUser.BotLimit, "")
 		for _, video := range youtubeVideos {
 			fmt.Println(video.Username, video.Title, video.VideoID)
@@ -42,29 +43,8 @@ func (b *Bot) CheckRobotChannel() {
 	}
 }
 
-func (b *Bot) CheckAllYoutubeUser() {
-	youtubeUsers := b.getYoutubeRobotUsers()
-	for _, youtubeUser := range youtubeUsers {
-		fmt.Println(youtubeUser.Username)
-		b.CheckYoutubeUser(youtubeUser.Username, 1, youtubeUser.BotLimit)
-	}
-}
-
-func (b *Bot) CheckYoutubeUser(username string, start int, botLimit int) {
-	b.CheckYoutubeUserAndKeyword(username, start, botLimit, "")
-}
-
-func (b *Bot) CheckYoutubeUserAndKeyword(username string, start int, botLimit int, keyword string) {
-	y := NewYoutube()
-	_, youtubeVideos := y.GetVideoByUserAndKeyword(username, start, botLimit, keyword)
-	for _, video := range youtubeVideos {
-		fmt.Println(video.Username, video.Title, video.VideoID)
-		b.checkBotVideoExistingAndAddBot(video)
-	}
-}
-
 func (b *Bot) CheckVideoInChannel(username string, channelID string) {
-	y := NewYoutube()
+	y := youtube.NewYoutube()
 	botLimit := 50
 
 	nextPageToken := ""
@@ -78,23 +58,6 @@ func (b *Bot) CheckVideoInChannel(username string, channelID string) {
 		if nextPageToken == "" {
 			break
 		}
-	}
-}
-
-func (b *Bot) CheckAllVideoInYoutubeUserAndKeyword(username string, keyword string) {
-	y := NewYoutube()
-	botLimit := 50
-	var total int
-	if keyword != "" {
-		fmt.Println(keyword)
-		total, _ = y.GetVideoByUserAndKeyword(username, 1, botLimit, keyword)
-	} else {
-		// total, _ = y.GetVideoByUser(username, 1, botLimit)
-	}
-
-	totalLoop := (total / botLimit) + 1
-	for i := 0; i < totalLoop; i++ {
-		b.CheckYoutubeUserAndKeyword(username, (i*botLimit)+1, botLimit, keyword)
 	}
 }
 
@@ -156,7 +119,7 @@ func (b *Bot) queryYoutubeUsers(q string) []*YoutubeUser {
 }
 
 func (b *Bot) FindChannel() {
-	y := NewYoutube()
+	y := youtube.NewYoutube()
 	youtubeUsers := b.getEmptyChannel()
 	for _, youtubeUser := range youtubeUsers {
 		channelID := y.GetChannelIDByUser(youtubeUser.Username)
@@ -168,7 +131,7 @@ func (b *Bot) FindChannel() {
 	}
 }
 
-func (b *Bot) checkBotVideoExistingAndAddBot(video *YoutubeVideo) {
+func (b *Bot) checkBotVideoExistingAndAddBot(video *youtube.YoutubeVideo) {
 	rows, err := b.Db.Query("SELECT id from tv_bot_videos WHERE video_id = ?", video.VideoID)
 	if err != nil {
 		fmt.Println(err)
@@ -222,7 +185,7 @@ func (b *Bot) checkBotKrobkruakaoExistingAndAddBot(video *Krobkruakao) {
 	}
 }
 
-func (b *Bot) insertBotVideo(video *YoutubeVideo) {
+func (b *Bot) insertBotVideo(video *youtube.YoutubeVideo) {
 	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, video_id, video_type, published, status) VALUES (?, ?, ?, 'youtube', ?, ?)", video.Username, video.Title, video.VideoID, video.Published, video.Status)
 	if err != nil {
 		panic(err)
