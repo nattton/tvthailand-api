@@ -11,7 +11,7 @@ import (
 )
 
 const OtvCategoryURL = "http://api.otv.co.th/api/index.php/v202/Category/index/15/1.0/2.0.2"
-const OtvShowListURL = "http://api.otv.co.th/api/index.php/v202/Lists/index/15/1.0/2.0.2/%s/0/20"
+const OtvShowListURL = "http://api.otv.co.th/api/index.php/v202/Lists/index/15/1.0/2.0.2/%s/0/50"
 
 type Otv struct {
 	Db *sql.DB
@@ -36,6 +36,7 @@ type OtvShowListItem struct {
 	ContentSeasonID string `json:"content_season_id"`
 	NameTh          string `json:"name_th"`
 	NameEn          string `json:"name_en"`
+	ContentType     string `json:"content_type"`
 	ModifiedDate    string `json:"modified_date"`
 	Thumbnail       string `json:"thumbnail"`
 }
@@ -50,6 +51,7 @@ func OtvProcessOption() []ProcessType {
 	options := []ProcessType{
 		ProcessType{"OTV Update Modified Date", "modified", true},
 		ProcessType{"OTV Existing Show", "existing", false},
+		ProcessType{"Find Embed", "findembed", false},
 	}
 	return options
 }
@@ -86,7 +88,32 @@ func (o *Otv) UpdateModified() []*OtvShowListItem {
 				shows = append(shows, show)
 				if rowAffected == 0 {
 					fmt.Println("Break Update")
-					break
+					// break
+				}
+			}
+		}
+	}
+	return shows
+}
+
+func (o *Otv) FindEmbed() []*OtvShowListItem {
+	var shows []*OtvShowListItem
+	c := o.getOtvCategory()
+	for _, cat := range c.Items {
+		fmt.Println("#####", cat.ID, cat.APIName, cat.NameEn, "#####")
+		if cat.ID != "5" {
+			s := o.getOtvShowList(cat.ID)
+			for _, show := range s.Items {
+				if show.ContentType == "embed" {
+					rowAffected, err := o.updateEmbedCh7(show)
+					if err != nil {
+						panic(err)
+					}
+					if rowAffected == 0 {
+						fmt.Println("No Update")
+					}
+					fmt.Println("#####", show.ContentSeasonID, show.NameTh, show.ContentType, "#####")
+					shows = append(shows, show)
 				}
 			}
 		}
@@ -113,6 +140,17 @@ func (o *Otv) updateModifiedDate(show *OtvShowListItem) (int64, error) {
 	fmt.Println("ModifiedDate", show.ModifiedDate)
 
 	result, err := o.Db.Exec("UPDATE tv_program SET update_date = ? WHERE otv_id = ?", show.ModifiedDate, show.ContentSeasonID)
+	if err != nil {
+		panic(err)
+	}
+	return result.RowsAffected()
+}
+
+func (o *Otv) updateEmbedCh7(show *OtvShowListItem) (int64, error) {
+	fmt.Println("##### Update Embed Ch7 #####")
+	fmt.Println(show.ContentSeasonID, show.NameTh)
+
+	result, err := o.Db.Exec("UPDATE tv_program SET otv_api_name = ? WHERE otv_id = ?", "Ch7", show.ContentSeasonID)
 	if err != nil {
 		panic(err)
 	}

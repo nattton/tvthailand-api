@@ -160,6 +160,9 @@ func OtvProcessHandler(db *sql.DB, r render.Render, req *http.Request) {
 	case "existing":
 		results = otv.CheckOtvExisting()
 		message = "Check Otv Existing complete."
+	case "findembed":
+		results = otv.FindEmbed()
+		message = "Find Embed complete."
 	default:
 		message = "Please Select Process"
 	}
