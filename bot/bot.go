@@ -35,7 +35,7 @@ func (b *Bot) CheckRobotChannel() {
 	for _, youtubeUser := range youtubeUsers {
 		fmt.Println(youtubeUser.Username)
 		y := youtube.NewYoutube()
-		_, youtubeVideos, _, _ := y.GetVideoByChannelID(youtubeUser.Username, youtubeUser.ChannelID, youtubeUser.BotLimit, "")
+		_, youtubeVideos, _, _ := y.GetVideoByChannelID(youtubeUser.Username, youtubeUser.ChannelID, "", youtubeUser.BotLimit, "")
 		for _, video := range youtubeVideos {
 			fmt.Println(video.Username, video.Title, video.VideoID)
 			b.checkBotVideoExistingAndAddBot(video)
@@ -43,13 +43,13 @@ func (b *Bot) CheckRobotChannel() {
 	}
 }
 
-func (b *Bot) CheckVideoInChannel(username string, channelID string) {
+func (b *Bot) CheckVideoInChannel(username string, channelID string, q string) {
 	y := youtube.NewYoutube()
 	botLimit := 50
 
 	nextPageToken := ""
 	for {
-		_, youtubeVideos, _, nextToken := y.GetVideoByChannelID(username, channelID, botLimit, nextPageToken)
+		_, youtubeVideos, _, nextToken := y.GetVideoByChannelID(username, channelID, q, botLimit, nextPageToken)
 		nextPageToken = nextToken
 		for _, video := range youtubeVideos {
 			fmt.Println(video.Username, video.Title, video.VideoID)

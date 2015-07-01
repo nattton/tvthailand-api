@@ -7,8 +7,8 @@ import (
 	"net/http"
 )
 
-func (y *Youtube) GetVideoJsonByChannelID(channelID string, botLimit int, pageToken string) (api YoutubeAPI, err error) {
-	apiURL := fmt.Sprintf(YoutubeSearchAPIURL, y.apiKey, channelID, botLimit, pageToken)
+func (y *Youtube) GetVideoJsonByChannelID(channelID string, q string, botLimit int, pageToken string) (api YoutubeAPI, err error) {
+	apiURL := fmt.Sprintf(YoutubeSearchAPIURL, y.apiKey, channelID, q, botLimit, pageToken)
 	fmt.Println(apiURL)
 	resp, err := http.Get(apiURL)
 	if err != nil {
@@ -26,8 +26,8 @@ func (y *Youtube) GetVideoJsonByChannelID(channelID string, botLimit int, pageTo
 	return
 }
 
-func (y *Youtube) GetVideoByChannelID(username string, channelID string, botLimit int, pageToken string) (totalResults int, youtubeVideos []*YoutubeVideo, prevPageToken string, nextPageToken string) {
-	api, err := y.GetVideoJsonByChannelID(channelID, botLimit, pageToken)
+func (y *Youtube) GetVideoByChannelID(username string, channelID string, q string, botLimit int, pageToken string) (totalResults int, youtubeVideos []*YoutubeVideo, prevPageToken string, nextPageToken string) {
+	api, err := y.GetVideoJsonByChannelID(channelID, q, botLimit, pageToken)
 	if err != nil {
 		panic(err)
 	}

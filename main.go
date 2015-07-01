@@ -20,10 +20,12 @@ import (
 
 func main() {
 	port := flag.String("port", "9000", "PORT")
-	command := flag.String("command", "", "COMMAND")
+	command := flag.String("command", "", "COMMAND = botrun | findchannel | findvideochannel(user, channel)")
 	user := flag.String("user", "", "USER")
 	channel := flag.String("channel", "", "CHANNEL")
 	start := flag.Int("start", 0, "START")
+	stop := flag.Int("stop", 0, "STOP")
+	q := flag.String("q", "", "QUERY")
 	flag.Parse()
 
 	db, err := utils.OpenDB()
@@ -32,31 +34,35 @@ func main() {
 	}
 	defer db.Close()
 
+	fmt.Println(*command)
 	if *command == "krobkruakao" {
 		admin.ExampleKrobkruakao()
 	} else if *command == "botrun" {
-		fmt.Println(*command)
 		b := bot.NewBot(db)
 		b.CheckRobotChannel()
 	} else if *command == "botkrobkruakao" {
-		fmt.Println(*command)
 		b := bot.NewBot(db)
 		b.CheckKrobkruakao(*start)
 	} else if *command == "findchannel" {
-		fmt.Println(*command)
 		b := bot.NewBot(db)
 		if *user == "" {
 			b.FindChannel()
 		}
 	} else if *command == "findvideochannel" {
-		fmt.Println(*command)
 		b := bot.NewBot(db)
 		if *user == "" || *channel == "" {
 			fmt.Println("Must have -user=... -channel=...")
 		} else {
-			b.CheckVideoInChannel(*user, *channel)
+			b.CheckVideoInChannel(*user, *channel, *q)
 		}
 
+	} else if *command == "findconan" {
+		fmt.Println(*command)
+		b := bot.NewBot(db)
+		for i := *start; i < *stop; i++ {
+			ep := fmt.Sprintf("EP%%20%d", i)
+			b.CheckVideoInChannel("conanofficial", "UCmbpqlWIyoPEVUzU6iTf1OA", ep)
+		}
 	} else {
 		conn, err := net.Dial("tcp", os.Getenv("MEMCACHED_HOST"))
 		if err != nil {

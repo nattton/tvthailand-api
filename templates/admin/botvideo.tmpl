@@ -16,8 +16,10 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
     $scope.isNext = false;
     $scope.isLoading = false;
     $scope.nextPage = 1;
+    $scope.programID = 0;
 
     $scope.setSumID = function(video){
+      $scope.programID = video.ProgramID;
       if($scope.sumID.length > 0) {
         $scope.sumID += ","
       }
@@ -184,7 +186,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       </div>
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-          <a class="btn btn-success" id="btn_update" target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?id={{sumID}}&amp;title={{sumTitle}}&amp;src_type={{srcType}}" ng-show="sumID">Update</a>
+          <a class="btn btn-success" id="btn_update" target="_blank" href="http://tv-cms.makathon.com/bookmarktv.php?id={{sumID}}&amp;title={{sumTitle}}&amp;src_type={{srcType}}&amp;program_id={{programID}}" ng-show="sumID">Update</a>
           <input type="button" ng-click="clearSum()" class="btn btn-warning" id="btn_clear" value="Clear" />
         </div>
       </div>

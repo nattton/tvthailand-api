@@ -171,6 +171,7 @@ func (o *Otv) getOtvCategory() OtvCategory {
 	var c OtvCategory
 	err = json.Unmarshal(body, &c)
 	if err != nil {
+		fmt.Println("JSON Parser Error : ", OtvCategoryURL)
 		panic(err)
 	}
 	return c
@@ -191,6 +192,7 @@ func (o *Otv) getOtvShowList(catID string) OtvShowList {
 	var s OtvShowList
 	err = json.Unmarshal(body, &s)
 	if err != nil {
+		fmt.Println("JSON Parser Error : ", apiURL)
 		panic(err)
 	}
 	return s

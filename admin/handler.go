@@ -261,6 +261,7 @@ func YoutubeHandler(db *sql.DB, r render.Render, req *http.Request) {
 func YoutubeSearchChannelJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
 
 	channelID := req.FormValue("channelId")
+		q := req.FormValue("q")
 	maxResults, atoiErr := strconv.Atoi(req.FormValue("maxResults"))
 	if atoiErr != nil {
 		maxResults = 40
@@ -268,7 +269,7 @@ func YoutubeSearchChannelJSONHandler(db *sql.DB, r render.Render, req *http.Requ
 	pageToken := req.FormValue("pageToken")
 
 	y := youtube.NewYoutube()
-	api, err := y.GetVideoJsonByChannelID(channelID, maxResults, pageToken)
+	api, err := y.GetVideoJsonByChannelID(channelID, q, maxResults, pageToken)
 	if err != nil {
 		r.JSON(404, err)
 	} else {
