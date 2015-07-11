@@ -5,12 +5,21 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
+
+	"github.com/facebookgo/httpcontrol"
 )
 
 func (y *Youtube) GetVideoJsonByChannelID(channelID string, q string, botLimit int, pageToken string) (api YoutubeAPI, err error) {
 	apiURL := fmt.Sprintf(YoutubeSearchAPIURL, y.apiKey, channelID, q, botLimit, pageToken)
 	fmt.Println(apiURL)
-	resp, err := http.Get(apiURL)
+	client := &http.Client{
+		Transport: &httpcontrol.Transport{
+			RequestTimeout: time.Minute,
+			MaxTries:       3,
+		},
+	}
+	resp, err := client.Get(apiURL)
 	if err != nil {
 		panic(err)
 	}

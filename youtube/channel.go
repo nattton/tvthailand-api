@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
+
+	"github.com/facebookgo/httpcontrol"
 )
 
 const YoutubeChannelAPIURL = "https://www.googleapis.com/youtube/v3/channels?key=%s&forUsername=%s&part=snippet"
@@ -20,7 +23,13 @@ type ChannelItem struct {
 func (y *Youtube) GetChannelIDByUser(username string) string {
 	apiURL := fmt.Sprintf(YoutubeChannelAPIURL, y.apiKey, username)
 	fmt.Println(apiURL)
-	resp, err := http.Get(apiURL)
+	client := &http.Client{
+		Transport: &httpcontrol.Transport{
+			RequestTimeout: time.Minute,
+			MaxTries:       3,
+		},
+	}
+	resp, err := client.Get(apiURL)
 	if err != nil {
 		panic(err)
 	}
