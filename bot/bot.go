@@ -3,10 +3,15 @@ package bot
 import (
 	"database/sql"
 	"fmt"
+	"sync"
 
 	"github.com/code-mobi/tvthailand-api/youtube"
 	_ "github.com/go-sql-driver/mysql"
 )
+
+const maxConcurrency = 8
+
+var throttle = make(chan int, maxConcurrency)
 
 type Bot struct {
 	Db *sql.DB
@@ -31,33 +36,38 @@ func NewBot(db *sql.DB) *Bot {
 }
 
 func (b *Bot) CheckRobotChannel() {
+	var wg sync.WaitGroup
 	youtubeUsers := b.getYoutubeRobotChannels()
 	for _, youtubeUser := range youtubeUsers {
 		fmt.Println(youtubeUser.Username)
 		y := youtube.NewYoutube()
 		_, youtubeVideos, _, _ := y.GetVideoByChannelID(youtubeUser.Username, youtubeUser.ChannelID, "", youtubeUser.BotLimit, "")
 		for _, video := range youtubeVideos {
-			fmt.Println(video.Username, video.Title, video.VideoID)
-			b.checkBotVideoExistingAndAddBot(video)
+			throttle <- 1
+			wg.Add(1)
+			go b.checkBotVideoExistingAndAddBot(video, &wg, throttle)
 		}
+		wg.Wait()
 	}
 }
 
 func (b *Bot) CheckVideoInChannel(username string, channelID string, q string) {
+	var wg sync.WaitGroup
 	y := youtube.NewYoutube()
 	botLimit := 50
-
 	nextPageToken := ""
 	for {
 		_, youtubeVideos, _, nextToken := y.GetVideoByChannelID(username, channelID, q, botLimit, nextPageToken)
 		nextPageToken = nextToken
 		for _, video := range youtubeVideos {
-			fmt.Println(video.Username, video.Title, video.VideoID)
-			b.checkBotVideoExistingAndAddBot(video)
+			throttle <- 1
+			wg.Add(1)
+			go b.checkBotVideoExistingAndAddBot(video, &wg, throttle)
 		}
 		if nextPageToken == "" {
 			break
 		}
+		wg.Wait()
 	}
 }
 
@@ -131,7 +141,9 @@ func (b *Bot) FindChannel() {
 	}
 }
 
-func (b *Bot) checkBotVideoExistingAndAddBot(video *youtube.YoutubeVideo) {
+func (b *Bot) checkBotVideoExistingAndAddBot(video *youtube.YoutubeVideo, wg *sync.WaitGroup, throttle chan int) {
+	defer wg.Done()
+	fmt.Println(video.Username, video.Title, video.VideoID)
 	rows, err := b.Db.Query("SELECT id from tv_bot_videos WHERE video_id = ?", video.VideoID)
 	if err != nil {
 		fmt.Println(err)
@@ -152,6 +164,7 @@ func (b *Bot) checkBotVideoExistingAndAddBot(video *youtube.YoutubeVideo) {
 			b.insertBotVideo(video)
 		}
 	}
+	<-throttle
 }
 
 func (b *Bot) CheckKrobkruakao(start int) {
