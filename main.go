@@ -55,14 +55,15 @@ func main() {
 		} else {
 			b.CheckVideoInChannel(*user, *channel, *q)
 		}
-
 	} else if *command == "findconan" {
-		fmt.Println(*command)
 		b := bot.NewBot(db)
 		for i := *start; i < *stop; i++ {
 			ep := fmt.Sprintf("EP%%20%d", i)
 			b.CheckVideoInChannel("conanofficial", "UCmbpqlWIyoPEVUzU6iTf1OA", ep)
 		}
+	} else if *command == "otvupdate" {
+		otv := &admin.Otv{Db: db}
+		otv.UpdateModified()
 	} else {
 		conn, err := net.Dial("tcp", os.Getenv("MEMCACHED_HOST"))
 		if err != nil {
