@@ -28,7 +28,7 @@ func (y *Youtube) GetVideoJsonByPlaylistID(playlistID string, botLimit int, page
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(body))
+
 	err = json.Unmarshal(body, &api)
 	if err != nil {
 		fmt.Println("### Json Parser Error ", apiURL, " ###")

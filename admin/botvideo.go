@@ -62,6 +62,7 @@ func (b *BotVideo) getBotStatuses(id int) []*BotStatus {
 	botStatuses = append(botStatuses, &BotStatus{0, "Waiting", (id == 0)})
 	botStatuses = append(botStatuses, &BotStatus{1, "Updated", (id == 1)})
 	botStatuses = append(botStatuses, &BotStatus{-1, "Rejected", (id == -1)})
+	botStatuses = append(botStatuses, &BotStatus{2, "Suspended", (id == 2)})
 	return botStatuses
 }
 
@@ -71,6 +72,8 @@ func (b *BotVideo) getBotStatusID(status string) int {
 		return -1
 	case "Updated":
 		return 1
+	case "Suspended":
+		return 2
 	default:
 		return 0
 	}
