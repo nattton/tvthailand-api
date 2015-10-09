@@ -29,7 +29,9 @@ func Krobkruakaos(start int) (krobkruakaos []*Krobkruakao) {
 		if b {
 			shortUrl, date := FindGooUrl(url)
 			kr := &Krobkruakao{title, url, shortUrl, date, 0}
-			krobkruakaos = append(krobkruakaos, kr)
+			if strings.Contains(shortUrl, "goo.gl") {
+				krobkruakaos = append(krobkruakaos, kr)
+			}
 		}
 	})
 	return
