@@ -10,7 +10,7 @@ const limitRow int32 = 40
 
 func updateVideoEncrypt(db *sql.DB, listID int, videoID string) {
 	encryptID := EncryptVideo(videoID)
-	_, err := db.Exec("UPDATE tv_programlist SET programlist_youtube_encrypt = ? WHERE programlist_id = ?", encryptID, listID)
+	_, err := db.Exec("UPDATE episodes SET video_encrypt = ? WHERE id = ?", encryptID, listID)
 	if err != nil {
 		panic(err)
 	}

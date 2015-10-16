@@ -25,9 +25,9 @@ func (s *ShowList) getData(showID int) []*ShowListRow {
 	var err error
 	showListRows := []*ShowListRow{}
 	if showID == 0 {
-		rows, err = s.Db.Query("SELECT p.program_id, program_title, programlist_id, programlist_ep, programlist_epname, programlist_src_type, programlist_youtube FROM tv_programlist pl INNER JOIN tv_program p ON (pl.program_id = p.program_id) ORDER BY program_id DESC, programlist_id ASC LIMIT 0, 200")
+		rows, err = s.Db.Query("SELECT s.id, s.title, ep.id, ep.ep, ep.title, ep.src_type, ep.video FROM episodes ep INNER JOIN shows s ON (pl.program_id = p.program_id) ORDER BY s.id DESC, ep.id ASC LIMIT 0, 200")
 	} else {
-		rows, err = s.Db.Query("SELECT p.program_id, program_title, programlist_id, programlist_ep, programlist_epname, programlist_src_type, programlist_youtube FROM tv_programlist pl INNER JOIN tv_program p ON (pl.program_id = p.program_id) WHERE program_id = ? ORDER BY program_id DESC, programlist_id ASC LIMIT 0, 200", showID)
+		rows, err = s.Db.Query("SELECT s.id, s.title, ep.id, ep.ep, ep.title, ep.src_type, ep.video FROM episodes ep INNER JOIN shows s ON (pl.program_id = p.program_id)  WHERE program_id = ? ORDER BY s.id DESC, ep.id ASC LIMIT 0, 200", showID)
 	}
 
 	if err != nil {
@@ -57,7 +57,7 @@ func (s *ShowList) getData(showID int) []*ShowListRow {
 
 func (s *ShowList) getProgram() []*ShowListRow {
 	showListRows := []*ShowListRow{}
-	rows, err := s.Db.Query("SELECT DISTINCT p.program_id, program_title FROM tv_programlist pl INNER JOIN tv_program p ON (pl.program_id = p.program_id) WHERE programlist_banned = 1 ORDER BY program_id DESC, programlist_id ASC LIMIT 0, 200")
+	rows, err := s.Db.Query("SELECT DISTINCT s.id, s.title FROM episodes ep INNER JOIN shows s ON (ep.id = s.id) WHERE banned = 1 ORDER BY s.id DESC, ep.id ASC LIMIT 0, 200")
 	if err != nil {
 		panic(err)
 	}

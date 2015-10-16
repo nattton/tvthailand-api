@@ -57,11 +57,11 @@ func EncryptUpdateHandler(db *sql.DB, params martini.Params, req *http.Request, 
 
 	switch idType {
 	case "empty":
-		rows, _ = db.Query("SELECT program_id, programlist_id, programlist_youtube FROM tv_programlist WHERE programlist_youtube_encrypt = '' ORDER BY programlist_id DESC")
+		rows, _ = db.Query("SELECT show_id, id, video FROM episodes WHERE video_encrypt = '' ORDER BY episodes.id DESC")
 	case "showid":
-		rows, _ = db.Query("SELECT program_id, programlist_id, programlist_youtube FROM tv_programlist WHERE program_id = ? ORDER BY programlist_id DESC", id)
+		rows, _ = db.Query("SELECT show_id, id, video FROM episodes WHERE show_id = ? ORDER BY episodes.id DESC", id)
 	case "listid":
-		rows, _ = db.Query("SELECT program_id, programlist_id, programlist_youtube FROM tv_programlist WHERE programlist_id = ? ORDER BY programlist_id DESC", id)
+		rows, _ = db.Query("SELECT show_id, id, video FROM episodes WHERE id = ? ORDER BY episodes.id DESC", id)
 	}
 
 	defer rows.Close()
@@ -93,7 +93,7 @@ func EncryptUpdateHandler(db *sql.DB, params martini.Params, req *http.Request, 
 
 func MthaiParseURL(db *sql.DB, r render.Render) {
 	var results []*EncryptResult
-	rows, err := db.Query("SELECT program_id, programlist_id, programlist_youtube youtubeKey FROM tv_programlist WHERE programlist_banned = 0 AND programlist_src_type = 14 ORDER BY programlist_id DESC")
+	rows, err := db.Query("SELECT show_id, id, video FROM episodes WHERE banned = 0 AND src_type = 14 ORDER BY id DESC")
 	if err != nil {
 		panic(err)
 	}
@@ -123,7 +123,7 @@ func MthaiParseURL(db *sql.DB, r render.Render) {
 		encryptResult := EncryptVideo(videoResult)
 		fmt.Println("encryptResult :", encryptResult)
 
-		_, err := db.Exec("UPDATE tv_programlist SET programlist_youtube = ?, programlist_youtube_encrypt = ?, programlist_src_type = 11, mthai_video = ? WHERE programlist_id = ? ORDER BY program_id DESC", videoResult, encryptResult, youtubeKey, programlistID)
+		_, err := db.Exec("UPDATE episodes SET video = ?, video_encrypt = ?, src_type = 11, mthai_video = ? WHERE id = ? ORDER BY program_id DESC", videoResult, encryptResult, youtubeKey, programlistID)
 		if err != nil {
 			panic(err)
 		}
@@ -261,7 +261,7 @@ func YoutubeHandler(db *sql.DB, r render.Render, req *http.Request) {
 func YoutubeSearchChannelJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
 
 	channelID := req.FormValue("channelId")
-		q := req.FormValue("q")
+	q := req.FormValue("q")
 	maxResults, atoiErr := strconv.Atoi(req.FormValue("maxResults"))
 	if atoiErr != nil {
 		maxResults = 40

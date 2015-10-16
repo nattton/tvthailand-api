@@ -111,7 +111,7 @@ func (o *Otv) updateModifiedDate(show *OtvShowListItem) (int64, error) {
 		title   string
 		strDate string
 	)
-	err := o.Db.QueryRow("SELECT program_title, update_date from tv_program WHERE otv_id = ?", show.ContentSeasonID).Scan(&title, &strDate)
+	err := o.Db.QueryRow("SELECT title, update_date from shows WHERE otv_id = ?", show.ContentSeasonID).Scan(&title, &strDate)
 	if err != nil {
 		fmt.Println("####### Program Not Found ####### ")
 		return 0, nil
@@ -119,7 +119,7 @@ func (o *Otv) updateModifiedDate(show *OtvShowListItem) (int64, error) {
 	updateDate, _ := time.Parse(DateFMT, strDate)
 	if modifiedDate.After(updateDate) {
 		fmt.Println("ModifiedDate", modifiedDate, "After UpdateDate", updateDate)
-		result, err := o.Db.Exec("UPDATE tv_program SET update_date = ? WHERE otv_id = ?", show.ModifiedDate, show.ContentSeasonID)
+		result, err := o.Db.Exec("UPDATE shows SET update_date = ? WHERE otv_id = ?", show.ModifiedDate, show.ContentSeasonID)
 		if err != nil {
 			panic(err)
 		}
@@ -155,7 +155,7 @@ func (o *Otv) FindEmbed() []*OtvShowListItem {
 
 func (o *Otv) checkExisting(show *OtvShowListItem) bool {
 	var title string
-	err := o.Db.QueryRow("SELECT program_title from tv_program WHERE otv_id = ?", show.ContentSeasonID).Scan(&title)
+	err := o.Db.QueryRow("SELECT title from shows WHERE otv_id = ?", show.ContentSeasonID).Scan(&title)
 	if err != nil {
 		fmt.Println("##### Not Found #####")
 		fmt.Println(show.ContentSeasonID, show.NameTh)
@@ -170,7 +170,7 @@ func (o *Otv) updateEmbedCh7(show *OtvShowListItem) (int64, error) {
 	fmt.Println("##### Update Embed Ch7 #####")
 	fmt.Println(show.ContentSeasonID, show.NameTh)
 
-	result, err := o.Db.Exec("UPDATE tv_program SET otv_api_name = ? WHERE otv_id = ?", "Ch7", show.ContentSeasonID)
+	result, err := o.Db.Exec("UPDATE shows SET otv_api_name = ? WHERE otv_id = ?", "Ch7", show.ContentSeasonID)
 	if err != nil {
 		panic(err)
 	}

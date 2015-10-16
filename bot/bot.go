@@ -72,7 +72,7 @@ func (b *Bot) CheckVideoInChannel(username string, channelID string, q string) {
 }
 
 func (b *Bot) getYoutubeRobotChannels() (youtubeUsers []YoutubeUser) {
-	rows, err := b.Db.Query("SELECT username, channel_id, description, user_type, bot_limit FROM tv_youtube_users WHERE channel_id != '' AND bot = 1 ORDER BY official DESC, username ASC")
+	rows, err := b.Db.Query("SELECT username, channel_id, description, user_type, bot_limit FROM youtube_users WHERE channel_id != '' AND bot = 1 ORDER BY official DESC, username ASC")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -92,12 +92,12 @@ func (b *Bot) getYoutubeRobotChannels() (youtubeUsers []YoutubeUser) {
 }
 
 func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
-	q := "SELECT username, channel_id, description, user_type, bot_limit FROM tv_youtube_users WHERE bot = 1 ORDER BY username"
+	q := "SELECT username, channel_id, description, user_type, bot_limit FROM youtube_users WHERE bot = 1 ORDER BY username"
 	return b.queryYoutubeUsers(q)
 }
 
 func (b *Bot) getEmptyChannel() []*YoutubeUser {
-	q := "SELECT username, channel_id, description, user_type, bot_limit FROM tv_youtube_users WHERE bot = 1 AND user_type = 'user' AND channel_id = ''"
+	q := "SELECT username, channel_id, description, user_type, bot_limit FROM youtube_users WHERE bot = 1 AND user_type = 'user' AND channel_id = ''"
 	return b.queryYoutubeUsers(q)
 }
 
@@ -134,7 +134,7 @@ func (b *Bot) FindChannel() {
 	for _, youtubeUser := range youtubeUsers {
 		channelID := y.GetChannelIDByUser(youtubeUser.Username)
 		fmt.Printf("Username, %s, ChannelID : %s\n", youtubeUser.Username, channelID)
-		_, err := b.Db.Exec("UPDATE tv_youtube_users SET channel_id = ? WHERE username = ?", channelID, youtubeUser.Username)
+		_, err := b.Db.Exec("UPDATE youtube_users SET channel_id = ? WHERE username = ?", channelID, youtubeUser.Username)
 		if err != nil {
 			panic(err)
 		}
@@ -144,14 +144,14 @@ func (b *Bot) FindChannel() {
 func (b *Bot) checkBotVideoExistingAndAddBot(video *youtube.YoutubeVideo, wg *sync.WaitGroup, throttle chan int) {
 	defer wg.Done()
 	fmt.Println(video.Username, video.Title, video.VideoID)
-	rows, err := b.Db.Query("SELECT id from tv_bot_videos WHERE video_id = ?", video.VideoID)
+	rows, err := b.Db.Query("SELECT id from bot_videos WHERE video_id = ?", video.VideoID)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		defer rows.Close()
 
 		if !rows.Next() {
-			row2s, err := b.Db.Query("SELECT programlist_id from tv_programlist WHERE programlist_youtube LIKE ? ", "%"+video.VideoID+"%")
+			row2s, err := b.Db.Query("SELECT id from episodes WHERE video LIKE ? ", "%"+video.VideoID+"%")
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -176,14 +176,14 @@ func (b *Bot) CheckKrobkruakao(start int) {
 }
 
 func (b *Bot) checkBotKrobkruakaoExistingAndAddBot(video *Krobkruakao) {
-	rows, err := b.Db.Query("SELECT id from tv_bot_videos WHERE url = ?", video.Url)
+	rows, err := b.Db.Query("SELECT id from bot_videos WHERE url = ?", video.Url)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		defer rows.Close()
 
 		if !rows.Next() {
-			row2s, err := b.Db.Query("SELECT programlist_id from tv_programlist WHERE programlist_youtube LIKE ? ", "%"+video.ShortUrl+"%")
+			row2s, err := b.Db.Query("SELECT id from episodes WHERE video LIKE ? ", "%"+video.ShortUrl+"%")
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -199,7 +199,7 @@ func (b *Bot) checkBotKrobkruakaoExistingAndAddBot(video *Krobkruakao) {
 }
 
 func (b *Bot) insertBotVideo(video *youtube.YoutubeVideo) {
-	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, video_id, video_type, published, status) VALUES (?, ?, ?, 'youtube', ?, ?)", video.Username, video.Title, video.VideoID, video.Published, video.Status)
+	_, err := b.Db.Exec("INSERT INTO bot_videos (username, title, video_id, video_type, published, status) VALUES (?, ?, ?, 'youtube', ?, ?)", video.Username, video.Title, video.VideoID, video.Published, video.Status)
 	if err != nil {
 		panic(err)
 	}
@@ -207,7 +207,7 @@ func (b *Bot) insertBotVideo(video *youtube.YoutubeVideo) {
 }
 
 func (b *Bot) insertBotKrobkruakao(video *Krobkruakao) {
-	_, err := b.Db.Exec("INSERT INTO tv_bot_videos (username, title, url, video_id, video_type, published, status) VALUES ('krobkruakao3', ?, ?, ?, 'url', NOW(), ?)", video.Title+" | "+video.Date, video.Url, video.ShortUrl, video.Status)
+	_, err := b.Db.Exec("INSERT INTO bot_videos (username, title, url, video_id, video_type, published, status) VALUES ('krobkruakao3', ?, ?, ?, 'url', NOW(), ?)", video.Title+" | "+video.Date, video.Url, video.ShortUrl, video.Status)
 	if err != nil {
 		panic(err)
 	}

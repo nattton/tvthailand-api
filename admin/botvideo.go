@@ -81,7 +81,7 @@ func (b *BotVideo) getBotStatusID(status string) int {
 
 func (b *BotVideo) getBotUsers(selectUsername string) []*BotUser {
 	botUsers := []*BotUser{}
-	rows, err := b.Db.Query("SELECT DISTINCT v.username, u.description from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE u.description != '' ORDER BY description")
+	rows, err := b.Db.Query("SELECT DISTINCT v.username, u.description from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE u.description != '' ORDER BY description")
 	if err != nil {
 		panic(err)
 	}
@@ -110,9 +110,9 @@ func (b *BotVideo) getBotVideos(f *FormSearchBotUser) *BotVideos {
 	var err error
 
 	if f.Username == "all" || f.Username == "" {
-		err = b.Db.QueryRow("SELECT count(id) from tv_bot_videos WHERE status = ? AND title LIKE ?", f.Status, "%"+f.Q+"%").Scan(&countRow)
+		err = b.Db.QueryRow("SELECT count(id) from bot_videos WHERE status = ? AND title LIKE ?", f.Status, "%"+f.Q+"%").Scan(&countRow)
 	} else {
-		err = b.Db.QueryRow("SELECT count(id) from tv_bot_videos WHERE status = ? AND username = ? AND title LIKE ?", f.Status, f.Username, "%"+f.Q+"%").Scan(&countRow)
+		err = b.Db.QueryRow("SELECT count(id) from bot_videos WHERE status = ? AND username = ? AND title LIKE ?", f.Status, f.Username, "%"+f.Q+"%").Scan(&countRow)
 	}
 
 	extendedOrder := ""
@@ -121,9 +121,9 @@ func (b *BotVideo) getBotVideos(f *FormSearchBotUser) *BotVideos {
 	}
 
 	if f.Username == "all" || f.Username == "" {
-		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, video_type, DATE_ADD(published, INTERVAL 7 HOUR), status from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE status = ? AND title LIKE ? ORDER BY  u.official DESC, v.username ASC,"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
+		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, video_type, DATE_ADD(published, INTERVAL 7 HOUR), status from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE status = ? AND title LIKE ? ORDER BY  u.official DESC, v.username ASC,"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
 	} else {
-		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, video_type, DATE_ADD(published, INTERVAL 7 HOUR), status from tv_bot_videos v LEFT JOIN tv_youtube_users u ON (v.username = u.username) WHERE status = ? AND v.username = ? AND title LIKE ? ORDER BY"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, f.Username, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
+		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, video_type, DATE_ADD(published, INTERVAL 7 HOUR), status from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE status = ? AND v.username = ? AND title LIKE ? ORDER BY"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, f.Username, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
 	}
 
 	if err != nil {
@@ -173,7 +173,7 @@ func (b *BotVideo) getBotVideos(f *FormSearchBotUser) *BotVideos {
 }
 
 func (b *BotVideo) setBotVideoStatus(id int, status int) {
-	_, err := b.Db.Exec("UPDATE tv_bot_videos SET status = ? WHERE id = ?", status, id)
+	_, err := b.Db.Exec("UPDATE bot_videos SET status = ? WHERE id = ?", status, id)
 	if err != nil {
 		panic(err)
 	}
