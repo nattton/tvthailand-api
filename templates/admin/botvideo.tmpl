@@ -59,7 +59,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
         }).
         success(function(data){
           $scope.isLoading = false;
-          if (data.CurrentPage == 0) {
+          if (data.currentPage == 0) {
             $scope.videos = [];
           }
 
@@ -68,9 +68,9 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
             $scope.videos.push(video)
           });
 
-          if(data.MaxPage > data.CurrentPage) {
+          if(data.maxPage > data.currentPage) {
             $scope.isNext = true;
-            $scope.nextPage = data.CurrentPage+1;
+            $scope.nextPage = data.currentPage+1;
           } else {
             $scope.isNext = false;
           }
