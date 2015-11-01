@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"sync"
 
+	_ "github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-sql-driver/mysql"
 	"github.com/code-mobi/tvthailand-api/youtube"
-	_ "github.com/go-sql-driver/mysql"
 )
 
 const maxConcurrency = 8
@@ -45,9 +45,9 @@ func (b *Bot) CheckRobotChannel() {
 		for _, video := range youtubeVideos {
 			throttle <- 1
 			wg.Add(1)
-			go b.checkBotVideoExistingAndAddBot(video, &wg, throttle)
+			go b.runBotVideoExistingAndAddBot(video, &wg, throttle)
+			wg.Wait()
 		}
-		wg.Wait()
 	}
 }
 
@@ -62,7 +62,7 @@ func (b *Bot) CheckVideoInChannel(username string, channelID string, q string) {
 		for _, video := range youtubeVideos {
 			throttle <- 1
 			wg.Add(1)
-			go b.checkBotVideoExistingAndAddBot(video, &wg, throttle)
+			go b.runBotVideoExistingAndAddBot(video, &wg, throttle)
 		}
 		if nextPageToken == "" {
 			break
@@ -97,7 +97,7 @@ func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
 }
 
 func (b *Bot) getEmptyChannel() []*YoutubeUser {
-	q := "SELECT username, channel_id, description, user_type, bot_limit FROM youtube_users WHERE bot = 1 AND user_type = 'user' AND channel_id = ''"
+	q := "SELECT username, channel_id, description, user_type, bot_limit FROM youtube_users WHERE user_type = 'user' AND channel_id = ''"
 	return b.queryYoutubeUsers(q)
 }
 
@@ -141,8 +141,13 @@ func (b *Bot) FindChannel() {
 	}
 }
 
-func (b *Bot) checkBotVideoExistingAndAddBot(video *youtube.YoutubeVideo, wg *sync.WaitGroup, throttle chan int) {
+func (b *Bot) runBotVideoExistingAndAddBot(video *youtube.YoutubeVideo, wg *sync.WaitGroup, throttle chan int) {
 	defer wg.Done()
+	b.checkBotVideoExistingAndAddBot(video)
+	<-throttle
+}
+
+func (b *Bot) checkBotVideoExistingAndAddBot(video *youtube.YoutubeVideo) {
 	fmt.Println(video.Username, video.Title, video.VideoID)
 	rows, err := b.Db.Query("SELECT id from bot_videos WHERE video_id = ?", video.VideoID)
 	if err != nil {
@@ -164,7 +169,6 @@ func (b *Bot) checkBotVideoExistingAndAddBot(video *youtube.YoutubeVideo, wg *sy
 			b.insertBotVideo(video)
 		}
 	}
-	<-throttle
 }
 
 func (b *Bot) CheckKrobkruakao(start int) {
@@ -199,15 +203,15 @@ func (b *Bot) checkBotKrobkruakaoExistingAndAddBot(video *Krobkruakao) {
 }
 
 func (b *Bot) insertBotVideo(video *youtube.YoutubeVideo) {
-	_, err := b.Db.Exec("INSERT INTO bot_videos (username, title, video_id, video_type, published, status) VALUES (?, ?, ?, 'youtube', ?, ?)", video.Username, video.Title, video.VideoID, video.Published, video.Status)
+	_, err := b.Db.Exec("INSERT INTO bot_videos (channel_id, title, video_id, video_type, published_at, status) VALUES (?, ?, ?, 'youtube', ?, ?)", video.ChannelID, video.Title, video.VideoID, video.Published, video.Status)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Insert Bot Video ### ", video.Username, video.Title, video.VideoID, video.Published, "###")
+	fmt.Println("Insert Bot Video ### ", video.ChannelID, video.Title, video.VideoID, video.Published, "###")
 }
 
 func (b *Bot) insertBotKrobkruakao(video *Krobkruakao) {
-	_, err := b.Db.Exec("INSERT INTO bot_videos (username, title, url, video_id, video_type, published, status) VALUES ('krobkruakao3', ?, ?, ?, 'url', NOW(), ?)", video.Title+" | "+video.Date, video.Url, video.ShortUrl, video.Status)
+	_, err := b.Db.Exec("INSERT INTO bot_videos (channel_id, title, url, video_id, video_type, published_at, status) VALUES ('UCirZPTc9IoKM_DsA9aKbc4g', ?, ?, ?, 'url', NOW(), ?)", video.Title+" | "+video.Date, video.Url, video.ShortUrl, video.Status)
 	if err != nil {
 		panic(err)
 	}

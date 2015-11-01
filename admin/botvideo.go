@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 	"strconv"
+	"time"
 )
 
 type BotVideo struct {
@@ -53,7 +54,7 @@ type BotVideoRow struct {
 	Title       string
 	VideoID     string
 	VideoType   string
-	Published   string
+	Published   time.Time
 	Status      int
 }
 
@@ -121,9 +122,9 @@ func (b *BotVideo) getBotVideos(f *FormSearchBotUser) *BotVideos {
 	}
 
 	if f.Username == "all" || f.Username == "" {
-		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, video_type, DATE_ADD(published, INTERVAL 7 HOUR), status from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE status = ? AND title LIKE ? ORDER BY  u.official DESC, v.username ASC,"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
+		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, video_type, DATE_ADD(published, INTERVAL 7 HOUR), status from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE status = ? AND v.title LIKE ? ORDER BY u.official DESC, v.username ASC,"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
 	} else {
-		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, video_type, DATE_ADD(published, INTERVAL 7 HOUR), status from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE status = ? AND v.username = ? AND title LIKE ? ORDER BY"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, f.Username, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
+		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, video_type, DATE_ADD(published, INTERVAL 7 HOUR), status from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE status = ? AND v.username = ? AND v.title LIKE ? ORDER BY"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, f.Username, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
 	}
 
 	if err != nil {
@@ -143,7 +144,7 @@ func (b *BotVideo) getBotVideos(f *FormSearchBotUser) *BotVideos {
 			title        string
 			videoID      string
 			videoType    string
-			published    string
+			published    time.Time
 			status       int
 		)
 		if err := rows.Scan(&id, &username, &sDescription, &sProgramID, &sUserType, &title, &videoID, &videoType, &published, &status); err != nil {

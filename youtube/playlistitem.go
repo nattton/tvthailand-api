@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/facebookgo/httpcontrol"
+	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/facebookgo/httpcontrol"
 )
 
 func (y *Youtube) GetVideoJsonByPlaylistID(playlistID string, botLimit int, pageToken string) (api YoutubePlaylist, err error) {
@@ -45,7 +45,7 @@ func (y *Youtube) GetVideoByPlaylistID(username string, playlistID string, botLi
 	nextPageToken = api.NextPageToken
 	if len(api.Items) > 0 {
 		for _, item := range api.Items {
-			youtubeVideo := &YoutubeVideo{username, "", item.Snippet.ResourceId.VideoId, item.Snippet.Title, item.Snippet.PublishedAt, 0}
+			youtubeVideo := &YoutubeVideo{username, "", item.Snippet.ResourceID.VideoID, item.Snippet.Title, item.Snippet.PublishedAt, 0}
 			youtubeVideos = append(youtubeVideos, youtubeVideo)
 		}
 	}

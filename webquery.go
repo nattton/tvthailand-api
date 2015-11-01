@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/PuerkitoBio/goquery"
+	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/PuerkitoBio/goquery"
 )
 
 const YoutubeAPIURL = "https://www.googleapis.com/youtube/v3/videos?key=%s&id=%s&fields=items(id,snippet(channelId,title,publishedAt),statistics)&part=snippet"

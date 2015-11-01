@@ -1,6 +1,8 @@
 package youtube
 
-import "os"
+import (
+	"os"
+)
 
 const YoutubeSearchAPIURL = "https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&q=%s&part=snippet&fields=prevPageToken,nextPageToken,pageInfo,items(id(videoId),snippet(title,publishedAt,channelTitle))&order=date&maxResults=%d&pageToken=%s"
 const YoutubePlaylistItemsAPIURL = "https://www.googleapis.com/youtube/v3/playlistItems?key=%s&playlistId=%s&part=snippet&fields=prevPageToken,nextPageToken,pageInfo,items(id,snippet(title,publishedAt,channelTitle,resourceId(videoId)))&order=date&maxResults=%d&pageToken=%s"
@@ -28,7 +30,7 @@ type YoutubeAPI struct {
 	PrevPageToken string    `json:"prevPageToken"`
 	NextPageToken string    `json:"nextPageToken"`
 	PageInfo      PageInfo  `json:"pageInfo"`
-	Items         []*Item   `json:"items"`
+	Items         []Item    `json:"items"`
 	ErrorInfo     ErrorInfo `json:"error"`
 }
 
@@ -54,15 +56,15 @@ type ItemID struct {
 type Snippet struct {
 	Title       string     `json:"title"`
 	PublishedAt string     `json:"publishedAt"`
-	ResourceId  ResourceId `json:"resourceId"`
+	ResourceID  ResourceID `json:"resourceId"`
 }
 
 type YoutubePlaylist struct {
-	PrevPageToken string          `json:"prevPageToken"`
-	NextPageToken string          `json:"nextPageToken"`
-	PageInfo      PageInfo        `json:"pageInfo"`
-	Items         []*PlaylistItem `json:"items"`
-	ErrorInfo     ErrorInfo       `json:"error"`
+	PrevPageToken string         `json:"prevPageToken"`
+	NextPageToken string         `json:"nextPageToken"`
+	PageInfo      PageInfo       `json:"pageInfo"`
+	Items         []PlaylistItem `json:"items"`
+	ErrorInfo     ErrorInfo      `json:"error"`
 }
 
 type PlaylistItem struct {
@@ -70,6 +72,6 @@ type PlaylistItem struct {
 	Snippet Snippet `json:"snippet"`
 }
 
-type ResourceId struct {
-	VideoId string `json:"videoId"`
+type ResourceID struct {
+	VideoID string `json:"videoId"`
 }

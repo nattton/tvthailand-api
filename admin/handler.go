@@ -3,15 +3,16 @@ package admin
 import (
 	"database/sql"
 	"fmt"
+	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-martini/martini"
+	_ "github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-sql-driver/mysql"
+	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/jinzhu/gorm"
+	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/martini-contrib/render"
+	"github.com/code-mobi/tvthailand-api/data"
+	"github.com/code-mobi/tvthailand-api/youtube"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-
-	"github.com/code-mobi/tvthailand-api/youtube"
-	"github.com/go-martini/martini"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/martini-contrib/render"
 )
 
 const MThaiPlayerURL = "http://video.mthai.com/cool/player/%s.html"
@@ -222,18 +223,36 @@ func BotVideoPostHandler(db *sql.DB, r render.Render, req *http.Request) {
 	BotVideoHandler(db, r, req)
 }
 
-func BotVideoJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
+func BotVideoJSONHandler(db gorm.DB, r render.Render, req *http.Request) {
 	username := req.FormValue("username")
 	q := req.FormValue("q")
 	status, _ := strconv.Atoi(req.FormValue("status"))
 	page, _ := strconv.Atoi(req.FormValue("page"))
 	isOrderTitle := req.FormValue("isOrderTitle") == "true"
-	formSearch := &FormSearchBotUser{username, q, status, int32(page), isOrderTitle}
+	formSearch := data.FormSearchBotUser{
+		Username:     username,
+		Q:            q,
+		Status:       status,
+		Page:         int32(page),
+		IsOrderTitle: isOrderTitle,
+	}
 
-	b := NewBotVideo(db)
-	botVideos := b.getBotVideos(formSearch)
+	botVideos := data.GetBotVideos(&db, formSearch)
 	r.JSON(200, botVideos)
 }
+
+// func BotVideoJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
+// 	username := req.FormValue("username")
+// 	q := req.FormValue("q")
+// 	status, _ := strconv.Atoi(req.FormValue("status"))
+// 	page, _ := strconv.Atoi(req.FormValue("page"))
+// 	isOrderTitle := req.FormValue("isOrderTitle") == "true"
+// 	formSearch := &FormSearchBotUser{username, q, status, int32(page), isOrderTitle}
+//
+// 	b := NewBotVideo(db)
+// 	botVideos := b.getBotVideos(formSearch)
+// 	r.JSON(200, botVideos)
+// }
 
 func YoutubeHandler(db *sql.DB, r render.Render, req *http.Request) {
 	username := req.FormValue("username")

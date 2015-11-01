@@ -8,14 +8,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/dropbox/godropbox/memcache"
+	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-martini/martini"
+	_ "github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-sql-driver/mysql"
+	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/martini-contrib/auth"
+	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/martini-contrib/render"
 	"github.com/code-mobi/tvthailand-api/admin"
 	"github.com/code-mobi/tvthailand-api/api2"
 	"github.com/code-mobi/tvthailand-api/bot"
+	"github.com/code-mobi/tvthailand-api/data"
 	"github.com/code-mobi/tvthailand-api/utils"
-	"github.com/dropbox/godropbox/memcache"
-	"github.com/go-martini/martini"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/martini-contrib/render"
 )
 
 type CmdParam struct {
@@ -28,7 +30,6 @@ type CmdParam struct {
 }
 
 func main() {
-	port := flag.String("port", "9000", "PORT")
 	command := flag.String("command", "", "COMMAND = botrun | findchannel | findvideochannel(user, channel)")
 	user := flag.String("user", "", "USER")
 	channel := flag.String("channel", "", "CHANNEL")
@@ -55,7 +56,14 @@ func main() {
 		panic(err.Error())
 	}
 	defer db.Close()
-	conn, err := net.Dial("tcp", os.Getenv("MEMCACHED_HOST"))
+
+	dbg, err := utils.OpenGormDB()
+	if err != nil {
+		panic(err.Error())
+	}
+	defer dbg.Close()
+
+	conn, err := net.Dial("tcp", os.Getenv("MEMCACHED_SERVER"))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -63,6 +71,7 @@ func main() {
 
 	m := martini.Classic()
 	m.Map(db)
+	m.Map(dbg)
 	m.Map(client)
 	m.Use(render.Renderer(render.Options{
 		Directory:  "templates",
@@ -90,13 +99,17 @@ func main() {
 		r.Get("/episode/:id/:start", api2.EpisodeListHandler)
 	})
 
+	authAdmin := auth.BasicFunc(func(username, password string) bool {
+		return auth.SecureCompare(username, "saly") && auth.SecureCompare(password, "admin888")
+	})
+
 	m.Group("/admin", func(r martini.Router) {
 		r.Get("/encrypt", admin.EncryptHandler)
 		r.Post("/encrypt", admin.EncryptUpdateHandler)
-		r.Get("/otv", admin.OtvHandler)
-		r.Post("/otv", admin.OtvProcessHandler)
-		r.Get("/botvideo", admin.BotVideoHandler)
-		r.Post("/botvideo", admin.BotVideoPostHandler)
+		r.Get("/otv", authAdmin, admin.OtvHandler)
+		r.Post("/otv", authAdmin, admin.OtvProcessHandler)
+		r.Get("/botvideo", authAdmin, admin.BotVideoHandler)
+		r.Post("/botvideo", authAdmin, admin.BotVideoPostHandler)
 		r.Get("/botvideo.json", admin.BotVideoJSONHandler)
 		r.Get("/show.json", admin.ShowJSONHandler)
 		r.Get("/youtube", admin.YoutubeHandler)
@@ -113,9 +126,7 @@ func main() {
 		return "Flush!!!"
 	})
 
-	if err := http.ListenAndServe(":"+*port, m); err != nil {
-		panic(err)
-	}
+	m.Run()
 }
 
 func processCommand(cmd *CmdParam) {
@@ -124,6 +135,12 @@ func processCommand(cmd *CmdParam) {
 		panic(err.Error())
 	}
 	defer db.Close()
+
+	dbg, err := utils.OpenGormDB()
+	if err != nil {
+		panic(err.Error())
+	}
+	defer dbg.Close()
 
 	fmt.Println(cmd.Command)
 	switch cmd.Command {
@@ -154,6 +171,10 @@ func processCommand(cmd *CmdParam) {
 			ep := fmt.Sprintf("EP%%20%d", i)
 			b.CheckVideoInChannel("conanofficial", "UCmbpqlWIyoPEVUzU6iTf1OA", ep)
 		}
+	case "runbotpl":
+		data.RunBotPlaylists(&dbg)
+	case "migrate_botvideo":
+		data.MigrateUsernameToChannelID(&dbg)
 	}
 }
 

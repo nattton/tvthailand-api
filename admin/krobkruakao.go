@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/PuerkitoBio/goquery"
+	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/PuerkitoBio/goquery"
 )
 
 type Krobkruakao struct {
