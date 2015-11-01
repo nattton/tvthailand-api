@@ -4,11 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
-	"net"
+	// "net"
 	"net/http"
 	"os"
 
-	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/dropbox/godropbox/memcache"
+	// "github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/dropbox/godropbox/memcache"
 	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-martini/martini"
 	_ "github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-sql-driver/mysql"
 	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/martini-contrib/auth"
@@ -68,16 +68,16 @@ func main() {
 	}
 	defer dbg.Close()
 
-	conn, err := net.Dial("tcp", os.Getenv("MEMCACHED_SERVER"))
-	if err != nil {
-		panic(err.Error())
-	}
-	client := memcache.NewRawClient(0, conn)
+	// conn, err := net.Dial("tcp", os.Getenv("MEMCACHED_SERVER"))
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+	// client := memcache.NewRawClient(0, conn)
 
 	m := martini.Classic()
 	m.Map(db)
 	m.Map(dbg)
-	m.Map(client)
+	// m.Map(client)
 	m.Use(render.Renderer(render.Options{
 		Directory:  "templates",
 		Layout:     "layout",
@@ -127,7 +127,7 @@ func main() {
 	})
 
 	m.Get("/flush", func() string {
-		client.Flush(1)
+		// client.Flush(1)
 		return "Flush!!!"
 	})
 
