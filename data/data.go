@@ -1,3 +1,8 @@
 package data
 
-const limitRow int32 = 40
+const (
+	limitRow       = 40
+	maxConcurrency = 4
+)
+
+var throttle = make(chan int, maxConcurrency)

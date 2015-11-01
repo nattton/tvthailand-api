@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/jinzhu/gorm"
 	"github.com/code-mobi/tvthailand-api/youtube"
+	"log"
 	"math"
+	"sync"
 	"time"
 )
 
@@ -44,11 +46,12 @@ func GetBotVideoByVideoID(db *gorm.DB, videoID string) (botVideo BotVideo, err e
 	return
 }
 
-func AddBotVideoPlaylist(db *gorm.DB, pl YoutubePlaylist, item youtube.PlaylistItem) {
+func AddBotVideoPlaylist(db *gorm.DB, wg *sync.WaitGroup, throttle chan int, pl YoutubePlaylist, item youtube.PlaylistItem) {
+	defer wg.Done()
 	status := 0
 	publishedAt, err := time.Parse(time.RFC3339Nano, item.Snippet.PublishedAt)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	episode, _ := GetEpisodeByVideoID(db, item.Snippet.ResourceID.VideoID)
@@ -56,8 +59,8 @@ func AddBotVideoPlaylist(db *gorm.DB, pl YoutubePlaylist, item youtube.PlaylistI
 		status = 1
 	}
 
-	botVideo, err := GetBotVideoByVideoID(db, item.Snippet.ResourceID.VideoID)
-	if err.Error() == "record not found" && botVideo.ID == 0 {
+	botVideo, _ := GetBotVideoByVideoID(db, item.Snippet.ResourceID.VideoID)
+	if botVideo.ID == 0 {
 		botVideo = BotVideo{
 			ChannelID:   pl.ChannelID,
 			PlaylistID:  item.ID,
@@ -76,6 +79,7 @@ func AddBotVideoPlaylist(db *gorm.DB, pl YoutubePlaylist, item youtube.PlaylistI
 	}
 
 	fmt.Println(botVideo.ChannelID, botVideo.Title, botVideo.PublishedAt)
+	<-throttle
 }
 
 type FormSearchBotUser struct {

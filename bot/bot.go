@@ -41,7 +41,7 @@ func (b *Bot) CheckRobotChannel() {
 	for _, youtubeUser := range youtubeUsers {
 		fmt.Println(youtubeUser.Username)
 		y := youtube.NewYoutube()
-		_, youtubeVideos, _, _ := y.GetVideoByChannelID(youtubeUser.Username, youtubeUser.ChannelID, "", youtubeUser.BotLimit, "")
+		_, youtubeVideos, _, _ := y.GetVideoByChannelID(youtubeUser.ChannelID, "", youtubeUser.BotLimit, "")
 		for _, video := range youtubeVideos {
 			throttle <- 1
 			wg.Add(1)
@@ -51,13 +51,13 @@ func (b *Bot) CheckRobotChannel() {
 	}
 }
 
-func (b *Bot) CheckVideoInChannel(username string, channelID string, q string) {
+func (b *Bot) CheckVideoInChannel(channelID string, q string) {
 	var wg sync.WaitGroup
 	y := youtube.NewYoutube()
 	botLimit := 50
 	nextPageToken := ""
 	for {
-		_, youtubeVideos, _, nextToken := y.GetVideoByChannelID(username, channelID, q, botLimit, nextPageToken)
+		_, youtubeVideos, _, nextToken := y.GetVideoByChannelID(channelID, q, botLimit, nextPageToken)
 		nextPageToken = nextToken
 		for _, video := range youtubeVideos {
 			throttle <- 1
@@ -148,7 +148,7 @@ func (b *Bot) runBotVideoExistingAndAddBot(video *youtube.YoutubeVideo, wg *sync
 }
 
 func (b *Bot) checkBotVideoExistingAndAddBot(video *youtube.YoutubeVideo) {
-	fmt.Println(video.Username, video.Title, video.VideoID)
+	fmt.Println(video.ChannelID, video.Title, video.VideoID)
 	rows, err := b.Db.Query("SELECT id from bot_videos WHERE video_id = ?", video.VideoID)
 	if err != nil {
 		fmt.Println(err)

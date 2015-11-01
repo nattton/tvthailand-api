@@ -18,7 +18,6 @@ func NewYoutube() *Youtube {
 }
 
 type YoutubeVideo struct {
-	Username  string
 	ChannelID string
 	VideoID   string
 	Title     string

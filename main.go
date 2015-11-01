@@ -20,34 +20,30 @@ import (
 	"github.com/code-mobi/tvthailand-api/utils"
 )
 
-type CmdParam struct {
-	Command string
-	User    string
-	Channel string
-	Q       string
-	Start   int
-	Stop    int
+type CommandParam struct {
+	Command  string
+	Channel  string
+	Playlist string
+	Q        string
+	Start    int
+	Stop     int
+}
+
+var commandParam CommandParam
+
+func init() {
+	flag.StringVar(&commandParam.Command, "command", "", "COMMAND = botrun | findchannel | findvideochannel -channel | runbotpl [-playlist] | migrate_botvideo")
+	flag.StringVar(&commandParam.Channel, "channel", "", "CHANNEL")
+	flag.StringVar(&commandParam.Playlist, "playlist", "", "Playlist")
+	flag.StringVar(&commandParam.Q, "q", "", "QUERY")
+	flag.IntVar(&commandParam.Start, "start", 0, "START")
+	flag.IntVar(&commandParam.Stop, "stop", 0, "STOP")
+	flag.Parse()
 }
 
 func main() {
-	command := flag.String("command", "", "COMMAND = botrun | findchannel | findvideochannel(user, channel)")
-	user := flag.String("user", "", "USER")
-	channel := flag.String("channel", "", "CHANNEL")
-	q := flag.String("q", "", "QUERY")
-	start := flag.Int("start", 0, "START")
-	stop := flag.Int("stop", 0, "STOP")
-	flag.Parse()
-
-	if *command != "" {
-		cmdParam := &CmdParam{
-			*command,
-			*user,
-			*channel,
-			*q,
-			*start,
-			*stop,
-		}
-		processCommand(cmdParam)
+	if commandParam.Command != "" {
+		processCommand(commandParam)
 		return
 	}
 
@@ -134,7 +130,7 @@ func main() {
 	m.RunOnAddr(":" + port)
 }
 
-func processCommand(cmd *CmdParam) {
+func processCommand(cmd CommandParam) {
 	db, err := utils.OpenDB()
 	if err != nil {
 		panic(err.Error())
@@ -162,10 +158,10 @@ func processCommand(cmd *CmdParam) {
 		b.FindChannel()
 	case "findvideochannel":
 		b := bot.NewBot(db)
-		if cmd.User == "" || cmd.Channel == "" {
-			fmt.Println("Must have -user=... -channel=...")
+		if cmd.Channel == "" {
+			fmt.Println("Must have -channel=...")
 		} else {
-			b.CheckVideoInChannel(cmd.User, cmd.Channel, cmd.Q)
+			b.CheckVideoInChannel(cmd.Channel, cmd.Q)
 		}
 	case "otvupdate":
 		otv := &admin.Otv{Db: db}
@@ -174,10 +170,15 @@ func processCommand(cmd *CmdParam) {
 		b := bot.NewBot(db)
 		for i := cmd.Start; i < cmd.Stop; i++ {
 			ep := fmt.Sprintf("EP%%20%d", i)
-			b.CheckVideoInChannel("conanofficial", "UCmbpqlWIyoPEVUzU6iTf1OA", ep)
+			b.CheckVideoInChannel("UCmbpqlWIyoPEVUzU6iTf1OA", ep)
 		}
 	case "runbotpl":
-		data.RunBotPlaylists(&dbg)
+		if commandParam.Playlist != "" {
+			data.RunBotPlaylist(&dbg, commandParam.Playlist)
+		} else {
+			data.RunBotPlaylists(&dbg)
+		}
+
 	case "migrate_botvideo":
 		data.MigrateUsernameToChannelID(&dbg)
 	}

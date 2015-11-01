@@ -36,7 +36,7 @@ func (y *Youtube) GetVideoJsonByPlaylistID(playlistID string, botLimit int, page
 	return
 }
 
-func (y *Youtube) GetVideoByPlaylistID(username string, playlistID string, botLimit int, pageToken string) (totalResults int, youtubeVideos []*YoutubeVideo, prevPageToken string, nextPageToken string) {
+func (y *Youtube) GetVideoByPlaylistID(channelId string, playlistID string, botLimit int, pageToken string) (totalResults int, youtubeVideos []*YoutubeVideo, prevPageToken string, nextPageToken string) {
 	api, err := y.GetVideoJsonByPlaylistID(playlistID, botLimit, pageToken)
 	if err != nil {
 		panic(err)
@@ -45,7 +45,7 @@ func (y *Youtube) GetVideoByPlaylistID(username string, playlistID string, botLi
 	nextPageToken = api.NextPageToken
 	if len(api.Items) > 0 {
 		for _, item := range api.Items {
-			youtubeVideo := &YoutubeVideo{username, "", item.Snippet.ResourceID.VideoID, item.Snippet.Title, item.Snippet.PublishedAt, 0}
+			youtubeVideo := &YoutubeVideo{channelId, item.Snippet.ResourceID.VideoID, item.Snippet.Title, item.Snippet.PublishedAt, 0}
 			youtubeVideos = append(youtubeVideos, youtubeVideo)
 		}
 	}
