@@ -51,6 +51,11 @@ func main() {
 		return
 	}
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+
 	db, err := utils.OpenDB()
 	if err != nil {
 		panic(err.Error())
@@ -126,7 +131,7 @@ func main() {
 		return "Flush!!!"
 	})
 
-	m.Run()
+	m.RunOnAddr(":" + port)
 }
 
 func processCommand(cmd *CmdParam) {
