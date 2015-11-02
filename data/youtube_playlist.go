@@ -43,8 +43,12 @@ func RunBotPlaylists(db *gorm.DB) {
 
 func (p YoutubePlaylist) RunBot(db *gorm.DB, continuous bool, nextToken string) {
 	var wg sync.WaitGroup
+	limitRow := p.BotLimit
+	if continuous {
+		limitRow = 40
+	}
 	y := youtube.NewYoutube()
-	youtubePlaylist, err := y.GetVideoJsonByPlaylistID(p.PlaylistID, p.BotLimit, nextToken)
+	youtubePlaylist, err := y.GetVideoJsonByPlaylistID(p.PlaylistID, limitRow, nextToken)
 	if err != nil {
 		log.Fatal(err)
 	}
