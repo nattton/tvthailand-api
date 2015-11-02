@@ -81,7 +81,7 @@ func (b *BotVideo) getBotStatusID(status string) int {
 
 func (b *BotVideo) getBotUsers(selectUsername string) []*BotUser {
 	botUsers := []*BotUser{}
-	rows, err := b.Db.Query("SELECT DISTINCT v.channel_id, u.description from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE u.description != '' ORDER BY description")
+	rows, err := b.Db.Query("SELECT DISTINCT v.channel_id, u.description from bot_videos v LEFT JOIN youtube_users u ON (v.channel_id = u.channel_id) WHERE u.description != '' ORDER BY description")
 	if err != nil {
 		panic(err)
 	}
