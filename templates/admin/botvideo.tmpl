@@ -224,8 +224,8 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
         </thead>
           <tr ng-repeat="video in videos">
             <td><input type="checkbox" class="cb_bot_video" name="bot_video[]" value="{{video.id}}" ng-model="video.selected" /></td>
-            <td><a target="_blank" href="http://tv-cms.makathon.com/ytapi.php?user={{video.username}}">{{video.description}}</a>
-              <a target="_blank" href="https://www.youtube.com/{{video.userType}}/{{video.username}}/videos"><span class="glyphicon glyphicon-new-window"></span></a>
+            <td><a target="_blank" href="http://tv-cms.makathon.com/ytapi.php?channelId={{video.channelId}}">{{video.description}}</a>
+              <a target="_blank" href="https://www.youtube.com/channel/{{video.channelId}}/videos"><span class="glyphicon glyphicon-new-window"></span></a>
               <a href="#"><span class="glyphicon glyphicon-th-list" ng-click="selectUsername(video)"></span></a>
             </td>
             <td>{{video.title}}</td>
