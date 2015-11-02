@@ -3,7 +3,6 @@ package admin
 import (
 	"database/sql"
 	"log"
-	"math"
 	"strconv"
 	"time"
 )
@@ -27,7 +26,7 @@ type FormSearchBotUser struct {
 }
 
 type BotUser struct {
-	Username    string
+	ChannelID   string
 	Description string
 	IsSelected  bool
 }
@@ -82,96 +81,96 @@ func (b *BotVideo) getBotStatusID(status string) int {
 
 func (b *BotVideo) getBotUsers(selectUsername string) []*BotUser {
 	botUsers := []*BotUser{}
-	rows, err := b.Db.Query("SELECT DISTINCT v.username, u.description from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE u.description != '' ORDER BY description")
+	rows, err := b.Db.Query("SELECT DISTINCT v.channel_id, u.description from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE u.description != '' ORDER BY description")
 	if err != nil {
 		panic(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var (
-			username    string
+			channelID   string
 			description string
 		)
-		if err := rows.Scan(&username, &description); err != nil {
+		if err := rows.Scan(&channelID, &description); err != nil {
 			log.Fatal(err)
 		}
-		isSelected := selectUsername == username
-		botUser := &BotUser{username, description, isSelected}
+		isSelected := selectUsername == channelID
+		botUser := &BotUser{channelID, description, isSelected}
 		botUsers = append(botUsers, botUser)
 	}
 
 	return botUsers
 }
 
-func (b *BotVideo) getBotVideos(f *FormSearchBotUser) *BotVideos {
-	var countRow int32
-	botVideos := []*BotVideoRow{}
-
-	var rows *sql.Rows
-	var err error
-
-	if f.Username == "all" || f.Username == "" {
-		err = b.Db.QueryRow("SELECT count(id) from bot_videos WHERE status = ? AND title LIKE ?", f.Status, "%"+f.Q+"%").Scan(&countRow)
-	} else {
-		err = b.Db.QueryRow("SELECT count(id) from bot_videos WHERE status = ? AND username = ? AND title LIKE ?", f.Status, f.Username, "%"+f.Q+"%").Scan(&countRow)
-	}
-
-	extendedOrder := ""
-	if f.IsOrderTitle {
-		extendedOrder = " v.title ASC,"
-	}
-
-	if f.Username == "all" || f.Username == "" {
-		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, video_type, DATE_ADD(published, INTERVAL 7 HOUR), status from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE status = ? AND v.title LIKE ? ORDER BY u.official DESC, v.username ASC,"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
-	} else {
-		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, video_type, DATE_ADD(published, INTERVAL 7 HOUR), status from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE status = ? AND v.username = ? AND v.title LIKE ? ORDER BY"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, f.Username, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
-	}
-
-	if err != nil {
-		panic(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var (
-			id           int32
-			username     string
-			sDescription sql.NullString
-			description  string
-			sProgramID   sql.NullInt64
-			programID    int64
-			sUserType    sql.NullString
-			userType     string
-			title        string
-			videoID      string
-			videoType    string
-			published    time.Time
-			status       int
-		)
-		if err := rows.Scan(&id, &username, &sDescription, &sProgramID, &sUserType, &title, &videoID, &videoType, &published, &status); err != nil {
-			log.Fatal(err)
-		}
-
-		if sDescription.Valid {
-			description = sDescription.String
-		}
-
-		if sProgramID.Valid {
-			programID = sProgramID.Int64
-		}
-
-		if sUserType.Valid {
-			userType = sUserType.String
-		} else {
-			userType = "channel"
-		}
-
-		botVideo := &BotVideoRow{id, username, description, programID, userType, title, videoID, videoType, published, status}
-		botVideos = append(botVideos, botVideo)
-	}
-
-	return &BotVideos{botVideos, countRow, f.Page, int32(math.Ceil(float64(countRow / limitRow)))}
-	// return botVideos
-}
+// func (b *BotVideo) getBotVideos(f *FormSearchBotUser) *BotVideos {
+// 	var countRow int32
+// 	botVideos := []*BotVideoRow{}
+//
+// 	var rows *sql.Rows
+// 	var err error
+//
+// 	if f.Username == "all" || f.Username == "" {
+// 		err = b.Db.QueryRow("SELECT count(id) from bot_videos WHERE status = ? AND title LIKE ?", f.Status, "%"+f.Q+"%").Scan(&countRow)
+// 	} else {
+// 		err = b.Db.QueryRow("SELECT count(id) from bot_videos WHERE status = ? AND username = ? AND title LIKE ?", f.Status, f.Username, "%"+f.Q+"%").Scan(&countRow)
+// 	}
+//
+// 	extendedOrder := ""
+// 	if f.IsOrderTitle {
+// 		extendedOrder = " v.title ASC,"
+// 	}
+//
+// 	if f.Username == "all" || f.Username == "" {
+// 		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, video_type, DATE_ADD(published, INTERVAL 7 HOUR), status from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE status = ? AND v.title LIKE ? ORDER BY u.official DESC, v.username ASC,"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
+// 	} else {
+// 		rows, err = b.Db.Query("SELECT v.id, v.username, u.description, u.program_id, u.user_type, v.title, video_id, video_type, DATE_ADD(published, INTERVAL 7 HOUR), status from bot_videos v LEFT JOIN youtube_users u ON (v.username = u.username) WHERE status = ? AND v.username = ? AND v.title LIKE ? ORDER BY"+extendedOrder+" published DESC LIMIT ?, ?", f.Status, f.Username, "%"+f.Q+"%", (f.Page * limitRow), limitRow)
+// 	}
+//
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer rows.Close()
+// 	for rows.Next() {
+// 		var (
+// 			id           int32
+// 			username     string
+// 			sDescription sql.NullString
+// 			description  string
+// 			sProgramID   sql.NullInt64
+// 			programID    int64
+// 			sUserType    sql.NullString
+// 			userType     string
+// 			title        string
+// 			videoID      string
+// 			videoType    string
+// 			published    time.Time
+// 			status       int
+// 		)
+// 		if err := rows.Scan(&id, &username, &sDescription, &sProgramID, &sUserType, &title, &videoID, &videoType, &published, &status); err != nil {
+// 			log.Fatal(err)
+// 		}
+//
+// 		if sDescription.Valid {
+// 			description = sDescription.String
+// 		}
+//
+// 		if sProgramID.Valid {
+// 			programID = sProgramID.Int64
+// 		}
+//
+// 		if sUserType.Valid {
+// 			userType = sUserType.String
+// 		} else {
+// 			userType = "channel"
+// 		}
+//
+// 		botVideo := &BotVideoRow{id, username, description, programID, userType, title, videoID, videoType, published, status}
+// 		botVideos = append(botVideos, botVideo)
+// 	}
+//
+// 	return &BotVideos{botVideos, countRow, f.Page, int32(math.Ceil(float64(countRow / limitRow)))}
+// 	// return botVideos
+// }
 
 func (b *BotVideo) setBotVideoStatus(id int, status int) {
 	_, err := b.Db.Exec("UPDATE bot_videos SET status = ? WHERE id = ?", status, id)

@@ -63,7 +63,7 @@ func AddBotVideoPlaylist(db *gorm.DB, wg *sync.WaitGroup, throttle chan int, pl 
 	if botVideo.ID == 0 {
 		botVideo = BotVideo{
 			ChannelID:   pl.ChannelID,
-			PlaylistID:  item.ID,
+			PlaylistID:  pl.PlaylistID,
 			Title:       item.Snippet.Title,
 			VideoID:     item.Snippet.ResourceID.VideoID,
 			VideoType:   "youtube",
@@ -83,7 +83,7 @@ func AddBotVideoPlaylist(db *gorm.DB, wg *sync.WaitGroup, throttle chan int, pl 
 }
 
 type FormSearchBotUser struct {
-	Username     string
+	ChannelID    string
 	Q            string
 	Status       int
 	Page         int32
@@ -98,26 +98,28 @@ type BotVideos struct {
 }
 
 type BotVideoRow struct {
-	ID          int32     `json:"id"`
-	Username    string    `json:"username"`
-	Description string    `json:"description"`
-	ProgramID   int64     `json:"programId"`
-	UserType    string    `json:"userType"`
-	Title       string    `json:"title"`
-	VideoID     string    `json:"videoId"`
-	VideoType   string    `json:"videoType"`
-	PublishedAt time.Time `json:"publishedAt"`
-	Status      int       `json:"status"`
+	ID                int32     `json:"id"`
+	ChannelID         string    `json:"channelId"`
+	Description       string    `json:"description"`
+	ProgramID         int64     `json:"programId"`
+	UserType          string    `json:"userType"`
+	Title             string    `json:"title"`
+	VideoID           string    `json:"videoId"`
+	VideoType         string    `json:"videoType"`
+	PublishedAt       time.Time `json:"publishedAt"`
+	Status            int       `json:"status"`
+	PlaylistTitle     string    `json:"-"`
+	PlaylistProgramID int64     `json:"-"`
 }
 
 func GetBotVideos(db *gorm.DB, f FormSearchBotUser) BotVideos {
 	var countRow int32
 	botVideos := []*BotVideoRow{}
-	dbQ := db.Table("bot_videos").Where("status = ? AND title LIKE ?", f.Status, "%"+f.Q+"%").Select("bot_videos.id, bot_videos.username, youtube_users.description, youtube_users.program_id, youtube_users.user_type, bot_videos.title, video_id, video_type, DATE_ADD(bot_videos.published_at, INTERVAL 7 HOUR), bot_videos.status").Joins("LEFT JOIN youtube_users ON (bot_videos.channel_id = youtube_users.channel_id)")
-	if f.Username == "all" || f.Username == "" {
+	dbQ := db.Table("bot_videos").Where("bot_videos.status = ? AND bot_videos.title LIKE ?", f.Status, "%"+f.Q+"%").Select("bot_videos.id, bot_videos.channel_id, youtube_users.description, youtube_users.program_id, youtube_users.user_type, bot_videos.title, video_id, video_type, DATE_ADD(bot_videos.published_at, INTERVAL 7 HOUR) published_at, bot_videos.status, youtube_playlists.title playlist_title, youtube_playlists.program_id playlist_program_id").Joins("LEFT JOIN youtube_users ON bot_videos.channel_id = youtube_users.channel_id LEFT JOIN youtube_playlists ON bot_videos.playlist_id = youtube_playlists.playlist_id")
+	if f.ChannelID == "all" || f.ChannelID == "" {
 		dbQ.Count(&countRow)
 	} else {
-		dbQ = dbQ.Where("username = ?", "%"+f.Q+"%")
+		dbQ = dbQ.Where("bot_videos.channel_id = ?", f.ChannelID)
 		dbQ.Count(&countRow)
 	}
 
@@ -126,6 +128,15 @@ func GetBotVideos(db *gorm.DB, f FormSearchBotUser) BotVideos {
 	}
 
 	err := dbQ.Limit(limitRow).Scan(&botVideos).Error
+
+	for index, _ := range botVideos {
+		if botVideos[index].PlaylistProgramID > 0 {
+			botVideos[index].ProgramID = botVideos[index].PlaylistProgramID
+		}
+		if botVideos[index].PlaylistTitle != "" {
+			botVideos[index].Title = fmt.Sprintf("%s | %s", botVideos[index].PlaylistTitle, botVideos[index].Title)
+		}
+	}
 
 	if err != nil {
 		panic(err)

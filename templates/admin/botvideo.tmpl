@@ -47,7 +47,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       $scope.isNext = false;
       $scope.isLoading = true;
       $http.get('/admin/botvideo.json', { params:{
-                                            username: $scope.username,
+                                            channelId: $scope.channelId,
                                             status: $scope.status,
                                             q: $scope.q,
                                             page: page,
@@ -101,9 +101,20 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       $scope.loadData();
     };
 
-    $scope.wrapVideoID = function() {
+    $scope.wrapUpVideoID = function() {
       $scope.clearSum();
       for(i = $scope.videos.length - 1; i > -1; i--) {
+        var video = $scope.videos[i];
+        if(video.selected) {
+          $scope.setSumID(video);
+        }
+      }
+
+    };
+
+    $scope.wrapDownVideoID = function() {
+      $scope.clearSum();
+      for(i = 0; i < $scope.videos.length; i++) {
         var video = $scope.videos[i];
         if(video.selected) {
           $scope.setSumID(video);
@@ -139,10 +150,10 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       <div class="form-group">
         <label for="inputUsername" class="col-sm-2 control-label">Username</label>
         <div class="col-sm-10">
-          <select id="inputUsername" name="username" ng-model="username" ng-change="loadData(0)" class="chosen-select" style="width:350px;">
+          <select id="inputUsername" name="channelId" ng-model="channelId" ng-change="loadData(0)" class="chosen-select" style="width:350px;">
             <option value="">All</option>
             {[{range .botUsers}]}
-              <option value="{[{.Username}]}" {[{if .IsSelected}]} selected="selected" {[{end}]}>{[{.Description}]} - {[{.Username}]}</option>
+              <option value="{[{.ChannelID}]}" {[{if .IsSelected}]} selected="selected" {[{end}]}>{[{.Description}]} - {[{.ChannelID}]}</option>
             {[{end}]}
           </select>
 
@@ -201,7 +212,8 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       <input type="submit" class="btn btn-info" name="update_status" value="Updated" />
       <input type="submit" class="btn btn-warning" name="update_status" value="Suspended" />
       <label>Action : </label>
-      <input type="button" class="btn btn-info" value="Wrap" ng-click="wrapVideoID()" />
+      <input type="button" class="btn btn-info" value="Wrap Up" ng-click="wrapUpVideoID()" />
+      <input type="button" class="btn btn-info" value="Wrap Down" ng-click="wrapDownVideoID()" />
       <table class="table table-striped">
         <thead>
             <th><input type="checkbox" id="cb_bot_video" ng-model="toggleSelected" ng-change="toggleCheckAll()" /></th>

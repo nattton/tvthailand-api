@@ -224,13 +224,13 @@ func BotVideoPostHandler(db *sql.DB, r render.Render, req *http.Request) {
 }
 
 func BotVideoJSONHandler(db gorm.DB, r render.Render, req *http.Request) {
-	username := req.FormValue("username")
+	channelId := req.FormValue("channelId")
 	q := req.FormValue("q")
 	status, _ := strconv.Atoi(req.FormValue("status"))
 	page, _ := strconv.Atoi(req.FormValue("page"))
 	isOrderTitle := req.FormValue("isOrderTitle") == "true"
 	formSearch := data.FormSearchBotUser{
-		Username:     username,
+		ChannelID:    channelId,
 		Q:            q,
 		Status:       status,
 		Page:         int32(page),
