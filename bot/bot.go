@@ -72,7 +72,7 @@ func (b *Bot) CheckVideoInChannel(channelID string, q string) {
 }
 
 func (b *Bot) getYoutubeRobotChannels() (youtubeUsers []YoutubeUser) {
-	rows, err := b.Db.Query("SELECT username, channel_id, description, user_type, bot_limit FROM youtube_users WHERE channel_id != '' AND bot = 1 ORDER BY official DESC, username ASC")
+	rows, err := b.Db.Query("SELECT username, channel_id, description, user_type, bot_limit FROM youtube_users WHERE channel_id != '' AND bot_enabled = 1 ORDER BY official DESC, username ASC")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -92,7 +92,7 @@ func (b *Bot) getYoutubeRobotChannels() (youtubeUsers []YoutubeUser) {
 }
 
 func (b *Bot) getYoutubeRobotUsers() []*YoutubeUser {
-	q := "SELECT username, channel_id, description, user_type, bot_limit FROM youtube_users WHERE bot = 1 ORDER BY username"
+	q := "SELECT username, channel_id, description, user_type, bot_limit FROM youtube_users WHERE bot_enabled = 1 ORDER BY username"
 	return b.queryYoutubeUsers(q)
 }
 
