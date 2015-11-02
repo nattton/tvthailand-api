@@ -6,6 +6,7 @@ import (
 	"github.com/code-mobi/tvthailand-api/youtube"
 	"log"
 	"math"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -82,6 +83,23 @@ func AddBotVideoPlaylist(db *gorm.DB, wg *sync.WaitGroup, throttle chan int, pl 
 	<-throttle
 }
 
+type BotUser struct {
+	ChannelID   string
+	Description string
+	IsSelected  bool
+}
+
+func GetBotVideoUsers(db *gorm.DB, selectUsername string) (botUsers []BotUser) {
+	err := db.Table("youtube_users").Where("description != ? AND channel_id != ?", "", "").Select("channel_id, description").Order("description").Scan(&botUsers).Error
+	if err != nil {
+		panic(err)
+	}
+	for index := range botUsers {
+		botUsers[index].IsSelected = (selectUsername == botUsers[index].ChannelID)
+	}
+	return
+}
+
 type FormSearchBotUser struct {
 	ChannelID    string
 	Q            string
@@ -129,7 +147,7 @@ func GetBotVideos(db *gorm.DB, f FormSearchBotUser) BotVideos {
 
 	err := dbQ.Offset(f.Page * limitRow).Limit(limitRow).Scan(&botVideos).Error
 
-	for index, _ := range botVideos {
+	for index := range botVideos {
 		if botVideos[index].PlaylistProgramID > 0 {
 			botVideos[index].ProgramID = botVideos[index].PlaylistProgramID
 		}
@@ -147,4 +165,46 @@ func GetBotVideos(db *gorm.DB, f FormSearchBotUser) BotVideos {
 		CountRow: countRow, CurrentPage: f.Page,
 		MaxPage: int32(math.Ceil(float64(countRow / limitRow))),
 	}
+}
+
+type BotStatus struct {
+	ID         int32
+	Name       string
+	IsSelected bool
+}
+
+func GetBotVideoStatuses(id int) []BotStatus {
+	botStatuses := []BotStatus{}
+	botStatuses = append(botStatuses, BotStatus{0, "Waiting", (id == 0)})
+	botStatuses = append(botStatuses, BotStatus{1, "Updated", (id == 1)})
+	botStatuses = append(botStatuses, BotStatus{-1, "Rejected", (id == -1)})
+	botStatuses = append(botStatuses, BotStatus{2, "Suspended", (id == 2)})
+	return botStatuses
+}
+
+func GetBotStatusID(status string) int {
+	switch status {
+	case "Rejected":
+		return -1
+	case "Updated":
+		return 1
+	case "Suspended":
+		return 2
+	default:
+		return 0
+	}
+}
+
+func SetBotVideoStatus(db *gorm.DB, id []int, status int) {
+	db.Model(BotVideo{}).Where("id in (?)", id).UpdateColumn("status", status)
+}
+
+func SetBotVideosStatus(db *gorm.DB, videoIDs []string, updateStatus string) {
+	statusID := GetBotStatusID(updateStatus)
+	var ids []int
+	for _, videoID := range videoIDs {
+		id, _ := strconv.Atoi(videoID)
+		ids = append(ids, id)
+	}
+	SetBotVideoStatus(db, ids, statusID)
 }

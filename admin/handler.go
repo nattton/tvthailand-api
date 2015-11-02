@@ -184,17 +184,16 @@ func OtvProcessHandler(db *sql.DB, r render.Render, req *http.Request) {
 
 }
 
-func BotVideoHandler(db *sql.DB, r render.Render, req *http.Request) {
-	username := req.FormValue("username")
+func BotVideoHandler(db gorm.DB, r render.Render, req *http.Request) {
+	username := req.FormValue("channelId")
 	q := req.FormValue("q")
 	status, _ := strconv.Atoi(req.FormValue("status"))
 	page, _ := strconv.Atoi(req.FormValue("page"))
 	isOrderTitle := req.FormValue("isOrderTitle") == "true"
-	formSearch := &FormSearchBotUser{username, q, status, int32(page), isOrderTitle}
+	formSearch := data.FormSearchBotUser{username, q, status, int32(page), isOrderTitle}
 
-	b := NewBotVideo(db)
-	botStatuses := b.getBotStatuses(formSearch.Status)
-	botUsers := b.getBotUsers(formSearch.Username)
+	botStatuses := data.GetBotVideoStatuses(formSearch.Status)
+	botUsers := data.GetBotVideoUsers(&db, formSearch.ChannelID)
 	// botVideos := b.getBotVideos(formSearch)
 
 	newmap := map[string]interface{}{
@@ -207,18 +206,15 @@ func BotVideoHandler(db *sql.DB, r render.Render, req *http.Request) {
 	r.HTML(200, "admin/botvideo", newmap)
 }
 
-func BotVideoPostHandler(db *sql.DB, r render.Render, req *http.Request) {
+func BotVideoPostHandler(db gorm.DB, r render.Render, req *http.Request) {
 	if err := req.ParseForm(); err != nil {
 		//handle error http.Error() for example
 		return
 	}
 
-	log.Println(req.Form)
-
-	b := NewBotVideo(db)
 	botVideos := req.Form["bot_video[]"]
 	updateStatus := req.FormValue("update_status")
-	b.setBotVideosStatus(botVideos, updateStatus)
+	data.SetBotVideosStatus(&db, botVideos, updateStatus)
 
 	BotVideoHandler(db, r, req)
 }
@@ -241,44 +237,7 @@ func BotVideoJSONHandler(db gorm.DB, r render.Render, req *http.Request) {
 	r.JSON(200, botVideos)
 }
 
-// func BotVideoJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
-// 	username := req.FormValue("username")
-// 	q := req.FormValue("q")
-// 	status, _ := strconv.Atoi(req.FormValue("status"))
-// 	page, _ := strconv.Atoi(req.FormValue("page"))
-// 	isOrderTitle := req.FormValue("isOrderTitle") == "true"
-// 	formSearch := &FormSearchBotUser{username, q, status, int32(page), isOrderTitle}
-//
-// 	b := NewBotVideo(db)
-// 	botVideos := b.getBotVideos(formSearch)
-// 	r.JSON(200, botVideos)
-// }
-
-func YoutubeHandler(db *sql.DB, r render.Render, req *http.Request) {
-	username := req.FormValue("username")
-	q := req.FormValue("q")
-	status, _ := strconv.Atoi(req.FormValue("status"))
-	page, _ := strconv.Atoi(req.FormValue("page"))
-	isOrderTitle := req.FormValue("isOrderTitle") == "true"
-	formSearch := &FormSearchBotUser{username, q, status, int32(page), isOrderTitle}
-
-	b := NewBotVideo(db)
-	botStatuses := b.getBotStatuses(formSearch.Status)
-	botUsers := b.getBotUsers(formSearch.Username)
-	// botVideos := b.getBotVideos(formSearch)
-
-	newmap := map[string]interface{}{
-		"formSearch":  formSearch,
-		"botStatuses": botStatuses,
-		"botUsers":    botUsers,
-		// "botVideos":   botVideos,
-	}
-
-	r.HTML(200, "admin/youtube", newmap)
-}
-
 func YoutubeSearchChannelJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
-
 	channelID := req.FormValue("channelId")
 	q := req.FormValue("q")
 	maxResults, atoiErr := strconv.Atoi(req.FormValue("maxResults"))

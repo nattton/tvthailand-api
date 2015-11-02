@@ -113,7 +113,6 @@ func main() {
 		r.Post("/botvideo", authAdmin, admin.BotVideoPostHandler)
 		r.Get("/botvideo.json", admin.BotVideoJSONHandler)
 		r.Get("/show.json", admin.ShowJSONHandler)
-		r.Get("/youtube", admin.YoutubeHandler)
 		r.Get("/youtube.search.channel", admin.YoutubeSearchChannelJSONHandler)
 		r.Get("/youtube.playlistItems", admin.YoutubePlaylistItemJSONHandler)
 		r.Get("/showlist", admin.ShowListHandler)
