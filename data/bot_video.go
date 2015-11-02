@@ -127,7 +127,7 @@ func GetBotVideos(db *gorm.DB, f FormSearchBotUser) BotVideos {
 		dbQ = dbQ.Order("bot_videos.title ASC")
 	}
 
-	err := dbQ.Limit(limitRow).Scan(&botVideos).Error
+	err := dbQ.Offset(f.Page * limitRow).Limit(limitRow).Scan(&botVideos).Error
 
 	for index, _ := range botVideos {
 		if botVideos[index].PlaylistProgramID > 0 {
