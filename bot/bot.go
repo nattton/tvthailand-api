@@ -46,8 +46,8 @@ func (b *Bot) CheckRobotChannel() {
 			throttle <- 1
 			wg.Add(1)
 			go b.runBotVideoExistingAndAddBot(video, &wg, throttle)
-			wg.Wait()
 		}
+		wg.Wait()
 	}
 }
 
