@@ -231,7 +231,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
             <td>{{video.title}}</td>
             <td><input type="text" ng-click="setSumID(video); style='selected-text'" ng-class="style" size="10" value="{{video.videoId}}" /></td>
             <td><a target="_blank" href="{{linkWatch(video)}}"><span class="glyphicon glyphicon-play-circle"></span></a></td>
-            <td>{{video.publishedAt | limitTo:10}}</td>
+            <td>{{video.publishedAt | limitTo:16}}</td>
             <td><a target="_blank" href="{{linkUpdate(video)}}"><span class="glyphicon glyphicon-thumbs-up"></span></a></td>
           </tr>
       </table>
