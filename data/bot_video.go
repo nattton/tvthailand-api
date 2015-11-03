@@ -123,7 +123,11 @@ type BotUser struct {
 }
 
 func GetBotVideoUsers(db *gorm.DB, selectUsername string) (botUsers []BotUser) {
-	err := db.Table("youtube_users").Where("description != ? AND channel_id != ?", "", "").Select("channel_id, description").Order("description").Scan(&botUsers).Error
+	err := db.Table("youtube_users").
+		Where("description != ? AND channel_id != ?", "", "").
+		Select("channel_id, description").
+		Order("description").
+		Scan(&botUsers).Error
 	if err != nil {
 		panic(err)
 	}
@@ -166,7 +170,11 @@ type BotVideoRow struct {
 func GetBotVideos(db *gorm.DB, f FormSearchBotUser) BotVideos {
 	var countRow int32
 	botVideos := []BotVideoRow{}
-	dbQ := db.Table("bot_videos").Where("bot_videos.status = ? AND bot_videos.title LIKE ?", f.Status, "%"+f.Q+"%").Select("bot_videos.id, bot_videos.channel_id, youtube_users.description, youtube_users.program_id, youtube_users.user_type, bot_videos.title, video_id, video_type, DATE_ADD(bot_videos.published_at, INTERVAL 7 HOUR) published_at, bot_videos.status, youtube_playlists.title playlist_title, youtube_playlists.program_id playlist_program_id").Joins("LEFT JOIN youtube_users ON bot_videos.channel_id = youtube_users.channel_id LEFT JOIN youtube_playlists ON bot_videos.playlist_id = youtube_playlists.playlist_id").Order("youtube_users.official DESC, bot_videos.channel_id ASC")
+	dbQ := db.Table("bot_videos").
+		Where("bot_videos.status = ? AND bot_videos.title LIKE ?", f.Status, "%"+f.Q+"%").
+		Select("bot_videos.id, bot_videos.channel_id, youtube_users.description, youtube_users.program_id, youtube_users.user_type, bot_videos.title, video_id, video_type, DATE_ADD(bot_videos.published_at, INTERVAL 7 HOUR) published_at, bot_videos.status, youtube_playlists.title playlist_title, youtube_playlists.program_id playlist_program_id").
+		Joins("LEFT JOIN youtube_users ON bot_videos.channel_id = youtube_users.channel_id LEFT JOIN youtube_playlists ON bot_videos.playlist_id = youtube_playlists.playlist_id").
+		Order("youtube_users.official DESC, bot_videos.channel_id ASC")
 	if f.ChannelID == "all" || f.ChannelID == "" {
 		dbQ.Count(&countRow)
 	} else {
@@ -175,7 +183,9 @@ func GetBotVideos(db *gorm.DB, f FormSearchBotUser) BotVideos {
 	}
 
 	if f.IsOrderTitle {
-		dbQ = dbQ.Order("bot_videos.title ASC, published_at DESC")
+		dbQ = dbQ.Order("bot_videos.title ASC")
+	} else {
+		dbQ = dbQ.Order("bot_videos.published_at DESC")
 	}
 
 	err := dbQ.Offset(f.Page * limitRow).Limit(limitRow).Scan(&botVideos).Error
