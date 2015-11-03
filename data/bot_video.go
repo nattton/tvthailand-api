@@ -47,6 +47,35 @@ func GetBotVideoByVideoID(db *gorm.DB, videoID string) (botVideo BotVideo, err e
 	return
 }
 
+func AddBotVideoChannel(db *gorm.DB, wg *sync.WaitGroup, throttle chan int, user YoutubeUser, item youtube.Item) {
+	defer wg.Done()
+	status := 0
+	publishedAt, err := time.Parse(time.RFC3339Nano, item.Snippet.PublishedAt)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	videoID := item.ID.VideoID
+	botVideo, _ := GetBotVideoByVideoID(db, videoID)
+	if botVideo.ID == 0 {
+		if CheckExistingVideoInEpisode(db, videoID) {
+			status = 1
+		}
+		botVideo = BotVideo{
+			ChannelID:   user.ChannelID,
+			Title:       item.Snippet.Title,
+			VideoID:     videoID,
+			VideoType:   "youtube",
+			PublishedAt: publishedAt,
+			Status:      status,
+		}
+		db.Create(&botVideo)
+	}
+
+	fmt.Println(botVideo.ChannelID, botVideo.Title, botVideo.PublishedAt)
+	<-throttle
+}
+
 func AddBotVideoPlaylist(db *gorm.DB, wg *sync.WaitGroup, throttle chan int, pl YoutubePlaylist, item youtube.PlaylistItem) {
 	defer wg.Done()
 	status := 0
@@ -55,18 +84,17 @@ func AddBotVideoPlaylist(db *gorm.DB, wg *sync.WaitGroup, throttle chan int, pl 
 		log.Fatal(err)
 	}
 
-	episode, _ := GetEpisodeByVideoID(db, item.Snippet.ResourceID.VideoID)
-	if episode.ID > 0 {
-		status = 1
-	}
-
-	botVideo, _ := GetBotVideoByVideoID(db, item.Snippet.ResourceID.VideoID)
+	videoID := item.Snippet.ResourceID.VideoID
+	botVideo, _ := GetBotVideoByVideoID(db, videoID)
 	if botVideo.ID == 0 {
+		if CheckExistingVideoInEpisode(db, videoID) {
+			status = 1
+		}
 		botVideo = BotVideo{
 			ChannelID:   pl.ChannelID,
 			PlaylistID:  pl.PlaylistID,
 			Title:       item.Snippet.Title,
-			VideoID:     item.Snippet.ResourceID.VideoID,
+			VideoID:     videoID,
 			VideoType:   "youtube",
 			PublishedAt: publishedAt,
 			Status:      status,
@@ -81,6 +109,11 @@ func AddBotVideoPlaylist(db *gorm.DB, wg *sync.WaitGroup, throttle chan int, pl 
 
 	fmt.Println(botVideo.ChannelID, botVideo.Title, botVideo.PublishedAt)
 	<-throttle
+}
+
+func CheckExistingVideoInEpisode(db *gorm.DB, videoID string) bool {
+	count, _ := GetCountEpisodeByVideoID(db, videoID)
+	return count > 0
 }
 
 type BotUser struct {
@@ -109,10 +142,10 @@ type FormSearchBotUser struct {
 }
 
 type BotVideos struct {
-	Videos      []*BotVideoRow `json:"videos"`
-	CountRow    int32          `json:"countRow"`
-	CurrentPage int32          `json:"currentPage"`
-	MaxPage     int32          `json:"maxPage"`
+	Videos      []BotVideoRow `json:"videos"`
+	CountRow    int32         `json:"countRow"`
+	CurrentPage int32         `json:"currentPage"`
+	MaxPage     int32         `json:"maxPage"`
 }
 
 type BotVideoRow struct {
@@ -132,7 +165,7 @@ type BotVideoRow struct {
 
 func GetBotVideos(db *gorm.DB, f FormSearchBotUser) BotVideos {
 	var countRow int32
-	botVideos := []*BotVideoRow{}
+	botVideos := []BotVideoRow{}
 	dbQ := db.Table("bot_videos").Where("bot_videos.status = ? AND bot_videos.title LIKE ?", f.Status, "%"+f.Q+"%").Select("bot_videos.id, bot_videos.channel_id, youtube_users.description, youtube_users.program_id, youtube_users.user_type, bot_videos.title, video_id, video_type, DATE_ADD(bot_videos.published_at, INTERVAL 7 HOUR) published_at, bot_videos.status, youtube_playlists.title playlist_title, youtube_playlists.program_id playlist_program_id").Joins("LEFT JOIN youtube_users ON bot_videos.channel_id = youtube_users.channel_id LEFT JOIN youtube_playlists ON bot_videos.playlist_id = youtube_playlists.playlist_id").Order("youtube_users.official DESC, bot_videos.channel_id ASC")
 	if f.ChannelID == "all" || f.ChannelID == "" {
 		dbQ.Count(&countRow)
@@ -207,4 +240,8 @@ func SetBotVideosStatus(db *gorm.DB, videoIDs []string, updateStatus string) {
 		ids = append(ids, id)
 	}
 	SetBotVideoStatus(db, ids, statusID)
+}
+
+func DeleteBotVideoByChannel(db *gorm.DB, channelID string) {
+	db.Where("channel_id = ?", channelID).Delete(BotVideo{})
 }

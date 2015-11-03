@@ -3,15 +3,16 @@ package youtube
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"time"
-
 	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/facebookgo/httpcontrol"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"net/url"
+	"time"
 )
 
-func (y *Youtube) GetVideoJsonByChannelID(channelID string, q string, botLimit int, pageToken string) (api YoutubeAPI, err error) {
-	apiURL := fmt.Sprintf(YoutubeSearchAPIURL, y.apiKey, channelID, q, botLimit, pageToken)
+func (y *Youtube) GetVideoJsonByChannelID(channelID string, query string, botLimit int, pageToken string) (api YoutubeAPI, err error) {
+	apiURL := fmt.Sprintf(YoutubeSearchAPIURL, y.apiKey, channelID, url.QueryEscape(query), botLimit, pageToken)
 	fmt.Println(apiURL)
 	client := &http.Client{
 		Transport: &httpcontrol.Transport{
@@ -21,12 +22,12 @@ func (y *Youtube) GetVideoJsonByChannelID(channelID string, q string, botLimit i
 	}
 	resp, err := client.Get(apiURL)
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 	err = json.Unmarshal(body, &api)
 	if err != nil {

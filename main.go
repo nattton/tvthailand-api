@@ -3,12 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"html/template"
-	// "net"
-	"net/http"
-	"os"
-
-	// "github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/dropbox/godropbox/memcache"
 	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-martini/martini"
 	_ "github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-sql-driver/mysql"
 	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/martini-contrib/auth"
@@ -18,13 +12,16 @@ import (
 	"github.com/code-mobi/tvthailand-api/bot"
 	"github.com/code-mobi/tvthailand-api/data"
 	"github.com/code-mobi/tvthailand-api/utils"
+	"html/template"
+	"net/http"
+	"os"
 )
 
 type CommandParam struct {
 	Command  string
 	Channel  string
 	Playlist string
-	Q        string
+	Query    string
 	Start    int
 	Stop     int
 }
@@ -32,10 +29,10 @@ type CommandParam struct {
 var commandParam CommandParam
 
 func init() {
-	flag.StringVar(&commandParam.Command, "command", "", "COMMAND = botrun | findchannel | findvideochannel -channel | runbotpl [-playlist] | migrate_botvideo")
+	flag.StringVar(&commandParam.Command, "command", "", "COMMAND = runbotch [-channel] [-q] | runbotpl [-playlist] | updateuser | migrate_botvideo")
 	flag.StringVar(&commandParam.Channel, "channel", "", "CHANNEL")
 	flag.StringVar(&commandParam.Playlist, "playlist", "", "Playlist")
-	flag.StringVar(&commandParam.Q, "q", "", "QUERY")
+	flag.StringVar(&commandParam.Query, "q", "", "QUERY")
 	flag.IntVar(&commandParam.Start, "start", 0, "START")
 	flag.IntVar(&commandParam.Stop, "stop", 0, "STOP")
 	flag.Parse()
@@ -130,12 +127,6 @@ func main() {
 }
 
 func processCommand(cmd CommandParam) {
-	db, err := utils.OpenDB()
-	if err != nil {
-		panic(err.Error())
-	}
-	defer db.Close()
-
 	dbg, err := utils.OpenGormDB()
 	if err != nil {
 		panic(err.Error())
@@ -144,32 +135,11 @@ func processCommand(cmd CommandParam) {
 
 	fmt.Println(cmd.Command)
 	switch cmd.Command {
-	case "krobkruakao":
-		admin.ExampleKrobkruakao()
-	case "botrun":
-		b := bot.NewBot(db)
-		b.CheckRobotChannel()
-	case "botkrobkruakao":
-		b := bot.NewBot(db)
-		b.CheckKrobkruakao(cmd.Start)
-	case "findchannel":
-		b := bot.NewBot(db)
-		b.FindChannel()
-	case "findvideochannel":
-		b := bot.NewBot(db)
-		if cmd.Channel == "" {
-			fmt.Println("Must have -channel=...")
+	case "runbotch":
+		if commandParam.Channel != "" {
+			data.RunBotChannel(&dbg, commandParam.Channel, commandParam.Query)
 		} else {
-			b.CheckVideoInChannel(cmd.Channel, cmd.Q)
-		}
-	case "otvupdate":
-		otv := &admin.Otv{Db: db}
-		otv.UpdateModified()
-	case "findconan":
-		b := bot.NewBot(db)
-		for i := cmd.Start; i < cmd.Stop; i++ {
-			ep := fmt.Sprintf("EP%%20%d", i)
-			b.CheckVideoInChannel("UCmbpqlWIyoPEVUzU6iTf1OA", ep)
+			data.RunBotChannels(&dbg)
 		}
 	case "runbotpl":
 		if commandParam.Playlist != "" {
@@ -177,7 +147,28 @@ func processCommand(cmd CommandParam) {
 		} else {
 			data.RunBotPlaylists(&dbg)
 		}
-
+	case "updateuser":
+		data.UpdateUserChannel(&dbg)
+	case "checkuser":
+		data.CheckActiveUser(&dbg)
+	case "krobkruakao":
+		admin.ExampleKrobkruakao()
+	case "botkrobkruakao":
+		db, err := utils.OpenDB()
+		if err != nil {
+			panic(err.Error())
+		}
+		defer db.Close()
+		b := bot.NewBot(db)
+		b.CheckKrobkruakao(cmd.Start)
+	case "otvupdate":
+		db, err := utils.OpenDB()
+		if err != nil {
+			panic(err.Error())
+		}
+		defer db.Close()
+		otv := &admin.Otv{Db: db}
+		otv.UpdateModified()
 	case "migrate_botvideo":
 		data.MigrateUsernameToChannelID(&dbg)
 	}

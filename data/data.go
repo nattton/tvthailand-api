@@ -2,7 +2,7 @@ package data
 
 const (
 	limitRow       = 40
-	maxConcurrency = 4
+	maxConcurrency = 8
 )
 
 var throttle = make(chan int, maxConcurrency)

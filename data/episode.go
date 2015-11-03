@@ -26,7 +26,7 @@ type Episode struct {
 	IsURL bool `sql:"-" json:"-"`
 }
 
-func GetEpisodeByVideoID(db *gorm.DB, videoID string) (episode Episode, err error) {
-	err = db.Where("video LIKE ?", "%"+videoID+"%").First(&episode).Error
+func GetCountEpisodeByVideoID(db *gorm.DB, videoID string) (count int, err error) {
+	err = db.Model(Episode{}).Unscoped().Where("video LIKE ?", "%"+videoID+"%").Count(&count).Error
 	return
 }
