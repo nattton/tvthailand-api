@@ -11,8 +11,6 @@ import (
 	"time"
 )
 
-const DateFMT = "2006-01-02T15:04:05"
-
 type BotVideo struct {
 	ID          int       `json:"id"`
 	ChannelID   string    `json:"channelId"`
@@ -204,9 +202,10 @@ func GetBotVideos(db *gorm.DB, f FormSearchBotUser) BotVideos {
 	}
 
 	return BotVideos{
-		Videos:   botVideos,
-		CountRow: countRow, CurrentPage: f.Page,
-		MaxPage: int32(math.Ceil(float64(countRow / limitRow))),
+		Videos:      botVideos,
+		CountRow:    countRow,
+		CurrentPage: f.Page,
+		MaxPage:     int32(math.Ceil(float64(countRow / limitRow))),
 	}
 }
 
