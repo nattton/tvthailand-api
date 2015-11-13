@@ -1,0 +1,13 @@
+{
+  "name": "tvthailand-api",
+  "description": "Web TV Thailand",
+  "keywords": [
+    "tv",
+    "thailand",
+    "tvthailand"
+  ],
+  "image": "heroku/go:1.5",
+  "mount_dir": "src/github.com/code-mobi/tvthailand-api",
+  "website": "tvthailand-api.herokuapp.com",
+  "repository": "http://github.com/code-mobi/tvthailand-api"
+}

@@ -1,1 +1,1 @@
-web: tvthailand-api -port=$PORT
+web: tvthailand-api
