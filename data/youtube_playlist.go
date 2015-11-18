@@ -58,7 +58,7 @@ func (p YoutubePlaylist) RunBot(db *gorm.DB, continuous bool, nextToken string) 
 	}
 	wg.Wait()
 
-	if continuous {
+	if continuous && youtubePlaylist.NextPageToken != "" {
 		p.RunBot(db, continuous, youtubePlaylist.NextPageToken)
 	}
 }
