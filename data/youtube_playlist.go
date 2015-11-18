@@ -36,7 +36,7 @@ func RunBotPlaylists(db *gorm.DB) {
 	playlists, _ := BotEnabledPlaylists(db)
 	for _, playlist := range playlists {
 		fmt.Println(playlist.Title, playlist.PlaylistID)
-		playlist.RunBot(db, false, "")
+		playlist.RunBot(db, true, "")
 	}
 }
 

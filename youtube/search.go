@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const YoutubeSearchAPIURL = "https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&q=%s&part=snippet&fields=prevPageToken,nextPageToken,pageInfo,items(id(videoId),snippet(title,publishedAt,channelTitle))&order=date&maxResults=%d&pageToken=%s"
+
 func (y *Youtube) GetVideoJsonByChannelID(channelID string, query string, botLimit int, pageToken string) (api YoutubeAPI, err error) {
 	apiURL := fmt.Sprintf(YoutubeSearchAPIURL, y.apiKey, channelID, url.QueryEscape(query), botLimit, pageToken)
 	fmt.Println(apiURL)

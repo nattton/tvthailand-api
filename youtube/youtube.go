@@ -4,9 +4,6 @@ import (
 	"os"
 )
 
-const YoutubeSearchAPIURL = "https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&q=%s&part=snippet&fields=prevPageToken,nextPageToken,pageInfo,items(id(videoId),snippet(title,publishedAt,channelTitle))&order=date&maxResults=%d&pageToken=%s"
-const YoutubePlaylistItemsAPIURL = "https://www.googleapis.com/youtube/v3/playlistItems?key=%s&playlistId=%s&part=snippet&fields=prevPageToken,nextPageToken,pageInfo,items(id,snippet(title,publishedAt,channelTitle,resourceId(videoId)))&order=date&maxResults=%d&pageToken=%s"
-
 type Youtube struct {
 	apiKey string
 }

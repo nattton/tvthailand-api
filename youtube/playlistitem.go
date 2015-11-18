@@ -10,6 +10,8 @@ import (
 	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/facebookgo/httpcontrol"
 )
 
+const YoutubePlaylistItemsAPIURL = "https://www.googleapis.com/youtube/v3/playlistItems?key=%s&playlistId=%s&part=snippet&fields=prevPageToken,nextPageToken,pageInfo,items(id,snippet(title,publishedAt,channelTitle,resourceId(videoId)))&maxResults=%d&pageToken=%s"
+
 func (y *Youtube) GetVideoJsonByPlaylistID(playlistID string, botLimit int, pageToken string) (api YoutubePlaylist, err error) {
 	apiURL := fmt.Sprintf(YoutubePlaylistItemsAPIURL, y.apiKey, playlistID, botLimit, pageToken)
 	fmt.Println(apiURL)
