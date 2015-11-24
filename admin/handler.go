@@ -3,16 +3,18 @@ package admin
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
+
 	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-martini/martini"
 	_ "github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-sql-driver/mysql"
 	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/jinzhu/gorm"
 	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/martini-contrib/render"
 	"github.com/code-mobi/tvthailand-api/data"
+	"github.com/code-mobi/tvthailand-api/utils"
 	"github.com/code-mobi/tvthailand-api/youtube"
-	"log"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
 const MThaiPlayerURL = "http://video.mthai.com/cool/player/%s.html"
@@ -237,7 +239,8 @@ func BotVideoJSONHandler(db gorm.DB, r render.Render, req *http.Request) {
 	r.JSON(200, botVideos)
 }
 
-func YoutubeSearchChannelJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
+func YoutubeSearchChannelJSONHandler(db *sql.DB, r render.Render, req *http.Request, w http.ResponseWriter) {
+	callback := req.FormValue("callback")
 	channelID := req.FormValue("channelId")
 	q := req.FormValue("q")
 	maxResults, atoiErr := strconv.Atoi(req.FormValue("maxResults"))
@@ -249,14 +252,14 @@ func YoutubeSearchChannelJSONHandler(db *sql.DB, r render.Render, req *http.Requ
 	y := youtube.NewYoutube()
 	api, err := y.GetVideoJsonByChannelID(channelID, q, maxResults, pageToken)
 	if err != nil {
-		r.JSON(404, err)
+		utils.JSONP(w, 404, callback, err)
 	} else {
-		r.JSON(200, api)
+		utils.JSONP(w, 200, callback, api)
 	}
 }
 
-func YoutubePlaylistItemJSONHandler(db *sql.DB, r render.Render, req *http.Request) {
-
+func YoutubePlaylistItemJSONHandler(db *sql.DB, r render.Render, req *http.Request, w http.ResponseWriter) {
+	callback := req.FormValue("callback")
 	playlistID := req.FormValue("playlistId")
 	maxResults, atoiErr := strconv.Atoi(req.FormValue("maxResults"))
 	if atoiErr != nil {
@@ -267,9 +270,9 @@ func YoutubePlaylistItemJSONHandler(db *sql.DB, r render.Render, req *http.Reque
 	y := youtube.NewYoutube()
 	api, err := y.GetVideoJsonByPlaylistID(playlistID, maxResults, pageToken)
 	if err != nil {
-		r.JSON(404, err)
+		utils.JSONP(w, 404, callback, err)
 	} else {
-		r.JSON(200, api)
+		utils.JSONP(w, 200, callback, api)
 	}
 }
 

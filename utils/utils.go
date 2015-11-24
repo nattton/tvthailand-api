@@ -2,10 +2,14 @@ package utils
 
 import (
 	"database/sql"
-	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-martini/martini"
-	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/jinzhu/gorm"
+	"fmt"
+	"net/http"
 	"os"
 	"time"
+	"encoding/json"
+
+	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-martini/martini"
+	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/jinzhu/gorm"
 )
 
 func OpenDB() (*sql.DB, error) {
@@ -21,4 +25,14 @@ func OpenGormDB() (gorm.DB, error) {
 func GetTimeStamp() string {
 	t := time.Now().Local()
 	return t.Format("20060102150405")
+}
+
+func JSONP(writer http.ResponseWriter, code int, callback string, v interface{}) {
+	writer.WriteHeader(code)
+	jsonBytes, _ := json.Marshal(v)
+	if callback != "" {
+		fmt.Fprintf(writer, "%s(%s)", callback, jsonBytes)
+	} else {
+		writer.Write(jsonBytes)
+	}
 }
