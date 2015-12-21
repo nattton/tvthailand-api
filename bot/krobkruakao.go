@@ -24,10 +24,8 @@ func Krobkruakaos(start int) (krobkruakaos []*Krobkruakao) {
 	}
 	doc.Find(".content-150-box .content-150-img a").Each(func(i int, s *goquery.Selection) {
 		url, b := s.Attr("href")
-		img := s.Find("img").Eq(0)
-		title, _ := img.Attr("title")
 		if b {
-			shortUrl, date := FindGooUrl(url)
+			title, shortUrl, date := FindGooUrl(url)
 			kr := &Krobkruakao{title, url, shortUrl, date, 0}
 			if strings.Contains(shortUrl, "goo.gl") {
 				krobkruakaos = append(krobkruakaos, kr)
@@ -37,11 +35,19 @@ func Krobkruakaos(start int) (krobkruakaos []*Krobkruakao) {
 	return
 }
 
-func FindGooUrl(url string) (shortUrl string, date string) {
+func FindGooUrl(url string) (title string, shortUrl string, date string) {
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
 		log.Fatal(err)
 	}
+    
+    doc.Find(".top-space-8 .Drak12normal").Each(func(i int, s *goquery.Selection) {
+		title = s.Text()
+	})
+    
+    doc.Find(".top-space-8 .tag-h").Each(func(i int, s *goquery.Selection) {
+        title = fmt.Sprintf("%s | %s", title, s.Text())
+	})
 
 	doc.Find(".copy_url span").Each(func(i int, s *goquery.Selection) {
 		shortUrl = s.Text()
