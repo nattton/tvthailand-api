@@ -15,13 +15,13 @@ type YoutubePlaylist struct {
 	Title      string
 	ProgramID  int
 	PlaylistID string
-	BotEnabled bool
+	BotEnabled int
 	BotLimit   int
 	BotAt      time.Time
 }
 
 func BotEnabledPlaylists(db *gorm.DB) (playlists []YoutubePlaylist, err error) {
-	err = db.Where("bot_enabled = ?", true).Order("bot_at").Find(&playlists).Error
+	err = db.Where("bot_enabled = ?", 1).Order("bot_at").Find(&playlists).Error
 	return
 }
 

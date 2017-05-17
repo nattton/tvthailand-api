@@ -3,6 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"html/template"
+	"net/http"
+	"os"
+
 	"github.com/code-mobi/tvthailand-api/admin"
 	"github.com/code-mobi/tvthailand-api/api2"
 	"github.com/code-mobi/tvthailand-api/bot"
@@ -12,9 +16,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/martini-contrib/auth"
 	"github.com/martini-contrib/render"
-	"html/template"
-	"net/http"
-	"os"
 )
 
 type CommandParam struct {
@@ -29,12 +30,16 @@ type CommandParam struct {
 var commandParam CommandParam
 
 func init() {
-	flag.StringVar(&commandParam.Command, "command", "", "COMMAND = runbotch [-channel] [-q] | runbotpl [-playlist] | updateuser | migrate_botvideo")
-	flag.StringVar(&commandParam.Channel, "channel", "", "CHANNEL")
-	flag.StringVar(&commandParam.Playlist, "playlist", "", "Playlist")
-	flag.StringVar(&commandParam.Query, "q", "", "QUERY")
-	flag.IntVar(&commandParam.Start, "start", 0, "START")
-	flag.IntVar(&commandParam.Stop, "stop", 0, "STOP")
+	flag.StringVar(&commandParam.Command, "command", "", `runbotch [-channel] [-q]
+	runbotchthai
+	runbotpl [-playlist]
+	updateuser
+	migrate_botvideo`)
+	flag.StringVar(&commandParam.Channel, "channel", "", "Channel ID")
+	flag.StringVar(&commandParam.Playlist, "playlist", "", "Playlist ID")
+	flag.StringVar(&commandParam.Query, "q", "", "Query")
+	flag.IntVar(&commandParam.Start, "start", 0, "Start")
+	flag.IntVar(&commandParam.Stop, "stop", 0, "Stop")
 	flag.Parse()
 }
 
@@ -141,6 +146,8 @@ func processCommand(cmd CommandParam) {
 		} else {
 			data.RunBotChannels(&dbg)
 		}
+	case "runbotchthai":
+		data.RunBotChannelsThai(&dbg)
 	case "runbotpl":
 		if commandParam.Playlist != "" {
 			data.RunBotPlaylist(&dbg, commandParam.Playlist)

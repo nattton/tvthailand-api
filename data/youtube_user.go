@@ -18,8 +18,10 @@ type YoutubeUser struct {
 	ProgramID   int       `json:"programId"`
 	BotEnabled  bool      `json:"botEnabled"`
 	BotLimit    int       `json:"botLimit"`
+	BotDelay    int       `json:"-"`
 	Official    bool      `json:"isOfficial"`
 	BotAt       time.Time `json:"-"`
+	BotThaiAt   time.Time `json:"-"`
 
 	CreatedAt time.Time  `json:"-"`
 	UpdatedAt time.Time  `json:"-"`
@@ -53,7 +55,12 @@ func CheckActiveUser(db *gorm.DB) {
 }
 
 func BotEnabledUsers(db *gorm.DB) (users []YoutubeUser, err error) {
-	err = db.Where("bot_enabled = ?", true).Order("bot_at").Find(&users).Error
+	err = db.Where("bot_enabled = ?", 1).Order("bot_at").Find(&users).Error
+	return
+}
+
+func BotEnabledUsersThai(db *gorm.DB) (users []YoutubeUser, err error) {
+	err = db.Where("bot_enabled = ?", 1).Where("is_thai").Order("bot_thai_at").Find(&users).Error
 	return
 }
 
@@ -75,9 +82,22 @@ func RunBotChannel(db *gorm.DB, channelId string, query string) {
 func RunBotChannels(db *gorm.DB) {
 	users, _ := BotEnabledUsers(db)
 	for _, user := range users {
-		fmt.Println(user.Description, user.ChannelID)
-		user.RunBot(db, false, "", "")
-		db.Model(&user).UpdateColumns(YoutubeUser{BotAt: time.Now()})
+		if time.Now().After(user.BotAt.Add(time.Duration(user.BotDelay) * time.Minute)) {
+			fmt.Println(user.Description, user.ChannelID)
+			user.RunBot(db, false, "", "")
+			db.Model(&user).UpdateColumns(YoutubeUser{BotAt: time.Now()})
+		}
+	}
+}
+
+func RunBotChannelsThai(db *gorm.DB) {
+	users, _ := BotEnabledUsersThai(db)
+	for _, user := range users {
+		if time.Now().After(user.BotThaiAt.Add(time.Duration(user.BotDelay) * time.Minute)) {
+			fmt.Println(user.Description, user.ChannelID)
+			user.RunBot(db, false, "", "")
+			db.Model(&user).UpdateColumns(YoutubeUser{BotThaiAt: time.Now()})
+		}
 	}
 }
 
