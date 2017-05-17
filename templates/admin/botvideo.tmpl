@@ -214,6 +214,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       <label>Action : </label>
       <input type="button" class="btn btn-info" value="Wrap Up" ng-click="wrapUpVideoID()" />
       <input type="button" class="btn btn-info" value="Wrap Down" ng-click="wrapDownVideoID()" />
+      <a href="#bottom" class="btn btn-default pull-right" >Bottom</a>
       <table class="table table-striped">
         <thead>
             <th><input type="checkbox" id="cb_bot_video" ng-model="toggleSelected" ng-change="toggleCheckAll()" /></th>
@@ -241,6 +242,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
           <img ng-show="isLoading" src="/static/images/loading.gif" />
         </div>
         <a href="#" class="btn btn-default pull-right" >Top</a>
+        <div id="bottom"></div>
     </form>
   </div>
 </div>
