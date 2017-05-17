@@ -2,22 +2,24 @@ package data
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
-	"github.com/code-mobi/tvthailand-api/youtube"
 	"log"
 	"sync"
 	"time"
+
+	"github.com/code-mobi/tvthailand-api/youtube"
+	"github.com/jinzhu/gorm"
 )
 
 type YoutubeUser struct {
-	Username    string `json:"username" gorm:"primary_key"`
-	ChannelID   string `json:"channelId"`
-	Description string `json:"description"`
-	UserType    string `json:"userType"`
-	ProgramID   int    `json:"programId"`
-	BotEnabled  bool   `json:"botEnabled"`
-	BotLimit    int    `json:"botLimit"`
-	Official    bool   `json:"isOfficial"`
+	Username    string    `json:"username" gorm:"primary_key"`
+	ChannelID   string    `json:"channelId"`
+	Description string    `json:"description"`
+	UserType    string    `json:"userType"`
+	ProgramID   int       `json:"programId"`
+	BotEnabled  bool      `json:"botEnabled"`
+	BotLimit    int       `json:"botLimit"`
+	Official    bool      `json:"isOfficial"`
+	BotAt       time.Time `json:"-"`
 
 	CreatedAt time.Time  `json:"-"`
 	UpdatedAt time.Time  `json:"-"`
@@ -51,7 +53,7 @@ func CheckActiveUser(db *gorm.DB) {
 }
 
 func BotEnabledUsers(db *gorm.DB) (users []YoutubeUser, err error) {
-	err = db.Where("bot_enabled = ?", true).Find(&users).Error
+	err = db.Where("bot_enabled = ?", true).Order("bot_at").Find(&users).Error
 	return
 }
 
@@ -75,6 +77,7 @@ func RunBotChannels(db *gorm.DB) {
 	for _, user := range users {
 		fmt.Println(user.Description, user.ChannelID)
 		user.RunBot(db, false, "", "")
+		db.Model(&user).UpdateColumns(YoutubeUser{BotAt: time.Now()})
 	}
 }
 

@@ -2,10 +2,12 @@ package data
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
-	"github.com/code-mobi/tvthailand-api/youtube"
 	"log"
 	"sync"
+	"time"
+
+	"github.com/code-mobi/tvthailand-api/youtube"
+	"github.com/jinzhu/gorm"
 )
 
 type YoutubePlaylist struct {
@@ -15,10 +17,11 @@ type YoutubePlaylist struct {
 	PlaylistID string
 	BotEnabled bool
 	BotLimit   int
+	BotAt      time.Time
 }
 
 func BotEnabledPlaylists(db *gorm.DB) (playlists []YoutubePlaylist, err error) {
-	err = db.Where("bot_enabled = ?", true).Find(&playlists).Error
+	err = db.Where("bot_enabled = ?", true).Order("bot_at").Find(&playlists).Error
 	return
 }
 
@@ -37,6 +40,7 @@ func RunBotPlaylists(db *gorm.DB) {
 	for _, playlist := range playlists {
 		fmt.Println(playlist.Title, playlist.PlaylistID)
 		playlist.RunBot(db, true, "")
+		db.Model(&playlist).UpdateColumns(YoutubePlaylist{BotAt: time.Now()})
 	}
 }
 
