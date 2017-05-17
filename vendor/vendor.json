@@ -129,5 +129,11 @@
 			"revisionTime": "2015-08-24T16:07:02Z"
 		}
 	],
-	"rootPath": "github.com/code-mobi/tvthailand-api"
+	"rootPath": "github.com/code-mobi/tvthailand-api",
+	"heroku": {
+		"install": [
+			"./..."
+		],
+		"goVersion": "go1.8.1"
+	}
 }
