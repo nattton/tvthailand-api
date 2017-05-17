@@ -1,7 +1,7 @@
 package data
 
 import (
-	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/jinzhu/gorm"
+	"github.com/jinzhu/gorm"
 	"time"
 )
 

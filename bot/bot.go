@@ -3,7 +3,7 @@ package bot
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Bot struct {

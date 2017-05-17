@@ -1,0 +1,133 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "wJJ1dqFYclMAr+7um4GKKgRbOIg=",
+			"path": "github.com/PuerkitoBio/goquery",
+			"revision": "b4440419d81240f8451a505b2f806c853bc2befc",
+			"revisionTime": "2015-06-06T02:16:32Z"
+		},
+		{
+			"checksumSHA1": "YKJEHQmesxr6ExwGE4WZrpQsq4s=",
+			"path": "github.com/andybalholm/cascadia",
+			"revision": "3ad29d1ad1c4f2023e355603324348cf1f4b2d48",
+			"revisionTime": "2015-07-30T17:44:59Z"
+		},
+		{
+			"checksumSHA1": "fcfxNsCuheCrubAAl6zWgimCnLY=",
+			"path": "github.com/codegangsta/inject",
+			"revision": "33e0aa1cb7c019ccc3fbe049a8262a6403d30504",
+			"revisionTime": "2015-01-14T23:56:00Z"
+		},
+		{
+			"checksumSHA1": "fBUtVZp1OtthaENWllE+SuRSlQI=",
+			"path": "github.com/dropbox/godropbox/container/set",
+			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
+			"revisionTime": "2015-06-14T20:43:22Z"
+		},
+		{
+			"checksumSHA1": "D01pEBxbZJkpILyIqBWEJKdW0tI=",
+			"path": "github.com/dropbox/godropbox/errors",
+			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
+			"revisionTime": "2015-06-14T20:43:22Z"
+		},
+		{
+			"checksumSHA1": "NHjH+3yPweWW3ciCEn1pIPV9IDQ=",
+			"path": "github.com/dropbox/godropbox/math2/rand2",
+			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
+			"revisionTime": "2015-06-14T20:43:22Z"
+		},
+		{
+			"checksumSHA1": "Xrq7kGulcMpHFRgltCuZ7U7ZPfU=",
+			"path": "github.com/dropbox/godropbox/memcache",
+			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
+			"revisionTime": "2015-06-14T20:43:22Z"
+		},
+		{
+			"checksumSHA1": "z88e5fBSm1gXDIBficSPZa2YEYM=",
+			"path": "github.com/dropbox/godropbox/net2",
+			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
+			"revisionTime": "2015-06-14T20:43:22Z"
+		},
+		{
+			"checksumSHA1": "RFUWKWL9AbeUEbUVA5AVfF0nTog=",
+			"path": "github.com/dropbox/godropbox/resource_pool",
+			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
+			"revisionTime": "2015-06-14T20:43:22Z"
+		},
+		{
+			"checksumSHA1": "wDzTl3GN/GFGJr2dUjWxhccKo0Q=",
+			"path": "github.com/dropbox/godropbox/singleton",
+			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
+			"revisionTime": "2015-06-14T20:43:22Z"
+		},
+		{
+			"checksumSHA1": "aIb20NobDZnQMGJzDAHh0fDuOEg=",
+			"path": "github.com/facebookgo/httpcontrol",
+			"revision": "ccde4420e1fee9af5da365cb76075b95683f39a6",
+			"revisionTime": "2015-07-08T23:40:01Z"
+		},
+		{
+			"checksumSHA1": "QiuVDlWvnw3iG//vyUmoOZsy0e0=",
+			"path": "github.com/go-martini/martini",
+			"revision": "9987fc59f060a063247d22472c2fb48654bac5f6",
+			"revisionTime": "2015-09-26T14:07:23Z"
+		},
+		{
+			"checksumSHA1": "OYNL3sIBglUoPIDpx3STL9lNTNo=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "3dd7008ac1529aca1bcd8a9db75228a71ba23cac",
+			"revisionTime": "2015-08-07T02:25:32Z"
+		},
+		{
+			"checksumSHA1": "/VKn8fOYAbSHgnXQnShnuIDqhHE=",
+			"path": "github.com/jinzhu/gorm",
+			"revision": "96f2bc40c701112de17de7a82d6e271052d36737",
+			"revisionTime": "2015-10-16T06:01:11Z"
+		},
+		{
+			"checksumSHA1": "jaCQF1par6Jl8g+V2Cgp0n/0wSc=",
+			"path": "github.com/lib/pq/hstore",
+			"revision": "ffe986aba3e6cfcded8b06615965941408891ef0",
+			"revisionTime": "2015-10-07T18:57:36Z"
+		},
+		{
+			"checksumSHA1": "W5s3U0jYcwRrdjGydZQz4bWzRYs=",
+			"path": "github.com/martini-contrib/auth",
+			"revision": "fa62c19b7ae87da370242054c8beb11af31d327f",
+			"revisionTime": "2015-02-19T11:46:09Z"
+		},
+		{
+			"checksumSHA1": "WMoHBLFJLLvhzbnatHIY+SgrrFI=",
+			"path": "github.com/martini-contrib/render",
+			"revision": "ec18f8345a1181146728238980606fb1d6f40e8c",
+			"revisionTime": "2015-07-07T14:21:08Z"
+		},
+		{
+			"checksumSHA1": "uG/irJIgifYdc+HC1kF6Gwgn7kU=",
+			"path": "github.com/oxtoacart/bpool",
+			"revision": "4e1c5567d7c2dd59fa4c7c83d34c2f3528b025d6",
+			"revisionTime": "2015-07-12T13:31:11Z"
+		},
+		{
+			"checksumSHA1": "u9gQNbhH7NixRoWtzhatwWAuF3Y=",
+			"path": "github.com/qor/inflection",
+			"revision": "3272df6c21d04180007eb3349844c89a3856bc25",
+			"revisionTime": "2015-10-09T08:41:29Z"
+		},
+		{
+			"checksumSHA1": "vqc3a+oTUGX8PmD0TS+qQ7gmN8I=",
+			"path": "golang.org/x/net/html",
+			"revision": "db8e4de5b2d6653f66aea53094624468caad15d2",
+			"revisionTime": "2015-08-24T16:07:02Z"
+		},
+		{
+			"checksumSHA1": "00eQaGynDYrv3tL+C7l9xH0IDZg=",
+			"path": "golang.org/x/net/html/atom",
+			"revision": "db8e4de5b2d6653f66aea53094624468caad15d2",
+			"revisionTime": "2015-08-24T16:07:02Z"
+		}
+	],
+	"rootPath": "github.com/code-mobi/tvthailand-api"
+}

@@ -2,14 +2,14 @@ package utils
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
-	"encoding/json"
 
-	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-martini/martini"
-	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/jinzhu/gorm"
+	"github.com/go-martini/martini"
+	"github.com/jinzhu/gorm"
 )
 
 func OpenDB() (*sql.DB, error) {

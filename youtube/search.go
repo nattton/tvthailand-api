@@ -3,7 +3,7 @@ package youtube
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/facebookgo/httpcontrol"
+	"github.com/facebookgo/httpcontrol"
 	"io/ioutil"
 	"log"
 	"net/http"

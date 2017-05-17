@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/facebookgo/httpcontrol"
-	_ "github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-sql-driver/mysql"
+	"github.com/facebookgo/httpcontrol"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 const (

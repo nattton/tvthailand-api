@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/facebookgo/httpcontrol"
+	"github.com/facebookgo/httpcontrol"
 )
 
 const YoutubePlaylistItemsAPIURL = "https://www.googleapis.com/youtube/v3/playlistItems?key=%s&playlistId=%s&part=snippet&fields=prevPageToken,nextPageToken,pageInfo,items(id,snippet(title,publishedAt,channelTitle,resourceId(videoId)))&maxResults=%d&pageToken=%s"

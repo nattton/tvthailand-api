@@ -2,7 +2,7 @@ package data
 
 import (
 	"fmt"
-	"github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/jinzhu/gorm"
+	"github.com/jinzhu/gorm"
 	"github.com/code-mobi/tvthailand-api/youtube"
 	"log"
 	"sync"

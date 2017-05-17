@@ -3,7 +3,7 @@ package api2
 import (
 	"encoding/json"
 	"fmt"
-	_ "github.com/code-mobi/tvthailand-api/Godeps/_workspace/src/github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/code-mobi/tvthailand-api/utils"
 	"io/ioutil"
 	"log"
