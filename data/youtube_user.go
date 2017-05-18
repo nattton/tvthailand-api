@@ -16,11 +16,12 @@ type YoutubeUser struct {
 	Description string    `json:"description"`
 	UserType    string    `json:"userType"`
 	ProgramID   int       `json:"programId"`
-	BotEnabled  bool      `json:"botEnabled"`
+	BotEnabled  int       `json:"botEnabled"`
 	BotLimit    int       `json:"botLimit"`
 	BotDelay    int       `json:"-"`
-	Official    bool      `json:"isOfficial"`
+	Official    int       `json:"isOfficial"`
 	BotAt       time.Time `json:"-"`
+	BotThai     int       `json:"-"`
 	BotThaiAt   time.Time `json:"-"`
 
 	CreatedAt time.Time  `json:"-"`
@@ -60,7 +61,7 @@ func BotEnabledUsers(db *gorm.DB) (users []YoutubeUser, err error) {
 }
 
 func BotEnabledUsersThai(db *gorm.DB) (users []YoutubeUser, err error) {
-	err = db.Where("bot_enabled = ?", 1).Where("is_thai").Order("bot_thai_at").Find(&users).Error
+	err = db.Where("bot_enabled = ?", 1).Where("bot_thai = ?", 1).Order("bot_thai_at").Find(&users).Error
 	return
 }
 
