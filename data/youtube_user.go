@@ -80,10 +80,11 @@ func RunBotChannel(db *gorm.DB, channelId string, query string) {
 	user.RunBot(db, true, query, "")
 }
 
-func RunBotChannels(db *gorm.DB) {
+func RunBotChannels(db *gorm.DB, skipTime bool) {
 	users, _ := BotEnabledUsers(db)
 	for _, user := range users {
-		if time.Now().After(user.BotAt.Add(time.Duration(user.BotDelay) * time.Minute)) {
+		if skipTime ||
+			time.Now().After(user.BotAt.Add(time.Duration(user.BotDelay)*time.Minute)) {
 			fmt.Println(user.Description, user.ChannelID)
 			user.RunBot(db, false, "", "")
 			db.Model(&user).UpdateColumns(YoutubeUser{BotAt: time.Now()})
@@ -91,10 +92,11 @@ func RunBotChannels(db *gorm.DB) {
 	}
 }
 
-func RunBotChannelsThai(db *gorm.DB) {
+func RunBotChannelsThai(db *gorm.DB, skipTime bool) {
 	users, _ := BotEnabledUsersThai(db)
 	for _, user := range users {
-		if time.Now().After(user.BotThaiAt.Add(time.Duration(user.BotDelay) * time.Minute)) {
+		if skipTime ||
+			time.Now().After(user.BotThaiAt.Add(time.Duration(user.BotDelay)*time.Minute)) {
 			fmt.Println(user.Description, user.ChannelID)
 			user.RunBot(db, false, "", "")
 			db.Model(&user).UpdateColumns(YoutubeUser{BotThaiAt: time.Now()})

@@ -25,13 +25,13 @@ type CommandParam struct {
 	Query    string
 	Start    int
 	Stop     int
+	Skip     bool
 }
 
 var commandParam CommandParam
 
 func init() {
-	flag.StringVar(&commandParam.Command, "command", "", `runbotch [-channel] [-q]
-	runbotchthai
+	flag.StringVar(&commandParam.Command, "command", "", `runbotch, runbotchthai [-channel=CHANNEL_ID] [-q=QUERY] [-skip for skip time]
 	runbotpl [-playlist]
 	updateuser
 	migrate_botvideo`)
@@ -40,6 +40,7 @@ func init() {
 	flag.StringVar(&commandParam.Query, "q", "", "Query")
 	flag.IntVar(&commandParam.Start, "start", 0, "Start")
 	flag.IntVar(&commandParam.Stop, "stop", 0, "Stop")
+	flag.BoolVar(&commandParam.Skip, "skip", false, "Skip")
 	flag.Parse()
 }
 
@@ -144,10 +145,10 @@ func processCommand(cmd CommandParam) {
 		if commandParam.Channel != "" {
 			data.RunBotChannel(&dbg, commandParam.Channel, commandParam.Query)
 		} else {
-			data.RunBotChannels(&dbg)
+			data.RunBotChannels(&dbg, commandParam.Skip)
 		}
 	case "runbotchthai":
-		data.RunBotChannelsThai(&dbg)
+		data.RunBotChannelsThai(&dbg, commandParam.Skip)
 	case "runbotpl":
 		if commandParam.Playlist != "" {
 			data.RunBotPlaylist(&dbg, commandParam.Playlist)
