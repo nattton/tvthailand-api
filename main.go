@@ -31,7 +31,8 @@ type CommandParam struct {
 var commandParam CommandParam
 
 func init() {
-	flag.StringVar(&commandParam.Command, "command", "", `runbotch, runbotchthai [-channel=CHANNEL_ID] [-q=QUERY] [-skip for skip time]
+	flag.StringVar(&commandParam.Command, "command", "", `runbotch [-channel] [-q] [-skip]
+	runbotchthai [-skip]
 	runbotpl [-playlist]
 	updateuser
 	migrate_botvideo`)
@@ -40,7 +41,7 @@ func init() {
 	flag.StringVar(&commandParam.Query, "q", "", "Query")
 	flag.IntVar(&commandParam.Start, "start", 0, "Start")
 	flag.IntVar(&commandParam.Stop, "stop", 0, "Stop")
-	flag.BoolVar(&commandParam.Skip, "skip", false, "Skip")
+	flag.BoolVar(&commandParam.Skip, "skip", false, "Skip Time")
 	flag.Parse()
 }
 

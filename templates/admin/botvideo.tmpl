@@ -206,14 +206,13 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
         </div>
       </div>
       <br />
-      <label>Change status to : </label>
       <input type="submit" class="btn btn-danger" name="update_status" value="Rejected" />
+      <input type="button" class="btn btn-success" value="Wrap Up" ng-click="wrapUpVideoID()" />
+      <input type="button" class="btn btn-warning" value="Wrap Down" ng-click="wrapDownVideoID()" />
+      <span style="margin-left:20px"></span>
       <input type="submit" class="btn btn-primary" name="update_status" value="Waiting" />
       <input type="submit" class="btn btn-info" name="update_status" value="Updated" />
       <input type="submit" class="btn btn-warning" name="update_status" value="Suspended" />
-      <label>Action : </label>
-      <input type="button" class="btn btn-info" value="Wrap Up" ng-click="wrapUpVideoID()" />
-      <input type="button" class="btn btn-info" value="Wrap Down" ng-click="wrapDownVideoID()" />
       <a href="#bottom" class="btn btn-default pull-right" >Bottom</a>
       <table class="table table-striped">
         <thead>
