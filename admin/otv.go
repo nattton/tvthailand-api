@@ -117,6 +117,7 @@ func (o *Otv) updateModifiedDate(show *OtvShowListItem) (int64, error) {
 		return 0, nil
 	}
 	updateDate, _ := time.Parse(DateFMT, strDate)
+	updateDate = updateDate.Add(-7 * time.Hour)
 	if modifiedDate.After(updateDate) {
 		fmt.Println("ModifiedDate", modifiedDate, "After UpdateDate", updateDate)
 		result, err := o.Db.Exec("UPDATE shows SET update_date = ? WHERE otv_id = ?", show.ModifiedDate, show.ContentSeasonID)
