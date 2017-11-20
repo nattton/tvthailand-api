@@ -83,7 +83,7 @@ func (o *Otv) UpdateModified() []*OtvShowListItem {
 	c := o.getOtvCategory()
 	for _, cat := range c.Items {
 		fmt.Println("#####", cat.ID, cat.APIName, cat.NameEn, "#####")
-		if cat.ID != "5" {
+		if cat.ID != "5" || cat.ID != "2" {
 			s := o.getOtvShowList(cat.ID)
 			for _, show := range s.Items {
 				rowAffected, err := o.updateModifiedDate(show)
