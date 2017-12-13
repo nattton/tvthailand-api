@@ -144,22 +144,22 @@ func processCommand(cmd CommandParam) {
 	switch cmd.Command {
 	case "runbotch":
 		if commandParam.Channel != "" {
-			data.RunBotChannel(&dbg, commandParam.Channel, commandParam.Query)
+			data.RunBotChannel(dbg, commandParam.Channel, commandParam.Query)
 		} else {
-			data.RunBotChannels(&dbg, commandParam.Skip)
+			data.RunBotChannels(dbg, commandParam.Skip)
 		}
 	case "runbotchthai":
-		data.RunBotChannelsThai(&dbg, commandParam.Skip)
+		data.RunBotChannelsThai(dbg, commandParam.Skip)
 	case "runbotpl":
 		if commandParam.Playlist != "" {
-			data.RunBotPlaylist(&dbg, commandParam.Playlist)
+			data.RunBotPlaylist(dbg, commandParam.Playlist)
 		} else {
-			data.RunBotPlaylists(&dbg)
+			data.RunBotPlaylists(dbg)
 		}
 	case "updateuser":
-		data.UpdateUserChannel(&dbg)
+		data.UpdateUserChannel(dbg)
 	case "checkuser":
-		data.CheckActiveUser(&dbg)
+		data.CheckActiveUser(dbg)
 	case "krobkruakao":
 		admin.ExampleKrobkruakao()
 	case "botkrobkruakao":
@@ -179,7 +179,7 @@ func processCommand(cmd CommandParam) {
 		otv := &admin.Otv{Db: db}
 		otv.UpdateModified()
 	case "migrate_botvideo":
-		data.MigrateUsernameToChannelID(&dbg)
+		data.MigrateUsernameToChannelID(dbg)
 	}
 }
 

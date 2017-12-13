@@ -16,7 +16,7 @@ func OpenDB() (*sql.DB, error) {
 	return sql.Open("mysql", os.Getenv("DATABASE_DSN"))
 }
 
-func OpenGormDB() (gorm.DB, error) {
+func OpenGormDB() (*gorm.DB, error) {
 	db, err := gorm.Open("mysql", os.Getenv("DATABASE_DSN"))
 	db.LogMode(martini.Env == "development")
 	return db, err
