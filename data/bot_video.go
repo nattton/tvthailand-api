@@ -2,13 +2,14 @@ package data
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
-	"github.com/code-mobi/tvthailand-api/youtube"
 	"log"
 	"math"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/code-mobi/tvthailand-api/youtube"
+	"github.com/jinzhu/gorm"
 )
 
 type BotVideo struct {

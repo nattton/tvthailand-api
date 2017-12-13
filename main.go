@@ -134,6 +134,12 @@ func main() {
 }
 
 func processCommand(cmd CommandParam) {
+	db, err := utils.OpenDB()
+	if err != nil {
+		panic(err.Error())
+	}
+	defer db.Close()
+
 	dbg, err := utils.OpenGormDB()
 	if err != nil {
 		panic(err.Error())
@@ -180,6 +186,8 @@ func processCommand(cmd CommandParam) {
 		otv.UpdateModified()
 	case "migrate_botvideo":
 		data.MigrateUsernameToChannelID(dbg)
+	case "testlive":
+		api2.TestLive(db)
 	}
 }
 

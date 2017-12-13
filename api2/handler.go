@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/dropbox/godropbox/memcache"
-	"github.com/go-martini/martini"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/dropbox/godropbox/memcache"
+	"github.com/go-martini/martini"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 const cacheExpireTime = uint32(600)
@@ -122,7 +123,7 @@ func ChannelListHandler(db *sql.DB, client memcache.ClientShard, params martini.
 	}
 
 	channels := GetChannel(db)
-	result := &Channels{channels}
+	result := channels
 	b, err := json.Marshal(result)
 	if err != nil {
 		log.Println(err)
