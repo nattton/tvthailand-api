@@ -35,6 +35,7 @@ func UpdateUserChannel(db *gorm.DB) {
 	for _, user := range users {
 		y := youtube.NewYoutube()
 		user.ChannelID = y.ChannelIDByUser(user.Username)
+		user.BotThaiAt = time.Now()
 		fmt.Printf("Username, %s, ChannelID : %s\n", user.Username, user.ChannelID)
 		db.Save(&user)
 	}
