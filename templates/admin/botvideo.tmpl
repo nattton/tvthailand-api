@@ -81,7 +81,6 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
       var paramProgramID = "";
       var title = encodeURIComponent(video.title.replace("&quot;", "").replace("&#39;", "").replace("\"", "").replace("\'", ""));
       console.log(title);
-      title = encodeURIComponent(title);
       if (video.programId > 0) {
         paramProgramID = "&program_id=" + video.programId;
       }
