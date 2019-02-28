@@ -24,7 +24,7 @@ tvModule.controller('BotVideoCtrl', function ($scope, $http) {
         $scope.sumID += ","
       }
       $scope.sumID += video.videoId;
-      $scope.sumTitle = video.title;
+      $scope.sumTitle = video.title.replace(/&quot;/g, "").replace(/&#39;/g, "");;
       $scope.countSumID = $scope.sumID.split(",").length
       if (video.videoType == "youtube") {
         $scope.srcType = 0;
