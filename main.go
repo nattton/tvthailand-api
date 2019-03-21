@@ -62,12 +62,6 @@ func main() {
 	}
 	defer db.Close()
 
-	dbg, err := utils.OpenGormDB()
-	if err != nil {
-		panic(err.Error())
-	}
-	defer dbg.Close()
-
 	// conn, err := net.Dial("tcp", os.Getenv("MEMCACHED_SERVER"))
 	// if err != nil {
 	// 	panic(err.Error())
@@ -76,7 +70,6 @@ func main() {
 
 	m := martini.Classic()
 	m.Map(db)
-	m.Map(dbg)
 	// m.Map(client)
 	m.Use(render.Renderer(render.Options{
 		Directory:  "templates",

@@ -8,13 +8,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-martini/martini"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/gorm"
-	"github.com/martini-contrib/render"
 	"github.com/code-mobi/tvthailand-api/data"
 	"github.com/code-mobi/tvthailand-api/utils"
 	"github.com/code-mobi/tvthailand-api/youtube"
+	"github.com/go-martini/martini"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/martini-contrib/render"
 )
 
 const MThaiPlayerURL = "http://video.mthai.com/cool/player/%s.html"
@@ -186,7 +185,13 @@ func OtvProcessHandler(db *sql.DB, r render.Render, req *http.Request) {
 
 }
 
-func BotVideoHandler(db gorm.DB, r render.Render, req *http.Request) {
+func BotVideoHandler(r render.Render, req *http.Request) {
+	dbg, err := utils.OpenGormDB()
+	if err != nil {
+		panic(err.Error())
+	}
+	defer dbg.Close()
+
 	username := req.FormValue("channelId")
 	q := req.FormValue("q")
 	status, _ := strconv.Atoi(req.FormValue("status"))
@@ -195,7 +200,7 @@ func BotVideoHandler(db gorm.DB, r render.Render, req *http.Request) {
 	formSearch := data.FormSearchBotUser{username, q, status, int32(page), isOrderTitle}
 
 	botStatuses := data.GetBotVideoStatuses(formSearch.Status)
-	botUsers := data.GetBotVideoUsers(&db, formSearch.ChannelID)
+	botUsers := data.GetBotVideoUsers(dbg, formSearch.ChannelID)
 	// botVideos := b.getBotVideos(formSearch)
 
 	newmap := map[string]interface{}{
@@ -208,7 +213,13 @@ func BotVideoHandler(db gorm.DB, r render.Render, req *http.Request) {
 	r.HTML(200, "admin/botvideo", newmap)
 }
 
-func BotVideoPostHandler(db gorm.DB, r render.Render, req *http.Request) {
+func BotVideoPostHandler(r render.Render, req *http.Request) {
+	dbg, err := utils.OpenGormDB()
+	if err != nil {
+		panic(err.Error())
+	}
+	defer dbg.Close()
+
 	if err := req.ParseForm(); err != nil {
 		//handle error http.Error() for example
 		return
@@ -216,12 +227,18 @@ func BotVideoPostHandler(db gorm.DB, r render.Render, req *http.Request) {
 
 	botVideos := req.Form["bot_video[]"]
 	updateStatus := req.FormValue("update_status")
-	data.SetBotVideosStatus(&db, botVideos, updateStatus)
+	data.SetBotVideosStatus(dbg, botVideos, updateStatus)
 
-	BotVideoHandler(db, r, req)
+	BotVideoHandler(r, req)
 }
 
-func BotVideoJSONHandler(db gorm.DB, r render.Render, req *http.Request) {
+func BotVideoJSONHandler(r render.Render, req *http.Request) {
+	dbg, err := utils.OpenGormDB()
+	if err != nil {
+		panic(err.Error())
+	}
+	defer dbg.Close()
+
 	channelId := req.FormValue("channelId")
 	q := req.FormValue("q")
 	status, _ := strconv.Atoi(req.FormValue("status"))
@@ -235,7 +252,7 @@ func BotVideoJSONHandler(db gorm.DB, r render.Render, req *http.Request) {
 		IsOrderTitle: isOrderTitle,
 	}
 
-	botVideos := data.GetBotVideos(&db, formSearch)
+	botVideos := data.GetBotVideos(dbg, formSearch)
 	r.JSON(200, botVideos)
 }
 

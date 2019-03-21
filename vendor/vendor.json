@@ -9,109 +9,109 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "wJJ1dqFYclMAr+7um4GKKgRbOIg=",
+			"checksumSHA1": "3CNCNy1epgvyaaqvIqdcnB4Bx54=",
 			"path": "github.com/PuerkitoBio/goquery",
 			"revision": "b4440419d81240f8451a505b2f806c853bc2befc",
 			"revisionTime": "2015-06-06T02:16:32Z"
 		},
 		{
-			"checksumSHA1": "YKJEHQmesxr6ExwGE4WZrpQsq4s=",
+			"checksumSHA1": "X9r5gpnkfBN90eD4jOfGVrmCZ5o=",
 			"path": "github.com/andybalholm/cascadia",
 			"revision": "3ad29d1ad1c4f2023e355603324348cf1f4b2d48",
 			"revisionTime": "2015-07-30T17:44:59Z"
 		},
 		{
-			"checksumSHA1": "fcfxNsCuheCrubAAl6zWgimCnLY=",
+			"checksumSHA1": "1Hm7Ij3YHAqBbxLCcGr4NKbI6e0=",
 			"path": "github.com/codegangsta/inject",
 			"revision": "33e0aa1cb7c019ccc3fbe049a8262a6403d30504",
 			"revisionTime": "2015-01-14T23:56:00Z"
 		},
 		{
-			"checksumSHA1": "fBUtVZp1OtthaENWllE+SuRSlQI=",
+			"checksumSHA1": "I5Bma2e43Ngf85tUlNt7cj3HJ7s=",
 			"path": "github.com/dropbox/godropbox/container/set",
 			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
 			"revisionTime": "2015-06-14T20:43:22Z"
 		},
 		{
-			"checksumSHA1": "D01pEBxbZJkpILyIqBWEJKdW0tI=",
+			"checksumSHA1": "MTBxL++DliQ/qzgsyc70+uaB3PU=",
 			"path": "github.com/dropbox/godropbox/errors",
 			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
 			"revisionTime": "2015-06-14T20:43:22Z"
 		},
 		{
-			"checksumSHA1": "NHjH+3yPweWW3ciCEn1pIPV9IDQ=",
+			"checksumSHA1": "N+1RgrKFOyulgDEqTzUfAksIyOY=",
 			"path": "github.com/dropbox/godropbox/math2/rand2",
 			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
 			"revisionTime": "2015-06-14T20:43:22Z"
 		},
 		{
-			"checksumSHA1": "Xrq7kGulcMpHFRgltCuZ7U7ZPfU=",
+			"checksumSHA1": "VmohRkZAkcZAqOWzU/ZE1f+DYOk=",
 			"path": "github.com/dropbox/godropbox/memcache",
 			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
 			"revisionTime": "2015-06-14T20:43:22Z"
 		},
 		{
-			"checksumSHA1": "z88e5fBSm1gXDIBficSPZa2YEYM=",
+			"checksumSHA1": "vKVFVOHlnzqkuYnB2KG/K3Q4s0A=",
 			"path": "github.com/dropbox/godropbox/net2",
 			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
 			"revisionTime": "2015-06-14T20:43:22Z"
 		},
 		{
-			"checksumSHA1": "RFUWKWL9AbeUEbUVA5AVfF0nTog=",
+			"checksumSHA1": "w0BKOGSfw1O7aDpoWA0BIb8H+Bo=",
 			"path": "github.com/dropbox/godropbox/resource_pool",
 			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
 			"revisionTime": "2015-06-14T20:43:22Z"
 		},
 		{
-			"checksumSHA1": "wDzTl3GN/GFGJr2dUjWxhccKo0Q=",
+			"checksumSHA1": "DeXQfNC1AyQIMqXVl/I5XpJz5fU=",
 			"path": "github.com/dropbox/godropbox/singleton",
 			"revision": "92b6613c66891772ad35862e247d4b3d548aa0ce",
 			"revisionTime": "2015-06-14T20:43:22Z"
 		},
 		{
-			"checksumSHA1": "aIb20NobDZnQMGJzDAHh0fDuOEg=",
+			"checksumSHA1": "KzSrcxUDg+p3I7qKJLF2wr1U5So=",
 			"path": "github.com/facebookgo/httpcontrol",
 			"revision": "ccde4420e1fee9af5da365cb76075b95683f39a6",
 			"revisionTime": "2015-07-08T23:40:01Z"
 		},
 		{
-			"checksumSHA1": "QiuVDlWvnw3iG//vyUmoOZsy0e0=",
+			"checksumSHA1": "AtI2wKvKTag/BASZPcdTd/KAjis=",
 			"path": "github.com/go-martini/martini",
-			"revision": "9987fc59f060a063247d22472c2fb48654bac5f6",
-			"revisionTime": "2015-09-26T14:07:23Z"
+			"revision": "22fa46961aabd2665cf3f1343b146d20028f5071",
+			"revisionTime": "2017-01-21T21:58:54Z"
 		},
 		{
-			"checksumSHA1": "rAnxK4LbUVYQh6VwXkq/89JaroY=",
+			"checksumSHA1": "XA/Y442W+yy5caVwS8AlMKH+6Cs=",
 			"path": "github.com/go-sql-driver/mysql",
 			"revision": "cd4cb909ce1a31435164be29bf3682031f61539a",
 			"revisionTime": "2017-11-17T11:51:24Z"
 		},
 		{
-			"checksumSHA1": "eljaapCfm6h09IEjd97AM9Pdeuo=",
+			"checksumSHA1": "mNJq17mONQsTfEIjjTc6pnbUYRs=",
 			"path": "github.com/jinzhu/gorm",
-			"revision": "b1885a643b4977c9089d77eb07c0fd96591f94b8",
-			"revisionTime": "2017-09-04T14:39:19Z"
+			"revision": "8b07437717e71c2ff00602ae19f8353ba10aafbb",
+			"revisionTime": "2019-03-10T12:17:21Z"
 		},
 		{
-			"checksumSHA1": "VIp1lZm6joWhlNdwhady8u//qRw=",
+			"checksumSHA1": "tUQ1pHvWxAcPFmveZtlmCR9H4TY=",
 			"path": "github.com/jinzhu/inflection",
 			"revision": "1c35d901db3da928c72a72d8458480cc9ade058f",
 			"revisionTime": "2017-01-02T12:52:26Z"
 		},
 		{
-			"checksumSHA1": "W5s3U0jYcwRrdjGydZQz4bWzRYs=",
+			"checksumSHA1": "SP+qB55MLwm47Uzfh6RxVN0iciY=",
 			"path": "github.com/martini-contrib/auth",
 			"revision": "fa62c19b7ae87da370242054c8beb11af31d327f",
 			"revisionTime": "2015-02-19T11:46:09Z"
 		},
 		{
-			"checksumSHA1": "WMoHBLFJLLvhzbnatHIY+SgrrFI=",
+			"checksumSHA1": "uJN0FNyB7HFq8yhTpm2NF2bwryE=",
 			"path": "github.com/martini-contrib/render",
 			"revision": "ec18f8345a1181146728238980606fb1d6f40e8c",
 			"revisionTime": "2015-07-07T14:21:08Z"
 		},
 		{
-			"checksumSHA1": "uG/irJIgifYdc+HC1kF6Gwgn7kU=",
+			"checksumSHA1": "TYrGVoBHMTlUR/AEw/p0elo+lQY=",
 			"path": "github.com/oxtoacart/bpool",
 			"revision": "4e1c5567d7c2dd59fa4c7c83d34c2f3528b025d6",
 			"revisionTime": "2015-07-12T13:31:11Z"

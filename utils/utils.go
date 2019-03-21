@@ -19,6 +19,7 @@ func OpenDB() (*sql.DB, error) {
 func OpenGormDB() (*gorm.DB, error) {
 	db, err := gorm.Open("mysql", os.Getenv("DATABASE_DSN"))
 	db.LogMode(martini.Env == "development")
+
 	return db, err
 }
 
