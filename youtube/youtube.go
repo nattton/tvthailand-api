@@ -41,18 +41,23 @@ type PageInfo struct {
 }
 
 type Item struct {
-	ID      ItemID  `json:"id"`
-	Snippet Snippet `json:"snippet"`
+	ContentDetails ContentDetails `json:"contentDetails"`
+	Snippet        Snippet        `json:"snippet"`
 }
 
-type ItemID struct {
+type ContentDetails struct {
+	Upload     Upload     `json:"upload"`
+	ResourceID ResourceID `json:"resourceId"`
+}
+
+type Upload struct {
 	VideoID string `json:"videoId"`
 }
 
 type Snippet struct {
-	Title       string     `json:"title"`
-	PublishedAt string     `json:"publishedAt"`
-	ResourceID  ResourceID `json:"resourceId"`
+	Title       string `json:"title"`
+	PublishedAt string `json:"publishedAt"`
+	Type        string `json:"type"`
 }
 
 type YoutubePlaylist struct {

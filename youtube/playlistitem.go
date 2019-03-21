@@ -46,10 +46,10 @@ func (y *Youtube) GetVideoByPlaylistID(channelId string, playlistID string, botL
 	prevPageToken = api.PrevPageToken
 	nextPageToken = api.NextPageToken
 	if len(api.Items) > 0 {
-		for _, item := range api.Items {
-			youtubeVideo := &YoutubeVideo{channelId, item.Snippet.ResourceID.VideoID, item.Snippet.Title, item.Snippet.PublishedAt, 0}
-			youtubeVideos = append(youtubeVideos, youtubeVideo)
-		}
+		// for _, item := range api.Items {
+		// youtubeVideo := &YoutubeVideo{channelId, item.Snippet.ResourceID.VideoID, item.Snippet.Title, item.Snippet.PublishedAt, 0}
+		// youtubeVideos = append(youtubeVideos, youtubeVideo)
+		// }
 	}
 	totalResults = api.PageInfo.TotalResults
 	return

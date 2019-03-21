@@ -54,7 +54,7 @@ func AddBotVideoChannel(db *gorm.DB, wg *sync.WaitGroup, throttle chan int, user
 		log.Fatal(err)
 	}
 
-	videoID := item.ID.VideoID
+	videoID := item.ContentDetails.Upload.VideoID
 	botVideo, _ := GetBotVideoByVideoID(db, videoID)
 	if botVideo.ID == 0 {
 		if CheckExistingVideoInEpisode(db, videoID) {
@@ -77,36 +77,36 @@ func AddBotVideoChannel(db *gorm.DB, wg *sync.WaitGroup, throttle chan int, user
 
 func AddBotVideoPlaylist(db *gorm.DB, wg *sync.WaitGroup, throttle chan int, pl YoutubePlaylist, item youtube.PlaylistItem) {
 	defer wg.Done()
-	status := 0
-	publishedAt, err := time.Parse(time.RFC3339Nano, item.Snippet.PublishedAt)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// status := 0
+	// publishedAt, err := time.Parse(time.RFC3339Nano, item.Snippet.PublishedAt)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	videoID := item.Snippet.ResourceID.VideoID
-	botVideo, _ := GetBotVideoByVideoID(db, videoID)
-	if botVideo.ID == 0 {
-		if CheckExistingVideoInEpisode(db, videoID) {
-			status = 1
-		}
-		botVideo = BotVideo{
-			ChannelID:   pl.ChannelID,
-			PlaylistID:  pl.PlaylistID,
-			Title:       item.Snippet.Title,
-			VideoID:     videoID,
-			VideoType:   "youtube",
-			PublishedAt: publishedAt,
-			Status:      status,
-		}
-		db.Create(&botVideo)
-	} else {
-		if botVideo.PlaylistID == "" {
-			botVideo.PlaylistID = item.ID
-			db.Save(&botVideo)
-		}
-	}
+	// // videoID := item.Snippet.ResourceID.VideoID
+	// botVideo, _ := GetBotVideoByVideoID(db, videoID)
+	// if botVideo.ID == 0 {
+	// 	if CheckExistingVideoInEpisode(db, videoID) {
+	// 		status = 1
+	// 	}
+	// 	botVideo = BotVideo{
+	// 		ChannelID:   pl.ChannelID,
+	// 		PlaylistID:  pl.PlaylistID,
+	// 		Title:       item.Snippet.Title,
+	// 		VideoID:     videoID,
+	// 		VideoType:   "youtube",
+	// 		PublishedAt: publishedAt,
+	// 		Status:      status,
+	// 	}
+	// 	db.Create(&botVideo)
+	// } else {
+	// 	if botVideo.PlaylistID == "" {
+	// 		botVideo.PlaylistID = item.ID
+	// 		db.Save(&botVideo)
+	// 	}
+	// }
 
-	fmt.Println(botVideo.ChannelID, botVideo.Title, botVideo.PublishedAt)
+	// fmt.Println(botVideo.ChannelID, botVideo.Title, botVideo.PublishedAt)
 	<-throttle
 }
 

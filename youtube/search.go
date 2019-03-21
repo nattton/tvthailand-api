@@ -3,18 +3,20 @@ package youtube
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/facebookgo/httpcontrol"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/facebookgo/httpcontrol"
 )
 
-const YoutubeSearchAPIURL = "https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&q=%s&part=snippet&fields=prevPageToken,nextPageToken,pageInfo,items(id(videoId),snippet(title,publishedAt,channelTitle))&order=date&maxResults=%d&pageToken=%s"
+// const YoutubeSearchAPIURL = "https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&q=%s&part=snippet&fields=prevPageToken,nextPageToken,pageInfo,items(id(videoId),snippet(title,publishedAt,channelTitle))&order=date&maxResults=%d&pageToken=%s"
+const YoutubeSearchAPIURL = "https://www.googleapis.com/youtube/v3/activities?key=%s&channelId=%s&q=%s&part=snippet,contentDetails&fields=items(contentDetails,kind,snippet(channelId,description,publishedAt,title,type)),nextPageToken,pageInfo,prevPageToken&maxResults=%d&pageToken=%s"
 
 func (y *Youtube) GetVideoJsonByChannelID(channelID string, query string, botLimit int, pageToken string) (api YoutubeAPI, err error) {
-	apiURL := fmt.Sprintf(YoutubeSearchAPIURL, y.apiKey, channelID, url.QueryEscape(query), botLimit, pageToken)
+	apiURL := fmt.Sprintf(YoutubeSearchAPIURL, y.apiKey, channelID, url.QueryEscape(query), 50, pageToken)
 	fmt.Println(apiURL)
 	client := &http.Client{
 		Transport: &httpcontrol.Transport{
@@ -47,8 +49,10 @@ func (y *Youtube) GetVideoByChannelID(channelID string, q string, botLimit int, 
 	nextPageToken = api.NextPageToken
 	if len(api.Items) > 0 {
 		for _, item := range api.Items {
-			youtubeVideo := &YoutubeVideo{channelID, item.ID.VideoID, item.Snippet.Title, item.Snippet.PublishedAt, 0}
-			youtubeVideos = append(youtubeVideos, youtubeVideo)
+			if item.Snippet.Type == "upload" {
+				youtubeVideo := &YoutubeVideo{channelID, item.ContentDetails.Upload.VideoID, item.Snippet.Title, item.Snippet.PublishedAt, 0}
+				youtubeVideos = append(youtubeVideos, youtubeVideo)
+			}
 		}
 	}
 	totalResults = api.PageInfo.TotalResults
