@@ -55,9 +55,10 @@ type Upload struct {
 }
 
 type Snippet struct {
-	Title       string `json:"title"`
-	PublishedAt string `json:"publishedAt"`
-	Type        string `json:"type"`
+	Title       string     `json:"title"`
+	PublishedAt string     `json:"publishedAt"`
+	Type        string     `json:"type"`
+	ResourceID  ResourceID `json:"resourceId"`
 }
 
 type YoutubePlaylist struct {
